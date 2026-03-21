@@ -341,3 +341,5 @@ healthchecksdb
 
 Directory.Build.props.user
 wspp/
+
+decompiled/*
