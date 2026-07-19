@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using MessengerRando.Archipelago;
 using MessengerRando.Utils.Constants;
 using UnityEngine;
+using Logger = MessengerRando.Utils.Logger;
 
 namespace MessengerRando.GameOverrideManagers;
 
 public static class RandoPortalManager
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(RandoPortalManager));
     public readonly struct Portal
     {
         public readonly int Region;
@@ -403,9 +405,9 @@ public static class RandoPortalManager
 
     private static LevelConstants.RandoLevel GetPortalExit(string enteredPortal)
     {
-        Console.WriteLine($"getting portal. entered {enteredPortal}");
+        logger.Log("Getting portal. Entered: {0}", enteredPortal);
         var portalExit = PortalMapping[Portals.IndexOf(enteredPortal)];
-        Console.WriteLine($"{portalExit.Region}, {portalExit.PortalType}, {portalExit.Index}");
+        logger.Log("Portal Exit: {0}, {1}, {2}", portalExit.Region, portalExit.PortalType, portalExit.Index);
         return AreaCheckpoints[portalExit.Region][portalExit.PortalType][portalExit.Index];
     }
 
@@ -416,7 +418,7 @@ public static class RandoPortalManager
                 new LevelConstants.Transition(ELevel.Level_13_TowerOfTimeHQ,
                     currentLevel), out var portal))
         {
-            Console.WriteLine($"unable to find portal for {currentLevel}");
+            logger.Log("Unable to find portal for {0}", currentLevel);
         }
         else
         {
@@ -456,7 +458,7 @@ public static class RandoPortalManager
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                logger.Log("Error while teleporting: {0}", e);
             }
         }
 
@@ -465,10 +467,10 @@ public static class RandoPortalManager
 
     public static void LeaveHQ(On.TotHQ.orig_LeaveToLevel orig, TotHQ self, bool playLevelMusic, bool loadingNewLevel)
     {
-        Console.WriteLine("leaving hq...");
+        logger.Log("Leaving HQ...");
         LeftHQPortal = true;
         ForceTeleport = !loadingNewLevel;
-        Console.WriteLine($"Force teleport: {ForceTeleport}");
+        logger.Log("Force teleport: {0}", ForceTeleport);
         orig(self, playLevelMusic, loadingNewLevel);
     }
 
@@ -476,7 +478,7 @@ public static class RandoPortalManager
     {
         try
         {
-            Console.WriteLine("Left ToT through portal.");
+            logger.Log("Left ToT through portal.");
             orig(self);
 
             if (!PortalShuffleEnabled)
@@ -487,8 +489,7 @@ public static class RandoPortalManager
         }
         catch (Exception e)
         {
-            Console.Write("Error in TowerOfTimePortal_LoadLevel");
-            Console.WriteLine(e);
+            logger.Log("Error in TowerOfTimePortal_LoadLevel: {0}", e);
         }
     }
 

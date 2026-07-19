@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Archipelago.MultiClient.Net.Enums;
 using MessengerRando.GameOverrideManagers;
+using MessengerRando.Utils;
 
 namespace MessengerRando.Archipelago;
 
 public class TrackerManager
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(TrackerManager));
 
     private List<string> VisitedEntrances = [];
-
 
     public void AddVisitedEntrance(string entrance)
     {
@@ -20,7 +20,7 @@ public class TrackerManager
         VisitedEntrances = ArchipelagoClient.Session.DataStorage[Scope.Slot, "VisitedEntrances"].To<List<string>>() ?? [];
         if (VisitedEntrances.Contains(entrance)) return;
 
-        Console.WriteLine("Adding visited entrance: " + entrance);
+        logger.Log("Adding visited entrance: {0}", entrance);
         VisitedEntrances.Add(entrance);
         VisitedEntrances.Sort();
         ArchipelagoClient.Session.DataStorage[Scope.Slot, "VisitedEntrances"] = VisitedEntrances;
@@ -38,7 +38,7 @@ public class TrackerManager
 
         var unlockedPortalsList = unlockedPortals.ToList();
         unlockedPortalsList.Sort();
-        Console.WriteLine($"Updating unlocked portals with Data Storage. Unlocked portals are\n\t{string.Join("\n\t", [.. unlockedPortalsList])}");
+        logger.Log("Updating unlocked portals with Data Storage. Unlocked portals are\n\t{0}", string.Join("\n\t", [.. unlockedPortalsList]));
         ArchipelagoClient.Session.DataStorage[Scope.Slot, "UnlockedPortals"] = unlockedPortalsList;
     }
 
