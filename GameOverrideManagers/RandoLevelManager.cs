@@ -20,28 +20,24 @@ public static class RandoLevelManager
     public static Dictionary<string, LevelConstants.RandoLevel> RandoLevelMapping;
     public static TrackerManager TrackerManager;
 
+    [SafeHook(callOrigOnError: true)]
     public static void LoadLevel(On.LevelManager.orig_LoadLevel orig, LevelManager self, LevelLoadingInfo levelInfo)
     {
         Console.WriteLine($"Current Level: {Manager<LevelManager>.Instance.GetCurrentLevelEnum()}");
         Console.WriteLine($"Loading Level: {levelInfo.levelName}");
         Console.WriteLine($"Entrance ID: {levelInfo.levelEntranceId}, Dimension: {levelInfo.dimension}");
-        try
+
+        if (!teleporting)
         {
-            if (!teleporting)
-            {
-                lastLevel = Manager<LevelManager>.Instance.GetCurrentLevelEnum();
-                var levelName = levelInfo.levelName.Contains("_Build")
-                    ? levelInfo.levelName.Replace("_Build", "")
-                    : levelInfo.levelName;
-                currentLevel = Manager<LevelManager>.Instance.GetLevelEnumFromLevelName(levelName);
-            }
-            // Console.WriteLine(lastLevel);
-            // Console.WriteLine(currentLevel);
+            lastLevel = Manager<LevelManager>.Instance.GetCurrentLevelEnum();
+            var levelName = levelInfo.levelName.Contains("_Build")
+                ? levelInfo.levelName.Replace("_Build", "")
+                : levelInfo.levelName;
+            currentLevel = Manager<LevelManager>.Instance.GetLevelEnumFromLevelName(levelName);
         }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
+        // Console.WriteLine(lastLevel);
+        // Console.WriteLine(currentLevel);
+
         orig(self, levelInfo);
     }
 

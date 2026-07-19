@@ -119,6 +119,8 @@
     <Compile Include="Utils\Menus\RandoMenu.cs" />
     <Compile Include="Utils\OptionsExporter.cs" />
     <Compile Include="Utils\ReflectionHelpers.cs" />
+    <Compile Include="Utils\SafeHook.cs" />
+    <Compile Include="Utils\SafeHookAttribute.cs" />
     <Compile Include="Utils\SeedGenerator.cs" />
     <Compile Include="Utils\Constants\BossConstants.cs" />
     <Compile Include="Utils\Constants\LevelConstants.cs" />
