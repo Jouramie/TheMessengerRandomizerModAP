@@ -3,12 +3,12 @@ using System.IO;
 using MessengerRando.Archipelago;
 using MessengerRando.GameOverrideManagers;
 using Tommy;
-using UnityEngine;
 
 namespace MessengerRando.Utils;
 
 public static class UserConfig
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(UserConfig));
     private static string configFileName = "APConfig.toml";
     public static string HostName = "archipelago.gg";
     public static int Port = 38281;
@@ -50,8 +50,7 @@ public static class UserConfig
         }
         catch (Exception e)
         {
-            Debug.Log(e);
-            Debug.Log("failed to get status size as float, trying int");
+            logger.Exception(e, "Failed to get status size as float, trying int");
             StatusTextSize = configTable.get_Item("status_text_size").AsInteger.Value;
         }
 
@@ -61,8 +60,7 @@ public static class UserConfig
         }
         catch (Exception e)
         {
-            Debug.Log(e);
-            Debug.Log("failed to get message size as float, trying int");
+            logger.Exception(e, "Failed to get message size as float, trying int");
             MessageTextSize = configTable.get_Item("message_text_size").AsInteger.Value;
         }
 
@@ -395,6 +393,9 @@ public static class UserConfig
             configTable.ToTomlString(writer);
             writer.Flush();
         }
-        catch (Exception e) { Console.Write(e); }
+        catch (Exception e)
+        {
+            logger.Exception(e);
+        }
     }
 }

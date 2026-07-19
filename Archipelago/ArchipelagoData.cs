@@ -9,6 +9,7 @@ namespace MessengerRando.Archipelago;
 
 public class ArchipelagoData
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(ArchipelagoData));
     public string Uri = "archipelago.gg";
     public int Port = 38281;
     public string SlotName = "";
@@ -26,7 +27,7 @@ public class ArchipelagoData
 
     public void StartNewSeed()
     {
-        Console.WriteLine("Creating new seed data");
+        logger.Log("Creating new seed data");
         Index = ArchipelagoClient.OfflineReceivedItems;
         PowerSealsCollected = 0;
         DefeatedBosses = [];
@@ -43,7 +44,7 @@ public class ArchipelagoData
     public static bool LoadData(int slot)
     {
         if (ArchipelagoClient.Offline) return false;
-        Console.WriteLine($"Loading Archipelago data for slot {slot}");
+        logger.Log($"Loading Archipelago data for slot {slot}");
         ArchipelagoClient.ServerData ??= new ArchipelagoData();
         return ArchipelagoClient.ServerData.loadData(slot);
     }
@@ -75,16 +76,16 @@ public class ArchipelagoData
                     ThreadPool.QueueUserWorkItem(_ =>
                         ArchipelagoClient.Session.Locations.CompleteLocationChecksAsync(null,
                             CheckedLocations.ToArray()));
-                    Console.WriteLine("connected from main menu, but continuing a seed.");
-                    Console.WriteLine($"items in remote queue: {ArchipelagoClient.ItemQueue.Count}");
-                    Console.WriteLine($"saved index: {Index}");
+                    logger.Log("connected from main menu, but continuing a seed.");
+                    logger.Log($"items in remote queue: {ArchipelagoClient.ItemQueue.Count}");
+                    logger.Log($"saved index: {Index}");
                     while (ArchipelagoClient.ItemQueue.Count > 0 && i < Index)
                     {
                         ArchipelagoClient.ItemQueue.Dequeue();
                         i += 1;
                     }
 
-                    Console.WriteLine($"Setting index to {ArchipelagoClient.OfflineReceivedItems}");
+                    logger.Log($"Setting index to {ArchipelagoClient.OfflineReceivedItems}");
                     Index = ArchipelagoClient.OfflineReceivedItems;
                     RandomizerStateManager.OnMainMenu = false;
                     // reconnect
@@ -101,7 +102,7 @@ public class ArchipelagoData
             Password = tempServerData.Password;
             SeedName = tempServerData.SeedName;
             Index = tempServerData.Index;
-            Console.WriteLine($"saved index: {Index}");
+            logger.Log($"saved index: {Index}");
             PowerSealsCollected = tempServerData.PowerSealsCollected;
             CheckedLocations = tempServerData.CheckedLocations ?? [];
             RandoBossManager.DefeatedBosses = DefeatedBosses = tempServerData.DefeatedBosses ?? [];
@@ -111,10 +112,10 @@ public class ArchipelagoData
             AvailableTeleports = tempServerData.AvailableTeleports ?? [false, false];
 
             //Attempt to connect to the server and save the new data
-            Console.WriteLine("Rando save found!");
+            logger.Log("Rando save found!");
             if (Uri == "offline")
             {
-                Console.WriteLine("continuing offline seed");
+                logger.Log("continuing offline seed");
                 RandomizerStateManager.InitializeSeed();
                 return ArchipelagoClient.HasConnected = ArchipelagoClient.Offline = true;
             }
@@ -130,7 +131,7 @@ public class ArchipelagoData
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.ToString());
+            logger.Exception(ex);
             return false;
         }
     }

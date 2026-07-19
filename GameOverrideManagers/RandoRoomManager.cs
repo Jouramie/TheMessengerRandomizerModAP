@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MessengerRando.Archipelago;
 using MessengerRando.Utils.Constants;
 using WebSocketSharp;
+using Logger = MessengerRando.Utils.Logger;
 
 namespace MessengerRando.GameOverrideManagers;
 
 public static class RandoRoomManager
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(RandoRoomManager));
     public static bool RoomRando;
     private static bool roomOverride;
     private static Dictionary<string, string> roomMap; // old room name - new room name
@@ -28,7 +29,7 @@ public static class RandoRoomManager
 
     static bool IsBossRoom(string roomKey, out string bossName)
     {
-        Console.WriteLine($"Checking if {roomKey} is a boss room");
+        logger.Log("Checking if {0} is a boss room", roomKey);
         bossName = string.Empty;
         return roomKey != null && BossConstants.RoomToVanillaBoss.TryGetValue(roomKey, out bossName) &&
                BossConstants.BossLocations.TryGetValue(bossName, out var bossLocation) &&
@@ -42,19 +43,16 @@ public static class RandoRoomManager
     {
         var oldRoomKey = GetRoomKey(leftEdge, rightEdge, bottomEdge, topEdge);
 #if DEBUG
-        Console.WriteLine("Changing rooms.");
-        Console.WriteLine($"Last Level: {Manager<LevelManager>.Instance.lastLevelLoaded}");
-        Console.WriteLine($"Current Level: {Manager<LevelManager>.Instance.GetCurrentLevelEnum()}");
-        Console.WriteLine($"new roomKey: {oldRoomKey}");
-        Console.WriteLine(self.CurrentRoom != null
+        logger.Log("Changing rooms.");
+        logger.Log("Last Level: {0}", Manager<LevelManager>.Instance.lastLevelLoaded);
+        logger.Log("Current Level: {0}", Manager<LevelManager>.Instance.GetCurrentLevelEnum());
+        logger.Log("new roomKey: {0}", oldRoomKey);
+        logger.Log(self.CurrentRoom != null
             ? $"currentRoom roomKey: {self.CurrentRoom.roomKey}"
             : "currentRoom does not exist.");
-        Console.WriteLine($"teleported: {teleportedInRoom}");
+        logger.Log("teleported: {0}", teleportedInRoom);
         var position = Manager<PlayerManager>.Instance.Player.transform.position;
-        Console.WriteLine("Player position: " +
-                          $"{position.x} " +
-                          $"{position.y} " +
-                          $"{position.z}");
+        logger.Log("Player position: ({0} {1} {2})", position.x, position.y, position.z);
 #endif
         //This func checks if the new roomKey exists within levelRooms before changing and checks if currentRoom exists
         //if we're in a room, it leaves the current room then enters the new room with the teleported bool

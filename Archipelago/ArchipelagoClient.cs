@@ -6,19 +6,19 @@ using System.Threading;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Exceptions;
-using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.MessageLog.Messages;
 using Archipelago.MultiClient.Net.Packets;
 using MessengerRando.GameOverrideManagers;
 using MessengerRando.Utils;
 using Mod.Courier.UI;
-using UnityEngine;
 using static Mod.Courier.UI.TextEntryButtonInfo;
+using Logger = MessengerRando.Utils.Logger;
 
 namespace MessengerRando.Archipelago;
 
 public static class ArchipelagoClient
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(ArchipelagoClient));
     private const string ApVersion = "0.5.0";
     public static ArchipelagoData ServerData = new();
 
@@ -56,7 +56,7 @@ public static class ArchipelagoClient
     {
         if (attemptingConnection || Authenticated) return;
         attemptingConnection = true;
-        Debug.Log($"Connecting to {ServerData.Uri}:{ServerData.Port} as {ServerData.SlotName}");
+        logger.Log("Connecting to {0}:{1} as {2}", ServerData.Uri, ServerData.Port, ServerData.SlotName);
         ThreadPool.QueueUserWorkItem(_ => Connect(OnConnected));
     }
 
@@ -66,7 +66,7 @@ public static class ArchipelagoClient
         attemptingConnection = true;
         if (ServerData == null)
             ServerData = new ArchipelagoData();
-        Debug.Log($"Connecting to {ServerData.Uri}:{ServerData.Port} as {ServerData.SlotName}");
+        logger.Log("Connecting to {0}:{1} as {2}", ServerData.Uri, ServerData.Port, ServerData.SlotName);
         Connect(result => OnConnected(result, connectButton));
     }
 
@@ -90,7 +90,7 @@ public static class ArchipelagoClient
         successPopup.Init(outputText);
         successPopup.gameObject.SetActive(true);
         // Object.Destroy(successPopup.transform.Find("BigFrame").Find("SymbolsGrid").gameObject);
-        Console.WriteLine(outputText);
+        logger.Log(outputText);
         attemptingConnection = false;
     }
 
@@ -134,7 +134,7 @@ public static class ArchipelagoClient
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Error: {e}");
+            logger.Error("Error: {0}", e);
             return e.ToString();
         }
 
@@ -151,7 +151,7 @@ public static class ArchipelagoClient
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Error: {e}");
+            logger.Error("Error: {0}", e);
             return e.ToString();
         }
 
@@ -177,7 +177,7 @@ public static class ArchipelagoClient
         }
         catch (Exception e)
         {
-            Console.Write($"Error: {e}");
+            logger.Error("Error: {0}", e);
             result = new LoginFailure(e.GetBaseException().Message);
         }
 
@@ -201,7 +201,7 @@ public static class ArchipelagoClient
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                logger.Exception(e);
                 outputText =
                     "Something went wrong.\n" +
                     "Please submit a bug report with the log.txt, " +
@@ -227,7 +227,7 @@ public static class ArchipelagoClient
             outputText +=
                 failure.Errors.Aggregate(outputText, (current, error) => current + $"\n    {error}");
 
-            Console.WriteLine(outputText);
+            logger.Error(outputText);
 
             Authenticated = false;
             Disconnect();
@@ -266,13 +266,13 @@ public static class ArchipelagoClient
             hintMessage.Item.ColorizeLocation());
         colorizedMessage = colorizedMessage.Replace(hintMessage.Item.ItemDisplayName,
             hintMessage.Item.Colorize());
-        Console.WriteLine(colorizedMessage);
+        logger.Log(colorizedMessage);
         return colorizedMessage;
     }
 
     private static void OnMessageReceived(LogMessage message)
     {
-        Console.WriteLine(message.ToString());
+        logger.Log(message);
         if (FilterAPMessages)
         {
 
@@ -324,7 +324,7 @@ public static class ArchipelagoClient
                 }
                 else if (ItemsAndLocationsHandler.ShopLocation(location, out var shopLoc))
                 {
-                    Debug.Log($"collecting {shopLoc.LocationName} ({shopLoc.PrettyLocationName})");
+                    logger.Log("collecting {0} ({1})", shopLoc.LocationName, shopLoc.PrettyLocationName);
                     try
                     {
                         var shopID = (EShopUpgradeID)Enum.Parse(typeof(EShopUpgradeID), shopLoc.LocationName);
@@ -332,7 +332,7 @@ public static class ArchipelagoClient
                     }
                     catch (Exception e1)
                     {
-                        Debug.Log(e1);
+                        logger.Exception(e1);
                         try
                         {
                             var shopID = (EShopUpgradeID)Enum.Parse(typeof(EShopUpgradeID),
@@ -341,7 +341,7 @@ public static class ArchipelagoClient
                         }
                         catch (Exception e2)
                         {
-                            Debug.Log(e2);
+                            logger.Exception(e2);
                         }
                     }
                 }
@@ -354,58 +354,37 @@ public static class ArchipelagoClient
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                Console.WriteLine($"{Session.Locations.GetLocationNameFromId(location)}: {location}");
+                logger.Exception(e);
+                logger.Error("{0}: {1}", Session.Locations.GetLocationNameFromId(location), location);
             }
         }
     }
 
     public static void SyncEvents()
     {
-        Console.WriteLine("Checking datastorage events");
+        logger.Log("Checking datastorage events");
         foreach (var cutscene in Session.DataStorage[Scope.Slot, "Events"].To<List<string>>())
         {
-            Console.WriteLine(cutscene);
+            logger.Log(cutscene);
             Manager<ProgressionManager>.Instance.cutscenesPlayed.Add(cutscene);
         }
     }
 
-    private static void OnItemReceived(ReceivedItemsHelper helper)
-    {
-        var itemToUnlock = helper.DequeueItem();
-        Console.WriteLine($"helper index: {helper.Index}");
-        Console.WriteLine($"Saved index: {ServerData.Index}");
-        if (helper.Index <= ServerData.Index) return;
-
-        if (RandomizerStateManager.OnMainMenu)
-        {
-            OfflineReceivedItems++;
-        }
-        else
-        {
-            ServerData.Index++;
-        }
-
-        ItemQueue.Enqueue(itemToUnlock.ItemId);
-        if (itemToUnlock.Player != Session.ConnectionInfo.Slot)
-            DialogQueue.Enqueue(itemToUnlock.ToReadableString());
-    }
-
     private static void SessionErrorReceived(Exception e, string message)
     {
-        Console.WriteLine(message);
-        Console.WriteLine(e.GetBaseException().Message);
+        logger.Error(message);
+        logger.Exception(e);
     }
 
     private static void SessionSocketClosed(string reason)
     {
-        Console.WriteLine($"Connection to Archipelago lost: {reason}");
+        logger.Error("Connection to Archipelago lost: {0}", reason);
         Disconnect();
     }
 
     public static void Disconnect()
     {
-        Console.WriteLine("Disconnecting from server...");
+        logger.Log("Disconnecting from server...");
         Session?.Socket.Disconnect();
         Session = null;
         Authenticated = false;
@@ -425,7 +404,7 @@ public static class ArchipelagoClient
         if (DialogQueue.Count > 0)
         {
             var message = (string)DialogQueue.Dequeue();
-            Console.WriteLine(message);
+            logger.Log(message);
             DialogChanger.CreateDialogBox(message);
         }
 
@@ -433,7 +412,7 @@ public static class ArchipelagoClient
         if (Offline) return;
         if (!Authenticated)
         {
-            Console.WriteLine("Attempting to reconnect to Archipelago Server...");
+            logger.Log("Attempting to reconnect to Archipelago Server...");
             ThreadPool.QueueUserWorkItem(_ => ConnectAsync());
             return;
         }
@@ -449,7 +428,7 @@ public static class ArchipelagoClient
 
     public static void UpdateClientStatus(ArchipelagoClientState newState)
     {
-        Console.WriteLine($"Updating client status to {newState}");
+        logger.Log("Updating client status to {0}", newState);
         var statusUpdatePacket = new StatusUpdatePacket { Status = newState };
         Session.Socket.SendPacket(statusUpdatePacket);
     }
@@ -477,7 +456,7 @@ public static class ArchipelagoClient
             {
                 Disconnect();
             }
-            Debug.Log(e);
+            logger.Exception(e);
             return false;
         }
     }
@@ -500,7 +479,7 @@ public static class ArchipelagoClient
             {
                 Disconnect();
             }
-            Debug.Log(e);
+            logger.Exception(e);
             return false;
         }
     }

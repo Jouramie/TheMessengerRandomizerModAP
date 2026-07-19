@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
 using MessengerRando.Utils;
-using Mod.Courier;
 using UnityEngine;
 using WebSocketSharp;
+using Logger = MessengerRando.Utils.Logger;
 
 namespace MessengerRando.Archipelago;
 
 public class DeathLinkInterface
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(DeathLinkInterface));
     public DeathLinkService DeathLinkService;
     public PlayerController Player;
     private readonly List<DeathLink> deathLinks = new List<DeathLink>();
@@ -26,7 +27,7 @@ public class DeathLinkInterface
     {
         try
         {
-            Console.WriteLine($"Initializing death link service... Should be set to {ArchipelagoData.DeathLink}");
+            logger.Log("Initializing death link service... Should be set to {0}", ArchipelagoData.DeathLink);
             DeathLinkService = ArchipelagoClient.Session.CreateDeathLinkService();
             DeathLinkService.OnDeathLinkReceived += DeathLinkReceived;
             GenerateFunnyCauses();
@@ -38,7 +39,7 @@ public class DeathLinkInterface
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.Exception(e);
         }
     }
 
@@ -46,7 +47,7 @@ public class DeathLinkInterface
     {
         receivedDeath = true;
         deathLinks.Add(deathLink);
-        Console.WriteLine($"Received Death Link from: {deathLink.Source} due to {deathLink.Cause}");
+        logger.Log("Received Death Link from: {0} due to {1}", deathLink.Source, deathLink.Cause);
     }
 
     public void KillPlayer()
@@ -69,7 +70,7 @@ public class DeathLinkInterface
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.ToString());
+            logger.Exception(e);
         }
     }
 
@@ -79,15 +80,15 @@ public class DeathLinkInterface
         {
             if (!ArchipelagoData.DeathLink || receivedDeath) return;
             deathsSent++;
-            Console.WriteLine("Sharing death with your friends...");
+            logger.Log("Sharing death with your friends...");
             var alias = ArchipelagoClient.Session.Players.GetPlayerAliasAndName(ArchipelagoClient.Session.ConnectionInfo.Slot);
-            // Debug.Log(killer.GetType());
+            // logger.Log(killer.GetType());
             var cause = GetDeathLinkCause(deathType);
             DeathLinkService.SendDeathLink(new DeathLink(ArchipelagoClient.ServerData.SlotName, alias + cause));
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Error: {e}");
+            logger.Exception(e);
         }
     }
 
@@ -183,7 +184,7 @@ public class DeathLinkInterface
         }
         catch (Exception e)
         {
-            e.LogDetailed();
+            logger.Exception(e);
             return " is a menace";
         }
     }

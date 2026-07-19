@@ -9,6 +9,7 @@ namespace MessengerRando.Utils;
 
 public static class RandomizerOptions
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(RandomizerOptions));
     // name
     public static string Name = "Ninja";
     public static bool OnNameEntry(string input)
@@ -81,7 +82,7 @@ public static class RandomizerOptions
             var errorPopup = InitTextEntryPopup(RandoMenu.randoScreen, string.Empty,
                 _ => true, 0, null, CharsetFlags.Space);
             errorPopup.Init("Invalid input. Please check the code and try again.");
-            Console.WriteLine(e);
+            logger.Exception(e);
             return;
         }
 

@@ -8,12 +8,14 @@ using MessengerRando.RO;
 using MessengerRando.Utils;
 using Mod.Courier;
 using UnityEngine;
+using Logger = MessengerRando.Utils.Logger;
 using Object = UnityEngine.Object;
 
 namespace MessengerRando.GameOverrideManagers;
 
 public static class RandoShopManager
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(RandoShopManager));
     public static Dictionary<EShopUpgradeID, int> ShopPrices;
     public static Dictionary<EFigurine, int> FigurePrices;
     private static readonly Queue FigurineQueue = new Queue();
@@ -61,18 +63,11 @@ public static class RandoShopManager
     {
         orig(self, camera, borders, transition);
 
-        try
+        while (FigurineQueue.Count > 0)
         {
-            while (FigurineQueue.Count > 0)
-            {
-                var figurine = (EFigurine)FigurineQueue.Dequeue();
-                Debug.Log($"Unlocking {figurine}");
-                UnlockFigurine(figurine);
-            }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
+            var figurine = (EFigurine)FigurineQueue.Dequeue();
+            logger.Log("Unlocking {0}", figurine);
+            UnlockFigurine(figurine);
         }
     }
 
@@ -107,7 +102,7 @@ public static class RandoShopManager
         MoneySinkUnclogCutscene self, View dialog)
     {
         orig(self, dialog);
-        Debug.Log("Unclogged that dang sink");
+        logger.Log("Unclogged that dang sink");
         var wrenchID = ItemsAndLocationsHandler.ItemFromEItem(EItems.MONEY_WRENCH);
         if (!ArchipelagoClient.ServerData.ReceivedItems
                 .ContainsKey(wrenchID))
@@ -144,13 +139,13 @@ public static class RandoShopManager
         var lookupName = string.Empty;
         if (locid.Contains("DESCRIPTION"))
         {
-            Console.WriteLine("description");
+            logger.Log("description");
             locType = TextType.Description;
             lookupName = locid.Replace("_DESCRIPTION", string.Empty);
         }
         else if (locid.Contains("NAME"))
         {
-            Console.WriteLine("name");
+            logger.Log("name");
             locType = TextType.Name;
             lookupName = locid.Replace("_NAME", string.Empty);
         }

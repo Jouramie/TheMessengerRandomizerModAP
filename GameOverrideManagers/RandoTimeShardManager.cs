@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using MessengerRando.Archipelago;
 using MessengerRando.RO;
+using Logger = MessengerRando.Utils.Logger;
 
 namespace MessengerRando.GameOverrideManagers;
 
 public class RandoTimeShardManager
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(RandoTimeShardManager));
     public struct MegaShard
     {
         private readonly ELevel shardRegion;
@@ -89,7 +90,7 @@ public class RandoTimeShardManager
     public static void BreakShard(MegaShard shardToBreak)
     {
         var location = ShardLocation(shardToBreak);
-        Console.WriteLine($"Broke Shard {location.LocationName}");
+        logger.Log("Broke Shard {0}", location.LocationName);
         if (!ArchipelagoClient.HasConnected) return;
 
         if (location.Equals(new LocationRO("Money Farm Room Mega Shard 1")) &&

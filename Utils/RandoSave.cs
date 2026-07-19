@@ -2,7 +2,6 @@
 using MessengerRando.Archipelago;
 using Mod.Courier.Save;
 using Newtonsoft.Json;
-using UnityEngine;
 using WebSocketSharp;
 
 namespace MessengerRando.Utils;
@@ -14,6 +13,7 @@ namespace MessengerRando.Utils;
 /// </summary>
 public class RandoSave : CourierModSave
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(RandoSave));
     public string APSaveData = GetSaveData();
 
     public void Update()
@@ -47,10 +47,10 @@ public class RandoSave : CourierModSave
 
     public static void TryLoad(string load)
     {
-        Debug.Log("loading rando save data...");
+        logger.Log("loading rando save data...");
         if (string.IsNullOrEmpty(load))
         {
-            Debug.Log("unable to find rando save data to load");
+            logger.Log("unable to find rando save data to load");
             return;
         }
         try
@@ -67,8 +67,7 @@ public class RandoSave : CourierModSave
         }
         catch (Exception e)
         {
-            Debug.Log("Failed to load AP Save Data");
-            Console.WriteLine(e);
+            logger.Exception(e, "Failed to load AP Save Data");
         }
     }
 }

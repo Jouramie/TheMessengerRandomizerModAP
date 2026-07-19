@@ -5,6 +5,7 @@ using MessengerRando.Archipelago;
 using MessengerRando.RO;
 using MessengerRando.Utils;
 using UnityEngine;
+using Logger = MessengerRando.Utils.Logger;
 using Object = UnityEngine.Object;
 // ReSharper disable StringLiteralTypo
 
@@ -12,6 +13,7 @@ namespace MessengerRando.GameOverrideManagers;
 
 public abstract class RandoBossManager
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(RandoBossManager));
     public static List<string> DefeatedBosses = [];
 
     private readonly Dictionary<string, string> origToNewBoss;
@@ -139,7 +141,7 @@ public abstract class RandoBossManager
             bossName = RandomizerStateManager.Instance.BossManager.origToNewBoss
                 .First(name => name.Value.Equals(bossName)).Key;
 #if DEBUG
-        Console.WriteLine($"Checking if {bossName} is defeated.");
+        logger.Log("Checking if {0} is defeated.", bossName);
 #endif
         try
         {
@@ -147,7 +149,7 @@ public abstract class RandoBossManager
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.Log("Error while checking if {0} is defeated: {1}", bossName, e);
             return true;
         }
     }
@@ -188,11 +190,11 @@ public abstract class RandoBossManager
     {
         if (bossOverride) return false;
         var currentLevel = Manager<LevelManager>.Instance.GetCurrentLevelEnum();
-        Console.WriteLine($"Entered {bossName}'s room. Has Defeated: {HasBossDefeated(bossName)}");
+        logger.Log("Entered {0}'s room. Has Defeated: {1}", bossName, HasBossDefeated(bossName));
         if (HasBossDefeated(bossName) || !currentLevel.Equals(BossLocations[bossName].BossRegion)) return false;
 
         var teleporting = RandomizerStateManager.Instance.BossManager != null;
-        Console.WriteLine($"Should teleport: {teleporting}");
+        logger.Log("Should teleport: {0}", teleporting);
         if (teleporting)
         {
             try
@@ -203,13 +205,13 @@ public abstract class RandoBossManager
                     {
                         if (cutscene.IsInvoking())
                         {
-                            Console.WriteLine($"Ending cutscene: {cutscene.name}");
+                            logger.Log("Ending cutscene: {0}", cutscene.name);
                             cutscene.EndCutScene();
                         }
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine($"{e}\n{cutscene.name}");
+                        logger.Log("Error while ending cutscene {0}: {1}", cutscene.name, e);
                     }
                 }
 
@@ -219,19 +221,19 @@ public abstract class RandoBossManager
                     {
                         if (cutscene.IsInvoking())
                         {
-                            Console.WriteLine($"Ending cutscene: {cutscene.name}");
+                            logger.Log("Ending cutscene: {0}", cutscene.name);
                             cutscene.EndCutScene();
                         }
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine($"{e}\n{cutscene.name}");
+                        logger.Log("Error while ending cutscene {0}: {1}", cutscene.name, e);
                     }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                logger.Log("Error while ending cutscenes: {0}", e);
             }
             bossName = RandomizerStateManager.Instance.BossManager.GetActualBoss(bossName);
         }
@@ -256,7 +258,7 @@ public abstract class RandoBossManager
 
     private string GetActualBoss(string vanillaBoss)
     {
-        Console.WriteLine($"requested {vanillaBoss}, going to {origToNewBoss[vanillaBoss]}");
+        logger.Log("Requested {0}, going to {1}", vanillaBoss, origToNewBoss[vanillaBoss]);
         return origToNewBoss[vanillaBoss];
     }
 }

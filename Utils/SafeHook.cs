@@ -1,10 +1,11 @@
 using System;
-using System.Reflection;
 
 namespace MessengerRando.Utils;
 
 public static class SafeHook
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(SafeHook));
+
     public static T Wrap<T>(T hook) where T : Delegate
     {
         Type delegateType = typeof(T);
@@ -12,7 +13,7 @@ public static class SafeHook
 
         if (invoke.ReturnType != typeof(void))
         {
-            Console.WriteLine("[SafeHook] Unsupported delegate type: " + delegateType.FullName + " (return type is not void)");
+            logger.Warning("Unsupported delegate type: {0} (return type is not void)", delegateType.FullName);
             return hook;
         }
 
@@ -28,7 +29,7 @@ public static class SafeHook
 
         if (wrapperType == null)
         {
-            Console.WriteLine("[SafeHook] Unsupported delegate type: " + delegateType.FullName + " (parameter count: " + parameters.Length + ")");
+            logger.Warning("Unsupported delegate type: {0} (parameter count: {1})", delegateType.FullName, parameters.Length);
             return hook;
         }
 
@@ -59,7 +60,7 @@ public static class SafeHook
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[" + handler.Method.Name + "] " + ex);
+                logger.Exception(ex, "[{0}]", handler.Method.Name);
                 if (callOrigOnError)
                 {
                     ((Delegate)(object)orig).DynamicInvoke([self]);
@@ -80,7 +81,7 @@ public static class SafeHook
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[" + handler.Method.Name + "] " + ex);
+                logger.Exception(ex, "[{0}]", handler.Method.Name);
                 if (callOrigOnError)
                 {
                     ((Delegate)(object)orig).DynamicInvoke([self, arg1]);
@@ -101,7 +102,7 @@ public static class SafeHook
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[" + handler.Method.Name + "] " + ex);
+                logger.Exception(ex, "[{0}]", handler.Method.Name);
                 if (callOrigOnError)
                 {
                     ((Delegate)(object)orig).DynamicInvoke([self, arg1, arg2]);

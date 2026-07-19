@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Logger = MessengerRando.Utils.Logger;
 using Random = System.Random;
 
 namespace MessengerRando.GameOverrideManagers;
 
 public static class RandoMusicManager
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(RandoMusicManager));
     private static Random random;
     public static bool ShuffleMusic;
 
@@ -24,7 +26,7 @@ public static class RandoMusicManager
         }
         catch (Exception e)
         {
-            Debug.Log(e);
+            logger.Exception(e);
         }
     }
 
@@ -40,9 +42,7 @@ public static class RandoMusicManager
         if (audioObjectDefinition == null)
             return null;
 #if DEBUG
-        Debug.Log("playing music");
-        Debug.Log(audioObjectDefinition.GetInstanceID());
-        Debug.Log(audioObjectDefinition.GetInstanceID());
+        logger.Log("Playing music {0}", audioObjectDefinition.GetInstanceID());
 #endif
         if (Manager<LevelManager>.Instance.GetCurrentLevelEnum().Equals(ELevel.Level_05_B_SunkenShrine))
         {

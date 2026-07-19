@@ -6,11 +6,13 @@ using MessengerRando.Utils;
 using MessengerRando.Utils.Constants;
 using Mod.Courier;
 using UnityEngine;
+using Logger = MessengerRando.Utils.Logger;
 
 namespace MessengerRando.GameOverrideManagers;
 
 public static class TrapManager
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(TrapManager));
     private static bool teleTrapped;
     public static float TrapTimer;
     private static float trapTime = 10.0f;
@@ -25,7 +27,7 @@ public static class TrapManager
     {
         try
         {
-            Console.WriteLine("doing a prophecy");
+            logger.Log("doing a prophecy");
             player = Manager<PlayerManager>.Instance.Player;
             player.graplou.Cancel();
             player.Unduck();
@@ -37,7 +39,7 @@ public static class TrapManager
         }
         catch (Exception e)
         {
-            e.LogDetailed();
+            logger.Exception(e);
         }
     }
 

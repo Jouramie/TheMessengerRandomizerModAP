@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Reflection;
+using MessengerRando.Utils;
 using Object = UnityEngine.Object;
 
 namespace MessengerRando.GameOverrideManagers;
 
 public static class LostWoodsManager
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(LostWoodsManager));
     public static bool ShouldBeSolved;
     public static bool NeedsSolved;
     private static bool tempSolve;
@@ -27,7 +29,7 @@ public static class LostWoodsManager
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.Log("Error while solving Lost Woods: {0}", e);
             NeedsSolved = ShouldBeSolved;
             tempSolve = false;
         }

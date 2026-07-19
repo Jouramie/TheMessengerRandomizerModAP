@@ -6,11 +6,13 @@ using MessengerRando.Utils.Constants;
 using MessengerRando.Utils.Menus;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Logger = MessengerRando.Utils.Logger;
 
 namespace MessengerRando.GameOverrideManagers;
 
 public static class RandoLevelManager
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(RandoLevelManager));
     private static bool teleporting;
     public static bool KillManfred;
     private static ELevel lastLevel;
@@ -23,9 +25,9 @@ public static class RandoLevelManager
     [SafeHook(callOrigOnError: true)]
     public static void LoadLevel(On.LevelManager.orig_LoadLevel orig, LevelManager self, LevelLoadingInfo levelInfo)
     {
-        Console.WriteLine($"Current Level: {Manager<LevelManager>.Instance.GetCurrentLevelEnum()}");
-        Console.WriteLine($"Loading Level: {levelInfo.levelName}");
-        Console.WriteLine($"Entrance ID: {levelInfo.levelEntranceId}, Dimension: {levelInfo.dimension}");
+        logger.Log("Current Level: {0}", Manager<LevelManager>.Instance.GetCurrentLevelEnum());
+        logger.Log("Loading Level: {0}", levelInfo.levelName);
+        logger.Log("Entrance ID: {0}, Dimension: {1}", levelInfo.levelEntranceId, levelInfo.dimension);
 
         if (!teleporting)
         {
@@ -35,15 +37,13 @@ public static class RandoLevelManager
                 : levelInfo.levelName;
             currentLevel = Manager<LevelManager>.Instance.GetLevelEnumFromLevelName(levelName);
         }
-        // Console.WriteLine(lastLevel);
-        // Console.WriteLine(currentLevel);
 
         orig(self, levelInfo);
     }
 
     public static bool WithinRange(float pos1, float pos2)
     {
-        Console.WriteLine($"comparing positions: {pos1}, {pos2}");
+        logger.Log("Comparing positions: {0}, {1}", pos1, pos2);
         var comparison = pos2 - pos1;
         if (comparison < 0) comparison *= -1;
         return comparison <= 50;
@@ -53,10 +53,10 @@ public static class RandoLevelManager
     {
         try
         {
-            Console.WriteLine("looking for entrance we just entered");
+            logger.Log("Looking for entrance we just entered");
             var playerPos = Manager<PlayerManager>.Instance.Player.transform.position;
-            Console.WriteLine(lastLevel);
-            Console.WriteLine(currentLevel);
+            logger.Log("Last Level: {0}", lastLevel);
+            logger.Log("Current Level: {0}", currentLevel);
 
             if (RandoLevelMapping == null) return new LevelConstants.RandoLevel(ELevel.NONE, new Vector3());
 
@@ -114,7 +114,7 @@ public static class RandoLevelManager
                         break;
                 }
             }
-            Console.WriteLine(entrance);
+            logger.Log("Entrance: {0}", entrance);
             string sourceExit;
             if (LevelConstants.SpecialConnectionSourceExits.TryGetValue(entrance, out var specialSource))
             {
@@ -143,7 +143,7 @@ public static class RandoLevelManager
             TrackerManager.AddVisitedEntrance(sourceExit);
             return RandoLevelMapping[entrance];
         }
-        catch (Exception e) { Console.WriteLine(e); }
+        catch (Exception e) { logger.Log("Error while finding entrance: {0}", e); }
         return new LevelConstants.RandoLevel(ELevel.NONE, new Vector3());
     }
 
@@ -163,7 +163,7 @@ public static class RandoLevelManager
         //         }
         //         catch (Exception e)
         //         {
-        //             Console.WriteLine(e);
+        //             logger.Log("Error while adjusting player in boss room: {0}", e);
         //             throw;
         //         }
         //         return;
@@ -201,9 +201,9 @@ public static class RandoLevelManager
             return;
         }
 
-        Console.WriteLine("loaded into level...");
-        Console.WriteLine(self.lastLevelLoaded);
-        Console.WriteLine(self.GetCurrentLevelEnum());
+        logger.Log("Loaded into level...");
+        logger.Log("Last Level Loaded: {0}", self.lastLevelLoaded);
+        logger.Log("Current Level: {0}", self.GetCurrentLevelEnum());
         if (self.lastLevelLoaded.Equals(ELevel.Level_13_TowerOfTimeHQ + "_Build"))
         {
             // we just teleported into HQ
@@ -263,7 +263,7 @@ public static class RandoLevelManager
     public static void TeleportInArea(ELevel area, Vector2 position, EBits dimension = EBits.NONE)
     {
 #if DEBUG
-        Console.WriteLine($"Attempting to teleport to {area}, ({position.x}, {position.y}), {dimension}");
+        logger.Log("Attempting to teleport to {0}, ({1}, {2}), {3}", area, position.x, position.y, dimension);
 #endif
         CleanupBeforeTeleport();
         Manager<ProgressionManager>.Instance.checkpointSaveInfo.loadedLevelPlayerPosition = position;

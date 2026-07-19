@@ -20,6 +20,7 @@ namespace MessengerRando.Utils;
 
 public class RandomizerStateManager
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(RandomizerStateManager));
     public static RandomizerStateManager Instance { private set; get; }
     public int CurrentFileSlot { set; get; }
 
@@ -59,7 +60,7 @@ public class RandomizerStateManager
             };
             if (ArchipelagoClient.Authenticated) InitializeSeed();
         }
-        catch (Exception e) { Console.WriteLine(e); }
+        catch (Exception e) { logger.Exception(e); }
     }
 
     public static void InitializeSeed()
@@ -104,7 +105,7 @@ public class RandomizerStateManager
         {
             var startingPortals = ((JArray)portals).ToObject<List<string>>();
             RandoPortalManager.StartingPortals = [];
-            Console.WriteLine($"Starting portals:\n\t{string.Join("\n\t", [.. startingPortals])}");
+            logger.Log("Starting portals:\n\t{0}", string.Join("\n\t", [.. startingPortals]));
             RandoPortalManager.StartingPortals.AddRange(startingPortals);
         }
         else
@@ -145,7 +146,7 @@ public class RandomizerStateManager
                     var orig = LevelConstants.TransitionNames[pairing[0]];
                     var replacement = LevelConstants.EntranceNameToRandoLevel[LevelConstants.TransitionNames[pairing[1]]];
                     RandoLevelManager.RandoLevelMapping[orig] = replacement;
-                    Console.WriteLine($"Replacing transition to {orig} by {LevelConstants.TransitionNames[pairing[1]]}");
+                    logger.Log("Replacing transition to {0} by {1}", orig, LevelConstants.TransitionNames[pairing[1]]);
                 }
             }
         }
@@ -154,20 +155,20 @@ public class RandomizerStateManager
               ItemsAndLocationsHandler.IDtoLocationsLookup.TryGetValue(location, out var loc)
               && loc.LocationName.StartsWith("Elemental Skylands - Shutdown")))
         {
-            Console.WriteLine("Found at least one location for skylands generator shutdown, meaning generators are shuffled");
+            logger.Log("Found at least one location for skylands generator shutdown, meaning generators are shuffled");
             skylandsGeneratorManager.AreGeneratorsShuffled = true;
 
         }
         else
         {
-            Console.WriteLine("No locations found for skylands generator shutdown, meaning generators are not shuffled");
+            logger.Log("No locations found for skylands generator shutdown, meaning generators are not shuffled");
         }
     }
 
     private static void SetupScoutedLocations(Dictionary<long, ScoutedItemInfo> scoutedLocationInfo)
     {
         Instance.ScoutedLocations = scoutedLocationInfo;
-        Console.WriteLine("scouting done");
+        logger.Log("Scouting done");
     }
 
     public static bool IsSafeTeleportState()
@@ -204,13 +205,13 @@ public class RandomizerStateManager
             locationID =
                 ItemsAndLocationsHandler.LocationFromEItem(vanillaLocationItem);
             if (locationID == 0) return false;
-            Console.WriteLine($"Checking if {vanillaLocationItem}, id: {locationID} is randomized.");
+            logger.Log("Checking if {0}, id: {1} is randomized.", vanillaLocationItem, locationID);
             return (ScoutedLocations != null && ScoutedLocations.ContainsKey(locationID)) ||
                    ArchipelagoClient.ServerData.LocationData.ContainsKey(locationID);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.Exception(e);
         }
 
         return false;
@@ -347,7 +348,7 @@ public class RandomizerStateManager
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.Exception(e);
         }
     }
 
@@ -370,7 +371,7 @@ public class RandomizerStateManager
 
         if (gameFile.IsNullOrEmpty())
         {
-            Console.WriteLine("unable to find file");
+            logger.Log("Unable to find file");
             return;
         }
 
@@ -390,9 +391,9 @@ public class RandomizerStateManager
 
             ArchipelagoClient.ServerData.Uri = "offline";
             ArchipelagoClient.ServerData.SlotName = gameData["name"].ToObject<string>();
-            Console.WriteLine("casting slot data");
+            logger.Log("Casting slot data");
             ArchipelagoClient.ServerData.SlotData = gameData["slot_data"].ToObject<Dictionary<string, object>>();
-            Console.WriteLine("casting loc data");
+            logger.Log("Casting loc data");
             ArchipelagoClient.ServerData.LocationData =
                 gameData["loc_data"].ToObject<Dictionary<long, Dictionary<string, List<long>>>>();
             ArchipelagoClient.HasConnected = ArchipelagoClient.Offline = true;
@@ -400,7 +401,7 @@ public class RandomizerStateManager
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.Exception(e);
         }
     }
     public static int ReceivedItemsCount()

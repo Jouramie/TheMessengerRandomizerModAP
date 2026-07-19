@@ -10,6 +10,7 @@ namespace MessengerRando.GameOverrideManagers;
 
 public class SkylandsGeneratorManager
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(SkylandsGeneratorManager));
 
     private readonly Dictionary<GeneratorType, ElementalSkylandGenerator> LoadedGenerators = [];
     private readonly Dictionary<GeneratorType, string> FlagsByGenerator = new()
@@ -41,22 +42,22 @@ public class SkylandsGeneratorManager
 
     public void ReceiveGeneratorShutdown(string generatorShutdownItem)
     {
-        Console.WriteLine($"Received {generatorShutdownItem}");
+        logger.Log("Received {0}", generatorShutdownItem);
 
         if (AreAllGeneratorsShutdownReceived())
         {
-            Console.WriteLine($"All generators already deactivated, so ignoring received shutdown");
+            logger.Log("All generators already deactivated, so ignoring received shutdown");
             return;
         }
 
         var generatorType = FindNextGeneratorToShutdown();
         var generatorFlag = FlagsByGenerator[generatorType];
         Manager<ProgressionManager>.Instance.SetFlag(generatorFlag, false);
-        Console.WriteLine($"Current flags are [{string.Join(", ", [.. Manager<ProgressionManager>.Instance.flags])}]");
+        logger.Log("Current flags are [{0}]", string.Join(", ", [.. Manager<ProgressionManager>.Instance.flags]));
 
         if (LoadedGenerators.TryGetValue(generatorType, out var generator) && generator != null)
         {
-            Console.WriteLine($"Generator loaded, so playing animation");
+            logger.Log("Generator loaded, so playing animation");
             Manager<AudioManager>.Instance.PlaySoundEffect(generator.shutdownSFX);
             generator.animator.SetTrigger("Deactivate");
         }
@@ -68,7 +69,7 @@ public class SkylandsGeneratorManager
 
         var generatorType = ToGeneratorType(self.name);
         LoadedGenerators[generatorType] = self;
-        Console.WriteLine($"Registered {generatorType} generator");
+        logger.Log("Registered {0} generator", generatorType);
 
         orig(self);
     }
@@ -81,7 +82,7 @@ public class SkylandsGeneratorManager
         var generatorType = ToGeneratorType(self.name);
         if (Manager<ProgressionManager>.Instance.IsFlagSet(self.deactivatedFlag))
         {
-            Console.WriteLine($"Deactivating {self.name}");
+            logger.Log("Deactivating {0}", self.name);
             self.animator.SetTrigger("DeactivateInstant");
         }
 
@@ -89,7 +90,7 @@ public class SkylandsGeneratorManager
         if ((generatorType == GeneratorType.FIRE && AreAllGeneratorsShutdownReceived())
             || (generatorType != GeneratorType.FIRE && (isLocationSent || Manager<ProgressionManager>.Instance.IsFlagSet(self.deactivatedFlag))))
         {
-            Console.WriteLine($"Opening door for {self.name}");
+            logger.Log("Opening door for {0}", self.name);
             self.wall.gameObject.SetActive(value: false);
         }
 
@@ -166,7 +167,7 @@ public class SkylandsGeneratorManager
 
         var generatorType = ToGeneratorType(self.name);
         LoadedGenerators[generatorType] = null;
-        Console.WriteLine($"Cleaned up {generatorType} generator");
+        logger.Log("Cleaned up {0} generator", generatorType);
 
         orig(self);
     }
@@ -175,7 +176,7 @@ public class SkylandsGeneratorManager
     {
         var generatorType = ToGeneratorType(generator.name);
         var location = LocationsByGenerator[generatorType];
-        Console.WriteLine($"Sending location {location.LocationName}");
+        logger.Log("Sending location {0}", location.LocationName);
         ItemsAndLocationsHandler.SendLocationCheck(location);
     }
 
@@ -204,21 +205,21 @@ public class SkylandsGeneratorManager
         var manager = Manager<ProgressionManager>.Instance;
         if (manager.IsFlagSet(Flags.WaterGeneratorDeactivated))
         {
-            Console.WriteLine($"Water generator already deactivated, so shutting down Fire generator");
+            logger.Log("Water generator already deactivated, so shutting down Fire generator");
             return GeneratorType.FIRE;
         }
         if (manager.IsFlagSet(Flags.EarthGeneratorDeactivated))
         {
-            Console.WriteLine($"Earth generator already deactivated, so shutting down Water generator");
+            logger.Log("Earth generator already deactivated, so shutting down Water generator");
             return GeneratorType.WATER;
         }
         if (manager.IsFlagSet(Flags.AirGeneratorDeactivated))
         {
-            Console.WriteLine($"Air generator already deactivated, so shutting down Earth generator");
+            logger.Log("Air generator already deactivated, so shutting down Earth generator");
             return GeneratorType.EARTH;
         }
 
-        Console.WriteLine($"No generators already deactivated, so shutting down Air generator");
+        logger.Log("No generators already deactivated, so shutting down Air generator");
         return GeneratorType.AIR;
     }
 

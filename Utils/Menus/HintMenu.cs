@@ -18,6 +18,7 @@ namespace MessengerRando.Utils.Menus;
 
 public class HintMenu
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(HintMenu));
     public static OptionsButtonInfo ArchipelagoHintMenuButton;
     private static HintScreen hintScreen;
 
@@ -330,8 +331,8 @@ public class HintMenu
                 // {
                 //     bounds.extents.Set(120f, 12f, 0f);
                 // }
-                // Debug.Log($"button bounds extent: {bounds.extents.x}, {bounds.extents.y}, {bounds.extents.z}");
-                // Debug.Log($"button bounds size: {bounds.x}, {bounds.y}, {bounds.z}");
+                // logger.Log($"button bounds extent: {bounds.extents.x}, {bounds.extents.y}, {bounds.extents.z}");
+                // logger.Log($"button bounds size: {bounds.x}, {bounds.y}, {bounds.z}");
                 // buttonInfo.nameTextMesh.bounds = new ;
                 buttonInfo.UpdateNameText();
             }
@@ -446,13 +447,11 @@ public class HintMenu
 
     public static void onHintsUpdated(Hint[] hints)
     {
-        Console.WriteLine("hints updated");
+        logger.Log("hints updated");
         foreach (var hint in hints)
         {
 #if DEBUG
-            Console.WriteLine(hint.ItemId);
-            Console.WriteLine(hint.Status);
-            Console.WriteLine(hint.Found);
+            logger.Log("ItemId: {0}, Status: {1}, Found: {2}", hint.ItemId, hint.Status, hint.Found);
 #endif
             try
             {
@@ -468,7 +467,7 @@ public class HintMenu
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                logger.Exception(e);
             }
         }
     }

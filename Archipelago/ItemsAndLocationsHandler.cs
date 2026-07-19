@@ -10,6 +10,7 @@ namespace MessengerRando.Archipelago;
 
 public static class ItemsAndLocationsHandler
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(ItemsAndLocationsHandler));
     public static Dictionary<long, RandoItemRO> ItemsLookup;
     public static Dictionary<LocationRO, long> LocationsLookup;
     private static Dictionary<EItems, long> EItemsLocationsLookup;
@@ -32,7 +33,7 @@ public static class ItemsAndLocationsHandler
     {
 
         long offset = BaseOffset;
-        Console.WriteLine("Building ItemsLookup...");
+        logger.Log("Building ItemsLookup...");
         ItemsLookup = new Dictionary<long, RandoItemRO>();
         foreach (var figurine in Enum.GetValues(typeof(EFigurine)))
             ArchipelagoItems.Add(new RandoItemRO(figurine.ToString(), EItems.NONE));
@@ -52,12 +53,11 @@ public static class ItemsAndLocationsHandler
         foreach (var item in ArchipelagoItems)
         {
             ItemsLookup.Add(offset, item);
-            // Console.WriteLine($"{item.Name}: {offset}");
             ++offset;
         }
 
         offset = BaseOffset;
-        Console.WriteLine("Building LocationsLookup...");
+        logger.Log("Building LocationsLookup...");
         LocationsLookup = new Dictionary<LocationRO, long>();
         EItemsLocationsLookup = new Dictionary<EItems, long>();
         IDtoLocationsLookup = new Dictionary<long, LocationRO>();
@@ -79,7 +79,7 @@ public static class ItemsAndLocationsHandler
         {
             LocationsLookup.Add(progLocation, offset);
             IDtoLocationsLookup.Add(offset, progLocation);
-            Console.WriteLine($"{progLocation.PrettyLocationName}: {offset}");
+            logger.Log("{0}: {1}", progLocation.PrettyLocationName, offset);
             if (progLocation.VanillaItem != EItems.NONE &&
                 !EItemsLocationsLookup.ContainsKey(progLocation.VanillaItem))
                 EItemsLocationsLookup.Add(progLocation.VanillaItem, offset);
@@ -317,13 +317,13 @@ public static class ItemsAndLocationsHandler
 
     public static bool HasDialog(long locationID)
     {
-        Console.WriteLine($"Checking if {locationID} has associated dialog");
+        logger.Log("Checking if {0} has associated dialog", locationID);
         if (!IDtoLocationsLookup.ContainsKey(locationID)) return false;
         var location = LocationFromID(locationID).PrettyLocationName;
         try
         {
             var locationEnum = (EItems)Enum.Parse(typeof(EItems), location);
-            Console.WriteLine($"{locationEnum}");
+            logger.Log("{0}", locationEnum);
             return DialogChanger.ItemDialogID.ContainsKey(locationEnum);
         }
         catch
@@ -341,10 +341,10 @@ public static class ItemsAndLocationsHandler
     {
         if (!ItemsLookup.TryGetValue(itemToUnlock, out var randoItem) || RandoStateManager.CurrentFileSlot == 0)
         {
-            Console.WriteLine($"Couldn't find {itemToUnlock} or not currently in game");
+            logger.Log("Couldn't find {0} or not currently in game", itemToUnlock);
             return;
         }
-        Console.WriteLine($"Unlocking {itemToUnlock}, {randoItem.Item}");
+        logger.Log("Unlocking {0}, {1}", itemToUnlock, randoItem.Item);
 
         switch (randoItem.Item)
         {
@@ -378,7 +378,7 @@ public static class ItemsAndLocationsHandler
                         quantity = 500;
                         break;
                 }
-                Console.WriteLine($"Unlocking time shards... {quantity}");
+                logger.Log("Unlocking time shards... {0}", quantity);
                 Manager<InventoryManager>.Instance.CollectTimeShard(quantity);
                 break;
             case EItems.POWER_SEAL:
@@ -413,7 +413,7 @@ public static class ItemsAndLocationsHandler
 
                 break;
             default:
-                Console.WriteLine($"Checking if {randoItem.Item} is a shop item: {ShopItem(randoItem.Item)}");
+                logger.Log("Checking if {0} is a shop item: {1}", randoItem.Item, ShopItem(randoItem.Item));
                 if (ShopItem(randoItem.Item))
                 {
                     // don't award shuriken twice if we already got it from windmill shuriken
@@ -422,10 +422,10 @@ public static class ItemsAndLocationsHandler
                     if (!new List<EItems> { EItems.HEART_CONTAINER, EItems.SHURIKEN_UPGRADE }.Contains(
                             randoItem.Item))
                     {
-                        Console.WriteLine($"checking if {itemToUnlock} has been received already");
+                        logger.Log("checking if {0} has been received already", itemToUnlock);
                         if (ArchipelagoClient.ServerData.ReceivedItems.ContainsKey(itemToUnlock))
                         {
-                            Console.WriteLine("bailing");
+                            logger.Log("bailing");
                             return;
                         }
                     }
@@ -464,7 +464,7 @@ public static class ItemsAndLocationsHandler
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.Exception(e);
             ArchipelagoClient.Disconnect();
         }
     }
@@ -472,7 +472,7 @@ public static class ItemsAndLocationsHandler
     public static void SendLocationCheck(long locationID)
     {
         if (!LocationsLookup.Values.Contains(locationID)) return;
-        Console.WriteLine($"Checking if we need to modify the location {locationID} before sending");
+        logger.Log("Checking if we need to modify the location {0} before sending", locationID);
         if (ArchipelagoClient.ServerData.CheckedLocations.Contains(locationID))
         {
             var loc = LocationFromID(locationID);
@@ -485,7 +485,7 @@ public static class ItemsAndLocationsHandler
         }
         ArchipelagoClient.ServerData.CheckedLocations.Add(locationID);
 
-        Console.WriteLine("Sending location checks");
+        logger.Log("Sending location checks");
         if (ArchipelagoClient.Authenticated)
         {
             ThreadPool.QueueUserWorkItem(_ =>
@@ -559,7 +559,7 @@ public static class ItemsAndLocationsHandler
             else receivedItems[currentItem] += 1;
             if (ArchipelagoClient.ServerData.ReceivedItems.ContainsKey(currentItem) &&
                 ArchipelagoClient.ServerData.ReceivedItems[currentItem] >= receivedItems[currentItem]) continue;
-            Console.WriteLine($"Determined {currentItem} missing while resyncing.");
+            logger.Log("Determined {0} missing while resyncing.", currentItem);
             Unlock(currentItem);
             if (itemToUnlock.OwnItem() &&
                 HasDialog(itemToUnlock.LocationId))

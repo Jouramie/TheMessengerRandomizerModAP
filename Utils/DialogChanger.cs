@@ -14,6 +14,7 @@ namespace MessengerRando.Utils;
 /// </summary>
 public static class DialogChanger
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(DialogChanger));
     public static readonly Dictionary<EItems, string> ItemDialogID = new Dictionary<EItems, string>
     {
         { EItems.KEY_OF_LOVE, "AWARD_KEY_OF_LOVE" },
@@ -44,7 +45,7 @@ public static class DialogChanger
 
     public static void CreateDialogBox(string text)
     {
-        Console.WriteLine($"Drawing text box for {text}");
+        logger.Log($"Drawing text box for {text}");
         var dialogBox = ScriptableObject.CreateInstance<DialogSequence>();
         dialogBox.dialogID = "ARCHIPELAGO_ITEM";
         dialogBox.name = text;

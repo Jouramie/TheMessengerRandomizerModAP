@@ -7,6 +7,7 @@ namespace MessengerRando.Utils;
 
 public static class OptionsExporter
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(OptionsExporter));
     private delegate void OnExport(bool result);
     private static bool exporting;
     private static string messageText = "";
@@ -15,7 +16,7 @@ public static class OptionsExporter
     {
         if (exporting) return;
         exporting = true;
-        Console.WriteLine("Exporting options");
+        logger.Log("Exporting options");
         Export(result => OnExported(result, exportButton));
     }
 
@@ -43,7 +44,7 @@ public static class OptionsExporter
                 else
                     data["The Messenger"][kvp.Key] = kvp.Value;
             }
-            Console.WriteLine(data);
+            logger.Log(data);
 
             var folder = Directory.GetCurrentDirectory() + "\\Archipelago";
             if (!Directory.Exists(folder))
@@ -63,7 +64,7 @@ public static class OptionsExporter
         catch (Exception e)
         {
             messageText = e.ToString();
-            Console.WriteLine(e);
+            logger.Exception(e);
             return false;
         }
         return true;

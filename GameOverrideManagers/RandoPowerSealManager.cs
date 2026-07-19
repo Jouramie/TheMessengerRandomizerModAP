@@ -1,12 +1,14 @@
 ﻿using System;
 using MessengerRando.Archipelago;
 using UnityEngine;
+using Logger = MessengerRando.Utils.Logger;
 using Object = UnityEngine.Object;
 
 namespace MessengerRando.GameOverrideManagers;
 
 public class RandoPowerSealManager
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(RandoPowerSealManager));
     public RandoPowerSealManager(int requiredPowerSeals)
     {
         if (requiredPowerSeals == 0)
@@ -27,7 +29,7 @@ public class RandoPowerSealManager
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.Exception(e);
             orig(self);
         }
     }
@@ -42,7 +44,7 @@ public class RandoPowerSealManager
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.Exception(e);
             orig(self);
         }
     }
@@ -51,13 +53,13 @@ public class RandoPowerSealManager
     {
         try
         {
-            Debug.Log("Opening the shop chest...");
+            logger.Log("Opening the shop chest...");
             Object.FindObjectOfType<Shop>().LeaveToCurrentLevel();
             RandoLevelManager.SkipMusicBox();
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            logger.Exception(e);
         }
     }
 

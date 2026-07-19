@@ -13,6 +13,7 @@ namespace MessengerRando.Utils;
 
 public static class SeedGenerator
 {
+    private static readonly Logger logger = Logger.GetLogger(typeof(SeedGenerator));
     public static string ArchipelagoPath = "";
     private delegate void OnGenerateAttempt(bool result);
     private static bool generating;
@@ -45,7 +46,7 @@ public static class SeedGenerator
                     var displayName = subkey.GetValue("DisplayName");
                     if (displayName != null && displayName.ToString().Contains("Archipelago "))
                     {
-                        Console.WriteLine(displayName);
+                        logger.Log(displayName.ToString());
                         path = subkey.GetValue("InstallLocation").ToString();
                         break;
                     }
@@ -53,7 +54,7 @@ public static class SeedGenerator
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                logger.Exception(e);
             }
             if (path.IsNullOrEmpty()) return false;
             ArchipelagoPath = path;
@@ -80,17 +81,17 @@ public static class SeedGenerator
         // archipelago.StartInfo.UseShellExecute = false;
         // archipelago.StartInfo.RedirectStandardInput = true;
         // archipelago.StartInfo.RedirectStandardOutput = true;
-        // archipelago.OutputDataReceived += (sender, e) => Console.WriteLine(e.Data);
+        // archipelago.OutputDataReceived += (sender, e) => logger.Log(e.Data);
         // archipelago.StartInfo.RedirectStandardError = true;
-        // archipelago.ErrorDataReceived += (sender, e) => Console.WriteLine(e.Data);
-        Console.WriteLine("attempting to generate...");
-        Console.WriteLine(archipelago.StartInfo.FileName);
-        Console.WriteLine(archipelago.StartInfo.Arguments);
+        // archipelago.ErrorDataReceived += (sender, e) => logger.Log(e.Data);
+        logger.Log("attempting to generate...");
+        logger.Log(archipelago.StartInfo.FileName);
+        logger.Log(archipelago.StartInfo.Arguments);
 
         archipelago.Start();
         archipelago.WaitForExit();
 
-        Console.WriteLine(archipelago.ExitCode);
+        logger.Log($"Exit code: {archipelago.ExitCode}");
         if (archipelago.ExitCode == 0)
         {
             RandomizerStateManager.StartOfflineSeed();
