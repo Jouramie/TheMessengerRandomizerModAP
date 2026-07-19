@@ -65,80 +65,77 @@ public class APRandomizerMain : CourierModule
         RandoLevelManager.TrackerManager = trackerManager;
 
         //Plug in my code :3
-        On.InventoryManager.AddItem += InventoryManager_AddItem;
-        On.ProgressionManager.SetChallengeRoomAsCompleted += ProgressionManager_SetChallengeRoomAsCompleted;
-        On.HasItem.IsTrue += HasItem_IsTrue;
-        On.AwardNoteCutscene.ShouldPlay += AwardNoteCutscene_ShouldPlay;
-        On.CutsceneHasPlayed.IsTrue += CutsceneHasPlayed_IsTrue;
-        On.SaveGameSelectionScreen.OnLoadGame += SaveGameSelectionScreen_OnLoadGame;
-        On.SaveGameSelectionScreen.OnNewGame += SaveGameSelectionScreen_OnNewGame;
-        On.SaveGameSelectionScreen.ConfirmSaveDelete += SaveGameSelectionScreen_ConfirmSaveDelete;
-        On.SaveGameSelectionScreen.OnDeleteChoiceDone += SaveGameSelectionScreen_OnDelete;
-        On.SaveGameSelectionScreen.Update += SaveSelectionScreen_OnUpdate;
-        On.NameSavePopup.Update += OnNameSaveUpdate;
-        On.BackToTitleScreen.GoBackToTitleScreen += PauseScreen_OnQuitToTitle;
-        On.NecrophobicWorkerCutscene.Play += NecrophobicWorkerCutscene_Play;
+        On.InventoryManager.AddItem += SafeHook.Wrap<On.InventoryManager.hook_AddItem>(InventoryManager_AddItem);
+        On.ProgressionManager.SetChallengeRoomAsCompleted += SafeHook.Wrap<On.ProgressionManager.hook_SetChallengeRoomAsCompleted>(ProgressionManager_SetChallengeRoomAsCompleted);
+        On.HasItem.IsTrue += SafeHook.Wrap<On.HasItem.hook_IsTrue>(HasItem_IsTrue);
+        On.AwardNoteCutscene.ShouldPlay += SafeHook.Wrap<On.AwardNoteCutscene.hook_ShouldPlay>(AwardNoteCutscene_ShouldPlay);
+        On.CutsceneHasPlayed.IsTrue += SafeHook.Wrap<On.CutsceneHasPlayed.hook_IsTrue>(CutsceneHasPlayed_IsTrue);
+        On.SaveGameSelectionScreen.OnLoadGame += SafeHook.Wrap<On.SaveGameSelectionScreen.hook_OnLoadGame>(SaveGameSelectionScreen_OnLoadGame);
+        On.SaveGameSelectionScreen.OnNewGame += SafeHook.Wrap<On.SaveGameSelectionScreen.hook_OnNewGame>(SaveGameSelectionScreen_OnNewGame);
+        On.SaveGameSelectionScreen.ConfirmSaveDelete += SafeHook.Wrap<On.SaveGameSelectionScreen.hook_ConfirmSaveDelete>(SaveGameSelectionScreen_ConfirmSaveDelete);
+        On.SaveGameSelectionScreen.OnDeleteChoiceDone += SafeHook.Wrap<On.SaveGameSelectionScreen.hook_OnDeleteChoiceDone>(SaveGameSelectionScreen_OnDelete);
+        On.SaveGameSelectionScreen.Update += SafeHook.Wrap<On.SaveGameSelectionScreen.hook_Update>(SaveSelectionScreen_OnUpdate);
+        On.NameSavePopup.Update += SafeHook.Wrap<On.NameSavePopup.hook_Update>(OnNameSaveUpdate);
+        On.BackToTitleScreen.GoBackToTitleScreen += SafeHook.Wrap<On.BackToTitleScreen.hook_GoBackToTitleScreen>(PauseScreen_OnQuitToTitle);
+        On.NecrophobicWorkerCutscene.Play += SafeHook.Wrap<On.NecrophobicWorkerCutscene.hook_Play>(NecrophobicWorkerCutscene_Play);
         IL.RuxxtinNoteAndAwardAmuletCutscene.Play += RuxxtinNoteAndAwardAmuletCutscene_Play;
-        On.DialogCutscene.Play += DialogCutscene_Play;
-        On.CatacombLevelInitializer.OnBeforeInitDone += CatacombLevelInitializer_OnBeforeInitDone;
-        On.DialogManager.LoadDialogs_ELanguage += DialogChanger.LoadDialogs_Elanguage;
-        On.OptionScreen.OnEnable += OnOptionScreenEnable;
-        On.LostWoods.SetAsSolved += LostWoodsManager.OnSetAsSolved;
+        On.DialogCutscene.Play += SafeHook.Wrap<On.DialogCutscene.hook_Play>(DialogCutscene_Play);
+        On.CatacombLevelInitializer.OnBeforeInitDone += SafeHook.Wrap<On.CatacombLevelInitializer.hook_OnBeforeInitDone>(CatacombLevelInitializer_OnBeforeInitDone);
+        On.DialogManager.LoadDialogs_ELanguage += SafeHook.Wrap<On.DialogManager.hook_LoadDialogs_ELanguage>(DialogChanger.LoadDialogs_Elanguage);
+        On.OptionScreen.OnEnable += SafeHook.Wrap<On.OptionScreen.hook_OnEnable>(OnOptionScreenEnable);
+        On.LostWoods.SetAsSolved += SafeHook.Wrap<On.LostWoods.hook_SetAsSolved>(LostWoodsManager.OnSetAsSolved);
         // shop management
-        On.UpgradeButtonData.GetPrice += RandoShopManager.GetPrice;
-        On.LocalizationManager.GetText += RandoShopManager.GetText;
-        // On.UpgradeButton.Refresh += RandoShopManager.UpgradeButton_Refresh;
-        On.BuyMoneyWrenchCutscene.OnBuyWrenchChoice += RandoShopManager.BuyMoneyWrench;
-        On.BuyMoneyWrenchCutscene.EndCutsceneOnDialogDone += RandoShopManager.EndMoneyWrenchCutscene;
-        On.MoneySinkUnclogCutscene.OnDialogOutDone += RandoShopManager.UnclogSink;
-        On.GoToSousSolCutscene.EndCutScene += RandoShopManager.GoToSousSol;
-        On.IronHoodShopScreen.GetFigurineData += RandoShopManager.GetFigurineData;
-        On.SousSol.UnlockFigurine += RandoShopManager.UnlockFigurine;
-        On.Shop.Init += RandoShopManager.ShopInit;
-        On.JukeboxTrack.IsUnlocked += (orig, self) => true;
-        On.UpgradeButtonData.IsStoryUnlocked += RandoShopManager.IsStoryUnlocked;
-        On.AudioManager.PlayMusic += RandoMusicManager.OnPlayMusic;
+        On.UpgradeButtonData.GetPrice += SafeHook.Wrap<On.UpgradeButtonData.hook_GetPrice>(RandoShopManager.GetPrice);
+        On.LocalizationManager.GetText += SafeHook.Wrap<On.LocalizationManager.hook_GetText>(RandoShopManager.GetText);
+        // On.UpgradeButton.Refresh += SafeHook.WrapSafe<On.UpgradeButton.hook_Refresh>(RandoShopManager.UpgradeButton_Refresh);
+        On.BuyMoneyWrenchCutscene.OnBuyWrenchChoice += SafeHook.Wrap<On.BuyMoneyWrenchCutscene.hook_OnBuyWrenchChoice>(RandoShopManager.BuyMoneyWrench);
+        On.BuyMoneyWrenchCutscene.EndCutsceneOnDialogDone += SafeHook.Wrap<On.BuyMoneyWrenchCutscene.hook_EndCutsceneOnDialogDone>(RandoShopManager.EndMoneyWrenchCutscene);
+        On.MoneySinkUnclogCutscene.OnDialogOutDone += SafeHook.Wrap<On.MoneySinkUnclogCutscene.hook_OnDialogOutDone>(RandoShopManager.UnclogSink);
+        On.GoToSousSolCutscene.EndCutScene += SafeHook.Wrap<On.GoToSousSolCutscene.hook_EndCutScene>(RandoShopManager.GoToSousSol);
+        On.IronHoodShopScreen.GetFigurineData += SafeHook.Wrap<On.IronHoodShopScreen.hook_GetFigurineData>(RandoShopManager.GetFigurineData);
+        On.SousSol.UnlockFigurine += SafeHook.Wrap<On.SousSol.hook_UnlockFigurine>(RandoShopManager.UnlockFigurine);
+        On.Shop.Init += SafeHook.Wrap<On.Shop.hook_Init>(RandoShopManager.ShopInit);
+        On.JukeboxTrack.IsUnlocked += SafeHook.Wrap<On.JukeboxTrack.hook_IsUnlocked>((orig, self) => true);
+        On.UpgradeButtonData.IsStoryUnlocked += SafeHook.Wrap<On.UpgradeButtonData.hook_IsStoryUnlocked>(RandoShopManager.IsStoryUnlocked);
+        On.AudioManager.PlayMusic += SafeHook.Wrap<On.AudioManager.hook_PlayMusic>(RandoMusicManager.OnPlayMusic);
         // boss management
-        On.ProgressionManager.HasDefeatedBoss +=
-            (orig, self, bossName) => RandoBossManager.HasBossDefeated(bossName);
-        On.ProgressionManager.HasEverDefeatedBoss +=
-            (orig, self, bossName) => RandoBossManager.HasBossDefeated(bossName);
-        On.ProgressionManager.SetBossAsDefeated +=
-            (orig, self, bossName) => RandoBossManager.SetBossAsDefeated(bossName);
+        On.ProgressionManager.HasDefeatedBoss += SafeHook.Wrap<On.ProgressionManager.hook_HasDefeatedBoss>((orig, self, bossName) => RandoBossManager.HasBossDefeated(bossName));
+        On.ProgressionManager.HasEverDefeatedBoss += SafeHook.Wrap<On.ProgressionManager.hook_HasEverDefeatedBoss>((orig, self, bossName) => RandoBossManager.HasBossDefeated(bossName));
+        On.ProgressionManager.SetBossAsDefeated += SafeHook.Wrap<On.ProgressionManager.hook_SetBossAsDefeated>((orig, self, bossName) => RandoBossManager.SetBossAsDefeated(bossName));
         // level teleporting etc management
-        On.Level.ChangeRoom += RandoRoomManager.Level_ChangeRoom;
-        On.LevelManager.LoadLevel += RandoLevelManager.LoadLevel;
-        On.LevelManager.EndLevelLoading += RandoLevelManager.EndLevelLoading;
-        On.ElementalSkylandsLevelInitializer.OnBeforeInitDone += RandoLevelManager.ElementalSkylandsInit;
+        On.Level.ChangeRoom += SafeHook.Wrap<On.Level.hook_ChangeRoom>(RandoRoomManager.Level_ChangeRoom);
+        On.LevelManager.LoadLevel += SafeHook.Wrap<On.LevelManager.hook_LoadLevel>(RandoLevelManager.LoadLevel);
+        On.LevelManager.EndLevelLoading += SafeHook.Wrap<On.LevelManager.hook_EndLevelLoading>(RandoLevelManager.EndLevelLoading);
+        On.ElementalSkylandsLevelInitializer.OnBeforeInitDone += SafeHook.Wrap<On.ElementalSkylandsLevelInitializer.hook_OnBeforeInitDone>(RandoLevelManager.ElementalSkylandsInit);
         // On.PortalOpeningCutscene.OnOpenPortalEvent += RandoPortalManager.OpenPortalEvent;
-        On.TotHQ.LeaveToLevel += RandoPortalManager.LeaveHQ;
-        On.TowerOfTimePortal.LoadLevel += RandoPortalManager.TowerOfTimePortal_LoadLevel;
+        On.TotHQ.LeaveToLevel += SafeHook.Wrap<On.TotHQ.hook_LeaveToLevel>(RandoPortalManager.LeaveHQ);
+        On.TowerOfTimePortal.LoadLevel += SafeHook.Wrap<On.TowerOfTimePortal.hook_LoadLevel>(RandoPortalManager.TowerOfTimePortal_LoadLevel);
         // generator deactivation management
         skylandsGeneratorManager.ApplyHooks();
         //These functions let us override and manage power seals ourselves with 'fake' items
-        On.ProgressionManager.TotalPowerSealCollected += ProgressionManager_TotalPowerSealCollected;
-        On.ShopChestOpenCutscene.OnChestOpened += (orig, self) =>
-            RandomizerStateManager.Instance.PowerSealManager?.OnShopChestOpen(orig, self);
-        On.ShopChestChangeShurikenCutscene.Play += (orig, self) =>
-            RandomizerStateManager.Instance.PowerSealManager?.OnShopChestOpen(orig, self);
+        On.ProgressionManager.TotalPowerSealCollected += SafeHook.Wrap<On.ProgressionManager.hook_TotalPowerSealCollected>(ProgressionManager_TotalPowerSealCollected);
+        On.ShopChestOpenCutscene.OnChestOpened += SafeHook.Wrap<On.ShopChestOpenCutscene.hook_OnChestOpened>((orig, self) =>
+            RandomizerStateManager.Instance.PowerSealManager?.OnShopChestOpen(orig, self));
+        On.ShopChestChangeShurikenCutscene.Play += SafeHook.Wrap<On.ShopChestChangeShurikenCutscene.hook_Play>((orig, self) =>
+            RandomizerStateManager.Instance.PowerSealManager?.OnShopChestOpen(orig, self));
         //update loops for Archipelago
         Courier.Events.PlayerController.OnUpdate += PlayerController_OnUpdate;
-        On.InGameHud.OnGUI += InGameHud_OnGUI;
-        On.SaveManager.DoActualSaving += SaveManager_DoActualSave;
-        On.PlayerController.Die += OnPlayerDie;
-        On.Quarble.OnDeathScreenDone += OnDeathScreenDone;
+        On.InGameHud.OnGUI += SafeHook.Wrap<On.InGameHud.hook_OnGUI>(InGameHud_OnGUI);
+        On.SaveManager.DoActualSaving += SafeHook.Wrap<On.SaveManager.hook_DoActualSaving>(SaveManager_DoActualSave);
+        On.PlayerController.Die += SafeHook.Wrap<On.PlayerController.hook_Die>(OnPlayerDie);
+        On.Quarble.OnDeathScreenDone += SafeHook.Wrap<On.Quarble.hook_OnDeathScreenDone>(OnDeathScreenDone);
         // On.MegaTimeShard.NextState += RandoTimeShardManager.NextState;
         // On.MegaTimeShard.ReceiveHit += RandoTimeShardManager.ReceiveHit;
-        On.MegaTimeShard.OnBreakDone += MegaTimeShard_OnBreakDone;
-        On.DialogSequence.GetDialogList += DialogSequence_GetDialogList;
-        On.Cutscene.Play += Cutscene_Play;
-        On.PlayerController.Awake += OnPlayerController_Awake;
+        On.MegaTimeShard.OnBreakDone += SafeHook.Wrap<On.MegaTimeShard.hook_OnBreakDone>(MegaTimeShard_OnBreakDone);
+        On.DialogSequence.GetDialogList += SafeHook.Wrap<On.DialogSequence.hook_GetDialogList>(DialogSequence_GetDialogList);
+        On.Cutscene.Play += SafeHook.Wrap<On.Cutscene.hook_Play>(Cutscene_Play);
+        On.PlayerController.Awake += SafeHook.Wrap<On.PlayerController.hook_Awake>(OnPlayerController_Awake);
         //temp add
 #if DEBUG
-        On.PhantomIntroCutscene.OnEnterRoom += PhantomIntro_OnEnterRoom; //this lets us skip the phantom fight
-        On.UIManager.ShowView += UIManager_ShowView;
-        On.MusicBox.SetNotesState += MusicBox_SetNotesState;
-        On.PowerSeal.OnEnterRoom += PowerSeal_OnEnterRoom;
+        On.PhantomIntroCutscene.OnEnterRoom += SafeHook.Wrap<On.PhantomIntroCutscene.hook_OnEnterRoom>(PhantomIntro_OnEnterRoom); //this lets us skip the phantom fight
+        On.UIManager.ShowView += SafeHook.Wrap<On.UIManager.hook_ShowView>(UIManager_ShowView);
+        On.MusicBox.SetNotesState += SafeHook.Wrap<On.MusicBox.hook_SetNotesState>(MusicBox_SetNotesState);
+        On.PowerSeal.OnEnterRoom += SafeHook.Wrap<On.PowerSeal.hook_OnEnterRoom>(PowerSeal_OnEnterRoom);
 #endif
 
         ItemsAndLocationsHandler.SkylandsGeneratorManager = skylandsGeneratorManager;

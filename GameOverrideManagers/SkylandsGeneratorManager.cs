@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using MessengerRando.Archipelago;
 using MessengerRando.RO;
 using MessengerRando.Utils;
+using static MessengerRando.Utils.SafeHook;
 
 namespace MessengerRando.GameOverrideManagers;
 
@@ -30,12 +31,12 @@ public class SkylandsGeneratorManager
 
     public void ApplyHooks()
     {
-        On.ElementalSkylandGenerator.Start += ElementalSkylandGenerator_Start;
-        On.ElementalSkylandGenerator.SetState += ElementalSkylandGenerator_SetState;
-        On.ElementalSkylandGenerator.OnLanternHit += ElementalSkylandGenerator_OnLanternHit;
-        On.ElementalSkylandGenerator.Shutdown += ElementalSkylandGenerator_Shutdown;
-        On.ElementalSkylandGenerator.OnDeactivateDone += ElementalSkylandGenerator_OnDeactivateDone;
-        On.ElementalSkylandGenerator.OnDisable += ElementalSkylandGenerator_OnDisable;
+        On.ElementalSkylandGenerator.Start += Wrap<On.ElementalSkylandGenerator.hook_Start>(ElementalSkylandGenerator_Start);
+        On.ElementalSkylandGenerator.SetState += Wrap<On.ElementalSkylandGenerator.hook_SetState>(ElementalSkylandGenerator_SetState);
+        On.ElementalSkylandGenerator.OnLanternHit += Wrap<On.ElementalSkylandGenerator.hook_OnLanternHit>(ElementalSkylandGenerator_OnLanternHit);
+        On.ElementalSkylandGenerator.Shutdown += Wrap<On.ElementalSkylandGenerator.hook_Shutdown>(ElementalSkylandGenerator_Shutdown);
+        On.ElementalSkylandGenerator.OnDeactivateDone += Wrap<On.ElementalSkylandGenerator.hook_OnDeactivateDone>(ElementalSkylandGenerator_OnDeactivateDone);
+        On.ElementalSkylandGenerator.OnDisable += Wrap<On.ElementalSkylandGenerator.hook_OnDisable>(ElementalSkylandGenerator_OnDisable);
     }
 
     public void ReceiveGeneratorShutdown(string generatorShutdownItem)
