@@ -317,10 +317,14 @@ public static class ArchipelagoClient
                 var locName = Session.Locations.GetLocationNameFromId(location);
                 if (locName.Contains("Seal"))
                 {
-                    var roomKey =
-                        ItemsAndLocationsHandler.ArchipelagoLocations.Find(
-                            loc => loc.PrettyLocationName.Equals(locName)).LocationName;
-                    Manager<ProgressionManager>.Instance.SetChallengeRoomAsCompleted(roomKey);
+                    var locationObj = ItemsAndLocationsHandler.ArchipelagoLocations.Find(loc => loc.PrettyLocationName.Equals(locName));
+                    if (locationObj == null)
+                    {
+                        logger.Error("Could not find location for {0}", locName);
+                        continue;
+                    }
+                    logger.Log("Marking {0} as completed", locName);
+                    Manager<ProgressionManager>.Instance.SetChallengeRoomAsCompleted(locationObj?.LocationName);
                 }
                 else if (ItemsAndLocationsHandler.ShopLocation(location, out var shopLoc))
                 {
@@ -354,8 +358,7 @@ public static class ArchipelagoClient
             }
             catch (Exception e)
             {
-                logger.Exception(e);
-                logger.Error("{0}: {1}", Session.Locations.GetLocationNameFromId(location), location);
+                logger.Exception(e, "Error while syncing location {0}: {1}", Session.Locations.GetLocationNameFromId(location), location);
             }
         }
     }
