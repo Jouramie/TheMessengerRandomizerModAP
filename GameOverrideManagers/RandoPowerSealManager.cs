@@ -8,7 +8,7 @@ namespace MessengerRando.GameOverrideManagers;
 
 public class RandoPowerSealManager
 {
-    private static readonly Logger logger = Logger.GetLogger(typeof(RandoPowerSealManager));
+    private static readonly Logger logger = Logger.GetLogger<RandoPowerSealManager>();
     public RandoPowerSealManager(int requiredPowerSeals)
     {
         if (requiredPowerSeals == 0)

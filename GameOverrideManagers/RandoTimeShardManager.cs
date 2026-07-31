@@ -8,7 +8,7 @@ namespace MessengerRando.GameOverrideManagers;
 
 public class RandoTimeShardManager
 {
-    private static readonly Logger logger = Logger.GetLogger(typeof(RandoTimeShardManager));
+    private static readonly Logger logger = Logger.GetLogger<RandoTimeShardManager>();
     public struct MegaShard
     {
         private readonly ELevel shardRegion;

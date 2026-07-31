@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using UnityEngine;
 
 namespace MessengerRando.Utils;
@@ -14,6 +15,11 @@ public class Logger(string Tag)
     public static Logger GetLogger(Type type)
     {
         return new Logger(type.Name);
+    }
+
+    public static Logger GetLogger<T>()
+    {
+        return new Logger(typeof(T).Name);
     }
 
     public void Log(string message)
@@ -74,8 +80,9 @@ public class Logger(string Tag)
 
     public void LogFormat(LogType logType, UnityEngine.Object context, string format, params object[] args)
     {
-        if (context == null) Console.Write("({0}) [AP] [{1}] [{2}] ", DateTime.Now, logType, Tag);
-        else Console.Write("({0}) [AP] [{1}] [{2}: {3}] ", DateTime.Now, logType, Tag, context.name);
+        var threadName = Thread.CurrentThread.Name ?? Thread.CurrentThread.ManagedThreadId.ToString();
+        if (context == null) Console.Write("({0}) [AP] [{1}] {2} [{3}] ", DateTime.Now, logType, threadName, Tag);
+        else Console.Write("({0}) [AP] [{1}] {2} [{3}: {4}] ", DateTime.Now, logType, threadName, Tag, context.name);
         Console.WriteLine(format, args);
     }
 }

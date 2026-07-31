@@ -8,7 +8,7 @@ namespace MessengerRando.Archipelago;
 
 public class TrackerManager
 {
-    private static readonly Logger logger = Logger.GetLogger(typeof(TrackerManager));
+    private static readonly Logger logger = Logger.GetLogger<TrackerManager>();
 
     private List<string> VisitedEntrances = [];
 

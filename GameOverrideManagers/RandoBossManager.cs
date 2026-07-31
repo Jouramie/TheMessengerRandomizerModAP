@@ -13,7 +13,7 @@ namespace MessengerRando.GameOverrideManagers;
 
 public abstract class RandoBossManager
 {
-    private static readonly Logger logger = Logger.GetLogger(typeof(RandoBossManager));
+    private static readonly Logger logger = Logger.GetLogger<RandoBossManager>();
     public static List<string> DefeatedBosses = [];
 
     private readonly Dictionary<string, string> origToNewBoss;

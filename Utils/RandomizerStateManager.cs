@@ -20,7 +20,7 @@ namespace MessengerRando.Utils;
 
 public class RandomizerStateManager
 {
-    private static readonly Logger logger = Logger.GetLogger(typeof(RandomizerStateManager));
+    private static readonly Logger logger = Logger.GetLogger<RandomizerStateManager>();
     public static RandomizerStateManager Instance { private set; get; }
     public int CurrentFileSlot { set; get; }
 

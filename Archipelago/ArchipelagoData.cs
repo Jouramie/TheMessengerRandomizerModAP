@@ -9,7 +9,7 @@ namespace MessengerRando.Archipelago;
 
 public class ArchipelagoData
 {
-    private static readonly Logger logger = Logger.GetLogger(typeof(ArchipelagoData));
+    private static readonly Logger logger = Logger.GetLogger<ArchipelagoData>();
     public string Uri = "archipelago.gg";
     public int Port = 38281;
     public string SlotName = "";

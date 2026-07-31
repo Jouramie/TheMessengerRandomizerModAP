@@ -13,7 +13,7 @@ namespace MessengerRando.Utils;
 /// </summary>
 public class RandoSave : CourierModSave
 {
-    private static readonly Logger logger = Logger.GetLogger(typeof(RandoSave));
+    private static readonly Logger logger = Logger.GetLogger<RandoSave>();
     public string APSaveData = GetSaveData();
 
     public void Update()

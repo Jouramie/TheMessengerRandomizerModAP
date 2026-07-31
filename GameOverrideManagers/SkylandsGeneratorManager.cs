@@ -10,7 +10,7 @@ namespace MessengerRando.GameOverrideManagers;
 
 public class SkylandsGeneratorManager
 {
-    private static readonly Logger logger = Logger.GetLogger(typeof(SkylandsGeneratorManager));
+    private static readonly Logger logger = Logger.GetLogger<SkylandsGeneratorManager>();
 
     private readonly Dictionary<GeneratorType, ElementalSkylandGenerator> LoadedGenerators = [];
     private readonly Dictionary<GeneratorType, string> FlagsByGenerator = new()

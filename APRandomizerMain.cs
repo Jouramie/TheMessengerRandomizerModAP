@@ -30,7 +30,7 @@ namespace MessengerRando;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class APRandomizerMain : CourierModule
 {
-    private static readonly Logger logger = Logger.GetLogger(typeof(APRandomizerMain));
+    private static readonly Logger logger = Logger.GetLogger<APRandomizerMain>();
     private float updateTimer;
     public static float UpdateTime = 3.0f;
 
@@ -53,6 +53,7 @@ public class APRandomizerMain : CourierModule
 
     public override void Load()
     {
+        Thread.CurrentThread.Name = "GameThread";
         logger.Log("Randomizer loading and ready to try things!");
 
         //Initialize the randomizer state manager
@@ -121,7 +122,7 @@ public class APRandomizerMain : CourierModule
         On.ShopChestChangeShurikenCutscene.Play += SafeHook.Wrap<On.ShopChestChangeShurikenCutscene.hook_Play>((orig, self) =>
             RandomizerStateManager.Instance.PowerSealManager?.OnShopChestOpen(orig, self));
         //update loops for Archipelago
-        Courier.Events.PlayerController.OnUpdate += PlayerController_OnUpdate;
+        Courier.Events.PlayerController.OnUpdate += SafeHook.Wrap(PlayerController_OnUpdate);
         On.InGameHud.OnGUI += SafeHook.Wrap<On.InGameHud.hook_OnGUI>(InGameHud_OnGUI);
         On.SaveManager.DoActualSaving += SafeHook.Wrap<On.SaveManager.hook_DoActualSaving>(SaveManager_DoActualSave);
         On.PlayerController.Die += SafeHook.Wrap<On.PlayerController.hook_Die>(OnPlayerDie);
@@ -638,11 +639,7 @@ public class APRandomizerMain : CourierModule
     View UIManager_ShowView(On.UIManager.orig_ShowView orig, UIManager self, Type viewType,
         EScreenLayers layer, IViewParams screenParams, bool transitionIn, AnimatorUpdateMode animUpdateMode)
     {
-        logger.Log($"viewType {viewType}");
-        logger.Log($"layer {layer}");
-        logger.Log($"params {screenParams}");
-        logger.Log($"transition {transitionIn}");
-        logger.Log($"updateMode {animUpdateMode}");
+        logger.Log($"ShowView {viewType} layer {layer} params [{screenParams}] transitionIn {transitionIn} updateMode {animUpdateMode}");
         return orig(self, viewType, layer, screenParams, transitionIn, animUpdateMode);
     }
 

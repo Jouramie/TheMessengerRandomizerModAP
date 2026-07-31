@@ -10,7 +10,7 @@ namespace MessengerRando.Archipelago;
 
 public class DeathLinkInterface
 {
-    private static readonly Logger logger = Logger.GetLogger(typeof(DeathLinkInterface));
+    private static readonly Logger logger = Logger.GetLogger<DeathLinkInterface>();
     public DeathLinkService DeathLinkService;
     public PlayerController Player;
     private readonly List<DeathLink> deathLinks = new List<DeathLink>();

@@ -18,7 +18,7 @@ namespace MessengerRando.Utils.Menus;
 
 public class HintMenu
 {
-    private static readonly Logger logger = Logger.GetLogger(typeof(HintMenu));
+    private static readonly Logger logger = Logger.GetLogger<HintMenu>();
     public static OptionsButtonInfo ArchipelagoHintMenuButton;
     private static HintScreen hintScreen;
 
