@@ -23,7 +23,6 @@ public static class ItemsAndLocationsHandler
     public const long BaseOffset = 0xADD_000;
 
     public static bool Synced;
-    public static TrackerManager TrackerManager;
 
     /// <summary>
     /// Builds the item and lookup dictionaries for converting to and from AP checks. Will always make every location
@@ -547,7 +546,6 @@ public static class ItemsAndLocationsHandler
     {
         Synced = true;
         ArchipelagoClient.SyncEvents();
-        TrackerManager.ReconciliateUnlockedPortals();
 
         var receivedItems = new Dictionary<long, int>();
 
