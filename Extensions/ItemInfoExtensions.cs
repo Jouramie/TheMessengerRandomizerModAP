@@ -1,9 +1,10 @@
 ﻿using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
 using MessengerRando.Archipelago;
+using MessengerRando.Utils;
 using WebSocketSharp;
 
-namespace MessengerRando.Utils;
+namespace MessengerRando.Extensions;
 
 public static class ItemInfoExtensions
 {

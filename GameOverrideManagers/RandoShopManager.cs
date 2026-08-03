@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Archipelago.MultiClient.Net.Enums;
 using MessengerRando.Archipelago;
+using MessengerRando.Extensions;
 using MessengerRando.RO;
 using MessengerRando.Utils;
 using Mod.Courier;

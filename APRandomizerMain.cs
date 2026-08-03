@@ -4,16 +4,15 @@ using System.Linq;
 using System.Threading;
 using Archipelago.MultiClient.Net.Enums;
 using MessengerRando.Archipelago;
+using MessengerRando.Extensions;
 using MessengerRando.GameOverrideManagers;
 using MessengerRando.Overrides;
-using MessengerRando.RO;
 using MessengerRando.Utils;
 using MessengerRando.Utils.Constants;
 using MessengerRando.Utils.Menus;
 using Mod.Courier;
 using Mod.Courier.Module;
 using Mod.Courier.UI;
-using MonoMod.Cil;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -96,13 +95,10 @@ public class APRandomizerMain : CourierModule
         On.BackToTitleScreen.GoBackToTitleScreen += SafeHook.Wrap<On.BackToTitleScreen.hook_GoBackToTitleScreen>(
             PauseScreen_OnQuitToTitle
         );
-        On.NecrophobicWorkerCutscene.Play += SafeHook.Wrap<On.NecrophobicWorkerCutscene.hook_Play>(
-            NecrophobicWorkerCutscene_Play
-        );
-        IL.RuxxtinNoteAndAwardAmuletCutscene.Play += RuxxtinNoteAndAwardAmuletCutscene_Play;
+
+        CatacombsOverrides.ApplyHooks();
+
         On.DialogCutscene.Play += SafeHook.Wrap<On.DialogCutscene.hook_Play>(DialogCutscene_Play);
-        On.CatacombLevelInitializer.OnBeforeInitDone +=
-            SafeHook.Wrap<On.CatacombLevelInitializer.hook_OnBeforeInitDone>(CatacombLevelInitializer_OnBeforeInitDone);
         On.DialogManager.LoadDialogs_ELanguage += SafeHook.Wrap<On.DialogManager.hook_LoadDialogs_ELanguage>(
             DialogChanger.LoadDialogs_Elanguage
         );
@@ -635,55 +631,6 @@ public class APRandomizerMain : CourierModule
         Manager<UIManager>.Instance.GetView<InGameHud>().UpdateShurikenVisibility();
     }
 
-    //Fixing necro cutscene check
-    void CatacombLevelInitializer_OnBeforeInitDone(
-        On.CatacombLevelInitializer.orig_OnBeforeInitDone orig,
-        CatacombLevelInitializer self
-    )
-    {
-        //check to see if we already have the item at Necro check
-        if (ArchipelagoClient.HasConnected)
-        {
-            if (
-                !RandomizerStateManager.HasCompletedCheck(
-                    ItemsAndLocationsHandler.LocationsLookup[new LocationRO("Necro")]
-                )
-            )
-                self.necrophobicWorkerCutscene.Play();
-            else
-                self.necrophobicWorkerCutscene.phobekin.gameObject.SetActive(false);
-            //Call our overriden fixing function
-            RandoCatacombLevelInitializer.FixPlayerStuckInChallengeRoom();
-        }
-        else
-        {
-            //we are not rando here, call orig method
-            orig(self);
-        }
-    }
-
-    // Breaking into Necro cutscene to fix things
-    private static void NecrophobicWorkerCutscene_Play(
-        On.NecrophobicWorkerCutscene.orig_Play orig,
-        NecrophobicWorkerCutscene self
-    )
-    {
-        //Cutscene moves Ninja around, lets see if i can stop it by making that "location" the current location the player is.
-        if (ArchipelagoClient.HasConnected)
-            self.playerStartPosition = Object.FindObjectOfType<PlayerController>().transform;
-        orig(self);
-    }
-
-    void RuxxtinNoteAndAwardAmuletCutscene_Play(ILContext il)
-    {
-        ILCursor cursor = new ILCursor(il);
-
-        while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcI4(55)))
-        {
-            cursor.EmitDelegate<Func<EItems, EItems>>(GetRandoItemByItem);
-        }
-    }
-
     void MegaTimeShard_OnBreakDone(On.MegaTimeShard.orig_OnBreakDone orig, MegaTimeShard self)
     {
         var currentLevel = Manager<LevelManager>.Instance.GetCurrentLevelEnum();
@@ -948,16 +895,6 @@ public class APRandomizerMain : CourierModule
         int.TryParse(answer, out var newTime);
         UpdateTime = newTime;
         return true;
-    }
-
-    /// <summary>
-    /// Delegate function for getting rando item. This can be used by IL hooks that need to make this call later.
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    private EItems GetRandoItemByItem(EItems item)
-    {
-        return !randoStateManager.IsLocationRandomized(item, out var ruxxAmuletLocation) ? item : EItems.POTION;
     }
 
     public static string GetCurrentSeedNum()

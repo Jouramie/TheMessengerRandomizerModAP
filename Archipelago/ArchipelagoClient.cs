@@ -8,6 +8,7 @@ using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Exceptions;
 using Archipelago.MultiClient.Net.MessageLog.Messages;
 using Archipelago.MultiClient.Net.Packets;
+using MessengerRando.Extensions;
 using MessengerRando.GameOverrideManagers;
 using MessengerRando.Utils;
 using Mod.Courier.UI;

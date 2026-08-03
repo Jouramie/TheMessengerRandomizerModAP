@@ -1,150 +1,156 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <TargetFramework>net35</TargetFramework>
-    <ProjectGuid>{6271B317-0737-489F-8319-67F0AC291D20}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MessengerRando</RootNamespace>
-    <AssemblyName>TheMessengerRandomizer</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <Version>0.16.0-beta</Version>
-    <LangVersion>latest</LangVersion>
-    <Configurations>Debug;Release</Configurations>
-    <Platforms>AnyCPU</Platforms>
-    <RuntimeIdentifier>win</RuntimeIdentifier>
-    <RuntimeIdentifiers>win</RuntimeIdentifiers>
-  </PropertyGroup>
+    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+    <PropertyGroup>
+        <TargetFramework>net35</TargetFramework>
+        <ProjectGuid>{6271B317-0737-489F-8319-67F0AC291D20}</ProjectGuid>
+        <OutputType>Library</OutputType>
+        <AppDesignerFolder>Properties</AppDesignerFolder>
+        <RootNamespace>MessengerRando</RootNamespace>
+        <AssemblyName>TheMessengerRandomizer</AssemblyName>
+        <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+        <FileAlignment>512</FileAlignment>
+        <Deterministic>true</Deterministic>
+        <Version>0.16.0-beta</Version>
+        <LangVersion>latest</LangVersion>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <RuntimeIdentifier>win</RuntimeIdentifier>
+        <RuntimeIdentifiers>win</RuntimeIdentifiers>
+    </PropertyGroup>
 
-  <Target Name="ValidateGamePath" BeforeTargets="PrepareForBuild">
-    <Error Condition="'$(GamePath)' == ''" Text="GamePath is not set. Set it in Directory.Build.props.user or pass /p:GamePath=..." />
-    <Error Condition="!Exists('$(GamePath)\TheMessenger_Data\Managed\Assembly-CSharp.dll')" Text="GamePath '$(GamePath)' does not look valid. Expected file not found: $(GamePath)\TheMessenger_Data\Managed\Assembly-CSharp.dll" />
-  </Target>
+    <Target Name="ValidateGamePath" BeforeTargets="PrepareForBuild">
+        <Error Condition="'$(GamePath)' == ''" Text="GamePath is not set. Set it in Directory.Build.props.user or pass /p:GamePath=..." />
+        <Error Condition="!Exists('$(GamePath)\TheMessenger_Data\Managed\Assembly-CSharp.dll')" Text="GamePath '$(GamePath)' does not look valid. Expected file not found: $(GamePath)\TheMessenger_Data\Managed\Assembly-CSharp.dll" />
+    </Target>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>$(GamePath)\Mods\TheMessengerRandomizerAP\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\net35\TheMessengerRandomizerAP\</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>$(GamePath)\Mods\TheMessengerRandomizerAP\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <Prefer32Bit>false</Prefer32Bit>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\net35\TheMessengerRandomizerAP\</OutputPath>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <Prefer32Bit>false</Prefer32Bit>
+    </PropertyGroup>
 
-  <Target Name="ZipMod" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <ZipDirectory SourceDirectory="bin\Release\net35\" DestinationFile="bin\Release\TheMessengerRandomizerAP-$(Version).zip" Overwrite="true" />
-  </Target>
+    <Target Name="ZipMod" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <ZipDirectory SourceDirectory="bin\Release\net35\" DestinationFile="bin\Release\TheMessengerRandomizerAP-$(Version).zip" Overwrite="true" />
+    </Target>
 
-  <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>$(GamePath)\TheMessenger_Data\Managed\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>$(GamePath)\TheMessenger_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MMHOOK_Assembly-CSharp">
-      <HintPath>$(GamePath)\TheMessenger_Data\Managed\MMHOOK_Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>$(GamePath)\TheMessenger_Data\Managed\Mono.Cecil.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MonoMod.Utils">
-      <HintPath>$(GamePath)\TheMessenger_Data\Managed\MonoMod.Utils.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System">
-      <HintPath>$(GamePath)\TheMessenger_Data\Managed\System.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>$(GamePath)\TheMessenger_Data\Managed\UnityEngine.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>$(GamePath)\TheMessenger_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>$(GamePath)\TheMessenger_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>$(GamePath)\TheMessenger_Data\Managed\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UIModule">
-      <HintPath>$(GamePath)\TheMessenger_Data\Managed\UnityEngine.UIModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
+    <ItemGroup>
+        <Reference Include="Assembly-CSharp">
+            <HintPath>$(GamePath)\TheMessenger_Data\Managed\Assembly-CSharp.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Assembly-CSharp-firstpass">
+            <HintPath>$(GamePath)\TheMessenger_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="MMHOOK_Assembly-CSharp">
+            <HintPath>$(GamePath)\TheMessenger_Data\Managed\MMHOOK_Assembly-CSharp.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="Mono.Cecil">
+            <HintPath>$(GamePath)\TheMessenger_Data\Managed\Mono.Cecil.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="MonoMod.Utils">
+            <HintPath>$(GamePath)\TheMessenger_Data\Managed\MonoMod.Utils.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="System">
+            <HintPath>$(GamePath)\TheMessenger_Data\Managed\System.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine">
+            <HintPath>$(GamePath)\TheMessenger_Data\Managed\UnityEngine.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.AnimationModule">
+            <HintPath>$(GamePath)\TheMessenger_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>$(GamePath)\TheMessenger_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.Physics2DModule">
+            <HintPath>$(GamePath)\TheMessenger_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UI">
+            <HintPath>$(GamePath)\TheMessenger_Data\Managed\UnityEngine.UI.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UIModule">
+            <HintPath>$(GamePath)\TheMessenger_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="Archipelago\ArchipelagoClient.cs" />
-    <Compile Include="Archipelago\ArchipelagoData.cs" />
-    <Compile Include="Archipelago\DeathLinkInterface.cs" />
-    <Compile Include="Archipelago\ItemsAndLocationsHandler.cs" />
-    <Compile Include="Archipelago\TrackerManager.cs" />
-    <Compile Include="Exceptions\RandomizerException.cs" />
-    <Compile Include="GameOverrideManagers\LostWoodsManager.cs" />
-    <Compile Include="GameOverrideManagers\RandoBossManager.cs" />
-    <Compile Include="GameOverrideManagers\SkylandsGeneratorManager.cs" />
-    <Compile Include="GameOverrideManagers\RandoMusicManager.cs" />
-    <Compile Include="GameOverrideManagers\RandoPortalManager.cs" />
-    <Compile Include="GameOverrideManagers\RandoPowerSealManager.cs" />
-    <Compile Include="GameOverrideManagers\RandoLevelManager.cs" />
-    <Compile Include="GameOverrideManagers\RandoRoomManager.cs" />
-    <Compile Include="GameOverrideManagers\RandoShopManager.cs" />
-    <Compile Include="GameOverrideManagers\RandoTimeShardManager.cs" />
-    <Compile Include="GameOverrideManagers\FlavorDialogManager.cs" />
-    <Compile Include="GameOverrideManagers\TrapManager.cs" />
-    <Compile Include="Overrides\RandoCatacombLevelInitializer.cs" />
-    <Compile Include="RO\RandoItemRO.cs" />
-    <Compile Include="RO\LocationRO.cs" />
-    <Compile Include="Utils\Logger.cs" />
-    <Compile Include="Utils\Menus\ArchipelagoMenu.cs" />
-    <Compile Include="Utils\Menus\HintButtonInfo.cs" />
-    <Compile Include="Utils\Menus\HintMenu.cs" />
-    <Compile Include="Utils\Menus\RandoMenu.cs" />
-    <Compile Include="Utils\OptionsExporter.cs" />
-    <Compile Include="Utils\ReflectionHelpers.cs" />
-    <Compile Include="Utils\SafeHook.cs" />
-    <Compile Include="Utils\SafeHookAttribute.cs" />
-    <Compile Include="Utils\SeedGenerator.cs" />
-    <Compile Include="Utils\Constants\BossConstants.cs" />
-    <Compile Include="Utils\Constants\LevelConstants.cs" />
-    <Compile Include="Utils\Constants\RoomConstants.cs" />
-    <Compile Include="Utils\RandomizerOptions.cs" />
-    <Compile Include="Utils\RandoSave.cs" />
-    <Compile Include="Utils\ItemInfoExtensions.cs" />
-    <Compile Include="Utils\DialogChanger.cs" />
-    <Compile Include="Utils\RandomizerConstants.cs" />
-    <Compile Include="Utils\RandomizerStateManager.cs" />
-    <Compile Include="Utils\ItemRandomizerUtil.cs" />
-    <Compile Include="APRandomizerMain.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils\UserConfig.cs" />
-    <Content Include="courier.toml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="wspp\win64\**\*.*" Link="%(RecursiveDir)%(Filename)%(Extension)">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Include="Archipelago\ArchipelagoClient.cs" />
+        <Compile Include="Archipelago\ArchipelagoData.cs" />
+        <Compile Include="Archipelago\DeathLinkInterface.cs" />
+        <Compile Include="Archipelago\ItemsAndLocationsHandler.cs" />
+        <Compile Include="Archipelago\TrackerManager.cs" />
+        <Compile Include="APDebug.cs" />
+        <Compile Include="Exceptions\RandomizerException.cs" />
+        <Compile Include="Extensions\ProgressionManagerExtensions.cs" />
+        <Compile Include="GameOverrideManagers\LostWoodsManager.cs" />
+        <Compile Include="GameOverrideManagers\RandoBossManager.cs" />
+        <Compile Include="GameOverrideManagers\SkylandsGeneratorManager.cs" />
+        <Compile Include="GameOverrideManagers\RandoMusicManager.cs" />
+        <Compile Include="GameOverrideManagers\RandoPortalManager.cs" />
+        <Compile Include="GameOverrideManagers\RandoPowerSealManager.cs" />
+        <Compile Include="GameOverrideManagers\RandoLevelManager.cs" />
+        <Compile Include="GameOverrideManagers\RandoRoomManager.cs" />
+        <Compile Include="GameOverrideManagers\RandoShopManager.cs" />
+        <Compile Include="GameOverrideManagers\RandoTimeShardManager.cs" />
+        <Compile Include="GameOverrideManagers\FlavorDialogManager.cs" />
+        <Compile Include="GameOverrideManagers\TrapManager.cs" />
+        <Compile Include="Overrides\CatacombsOverrides.cs" />
+        <Compile Include="RO\RandoItemRO.cs" />
+        <Compile Include="RO\LocationRO.cs" />
+        <Compile Include="Utils\Logger.cs" />
+        <Compile Include="Utils\Menus\ArchipelagoMenu.cs" />
+        <Compile Include="Utils\Menus\HintButtonInfo.cs" />
+        <Compile Include="Utils\Menus\HintMenu.cs" />
+        <Compile Include="Utils\Menus\RandoMenu.cs" />
+        <Compile Include="Utils\OptionsExporter.cs" />
+        <Compile Include="Extensions\ReflectionHelpers.cs" />
+        <Compile Include="Utils\SafeHook.cs" />
+        <Compile Include="Utils\SafeHookAttribute.cs" />
+        <Compile Include="Utils\SeedGenerator.cs" />
+        <Compile Include="Utils\Constants\BossConstants.cs" />
+        <Compile Include="Utils\Constants\LevelConstants.cs" />
+        <Compile Include="Utils\Constants\RoomConstants.cs" />
+        <Compile Include="Utils\RandomizerOptions.cs" />
+        <Compile Include="Utils\RandoSave.cs" />
+        <Compile Include="Extensions\ItemInfoExtensions.cs" />
+        <Compile Include="Utils\DialogChanger.cs" />
+        <Compile Include="Utils\RandomizerConstants.cs" />
+        <Compile Include="Utils\RandomizerStateManager.cs" />
+        <Compile Include="Utils\ItemRandomizerUtil.cs" />
+        <Compile Include="APRandomizerMain.cs" />
+        <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Utils\UserConfig.cs" />
+        <Content Include="courier.toml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="wspp\win64\**\*.*" Link="%(RecursiveDir)%(Filename)%(Extension)">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 
   <ItemGroup>
     <None Include="Directory.Build.props" />
@@ -152,15 +158,15 @@
     <None Include="docs\BUILD_INSTRUCTIONS.md" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Archipelago.MultiClient.Net" Version="6.6.0" />
-    <PackageReference Include="Archipelago.MultiClient.Net.Analyzers" Version="1.3.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net35" Version="1.0.3">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    <ItemGroup>
+        <PackageReference Include="Archipelago.MultiClient.Net" Version="6.6.0" />
+        <PackageReference Include="Archipelago.MultiClient.Net.Analyzers" Version="1.3.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net35" Version="1.0.3">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

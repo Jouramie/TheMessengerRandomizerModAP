@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using MessengerRando.Archipelago;
+using MessengerRando.Extensions;
 using MessengerRando.GameOverrideManagers;
 using UnityEngine;
 

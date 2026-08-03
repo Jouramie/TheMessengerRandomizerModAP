@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using MessengerRando.Archipelago;
+using MessengerRando.Extensions;
 using MessengerRando.RO;
 using MessengerRando.Utils;
 using static MessengerRando.Utils.SafeHook;
@@ -170,7 +171,7 @@ public class SkylandsGeneratorManager
         }
         if (flag)
         {
-            ReflectionHelpers.InvokeMethod(self, "Shutdown");
+            self.InvokeMethod("Shutdown");
         }
     }
 
@@ -220,7 +221,7 @@ public class SkylandsGeneratorManager
             self.wall.SetActive(value: false);
         }
 
-        self.StartCoroutine((IEnumerator)ReflectionHelpers.InvokeMethodWithReturn(self, "ShakeCamCoroutine"));
+        self.StartCoroutine(self.InvokeMethod<IEnumerator>("ShakeCamCoroutine"));
     }
 
     private void ElementalSkylandGenerator_OnDisable(
