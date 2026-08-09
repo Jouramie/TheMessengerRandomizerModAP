@@ -9,6 +9,7 @@ namespace MessengerRando.GameOverrideManagers;
 public class RandoTimeShardManager
 {
     private static readonly Logger logger = Logger.GetLogger<RandoTimeShardManager>();
+
     public struct MegaShard
     {
         private readonly ELevel shardRegion;
@@ -91,15 +92,22 @@ public class RandoTimeShardManager
     {
         var location = ShardLocation(shardToBreak);
         logger.Log("Broke Shard {0}", location.LocationName);
-        if (!ArchipelagoClient.HasConnected) return;
+        if (!ArchipelagoClient.HasConnected)
+            return;
 
-        if (location.Equals(new LocationRO("Money Farm Room Mega Shard 1")) &&
-            ArchipelagoClient.ServerData.CheckedLocations.Contains(
-                ItemsAndLocationsHandler.LocationsLookup[new LocationRO("Money Farm Room Mega Shard 1")]))
+        if (
+            location.Equals(new LocationRO("Money Farm Room Mega Shard 1"))
+            && ArchipelagoClient.ServerData.CheckedLocations.Contains(
+                ItemsAndLocationsHandler.LocationsLookup[new LocationRO("Money Farm Room Mega Shard 1")]
+            )
+        )
             location = new LocationRO("Money Farm Room Mega Shard 2");
-        else if (location.Equals(new LocationRO("Quick Restock Mega Shard 1")) &&
-                 ArchipelagoClient.ServerData.CheckedLocations.Contains(
-                     ItemsAndLocationsHandler.LocationsLookup[new LocationRO("Quick Restock Mega Shard 1")]))
+        else if (
+            location.Equals(new LocationRO("Quick Restock Mega Shard 1"))
+            && ArchipelagoClient.ServerData.CheckedLocations.Contains(
+                ItemsAndLocationsHandler.LocationsLookup[new LocationRO("Quick Restock Mega Shard 1")]
+            )
+        )
             location = new LocationRO("Quick Restock Mega Shard 2");
         ItemsAndLocationsHandler.SendLocationCheck(location);
     }
@@ -109,10 +117,13 @@ public class RandoTimeShardManager
         var currentLevel = Manager<LevelManager>.Instance.GetCurrentLevelEnum();
         var currentRoom = Manager<Level>.Instance.CurrentRoom.roomKey;
         var location = ShardLocation(new MegaShard(currentLevel, currentRoom));
-        if (!location.Equals(new LocationRO("Money Farm Room Mega Shard 1")) &&
-            !location.Equals(new LocationRO("Quick Restock Mega Shard 1")) &&
-            ArchipelagoClient.ServerData.CheckedLocations.
-                Contains(ItemsAndLocationsHandler.LocationsLookup[location]))
+        if (
+            !location.Equals(new LocationRO("Money Farm Room Mega Shard 1"))
+            && !location.Equals(new LocationRO("Quick Restock Mega Shard 1"))
+            && ArchipelagoClient.ServerData.CheckedLocations.Contains(
+                ItemsAndLocationsHandler.LocationsLookup[location]
+            )
+        )
         {
             self.SetHP(self.maxHP);
             return;

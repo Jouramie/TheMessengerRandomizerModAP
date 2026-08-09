@@ -14,7 +14,8 @@ public static class OptionsExporter
 
     public static void ExportAsync(SubMenuButtonInfo exportButton)
     {
-        if (exporting) return;
+        if (exporting)
+            return;
         exporting = true;
         logger.Log("Exporting options");
         Export(result => OnExported(result, exportButton));
@@ -78,7 +79,8 @@ public static class OptionsExporter
             entry => true,
             0,
             null,
-            TextEntryButtonInfo.CharsetFlags.Space);
+            TextEntryButtonInfo.CharsetFlags.Space
+        );
 
         generatePopup.Init(result ? "Options successfully exported!" : $"Options export failed: {messageText}");
         generatePopup.gameObject.SetActive(true);

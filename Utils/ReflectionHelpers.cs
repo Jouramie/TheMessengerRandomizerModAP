@@ -9,7 +9,8 @@ public static class ReflectionHelpers
     public static T GetPrivateField<T>(this object o, string fieldName)
     {
         var field = o.GetType().GetField(fieldName, Flags);
-        if (field != null) return (T)field.GetValue(o);
+        if (field != null)
+            return (T)field.GetValue(o);
         return default;
     }
 

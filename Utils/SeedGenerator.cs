@@ -20,7 +20,8 @@ public static class SeedGenerator
 
     public static void GenerateAsync(SubMenuButtonInfo generateButton)
     {
-        if (generating) return;
+        if (generating)
+            return;
         generating = true;
         Generate(result => OnGenerated(result, generateButton));
     }
@@ -38,8 +39,7 @@ public static class SeedGenerator
             var path = "";
             try
             {
-                var key = Registry.LocalMachine.OpenSubKey(
-                    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall");
+                var key = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall");
                 foreach (var subkeyName in key.GetSubKeyNames())
                 {
                     var subkey = key.OpenSubKey(subkeyName);
@@ -56,7 +56,8 @@ public static class SeedGenerator
             {
                 logger.Exception(e);
             }
-            if (path.IsNullOrEmpty()) return false;
+            if (path.IsNullOrEmpty())
+                return false;
             ArchipelagoPath = path;
         }
 
@@ -69,10 +70,10 @@ public static class SeedGenerator
         archipelago.StartInfo.FileName = $"{ArchipelagoPath}\\ArchipelagoGenerate.exe";
 
         var args =
-            "--multi 1 " +
-            $"--spoiler {RandomizerOptions.SpoilerLevel} " +
-            $"--player_files_path \"{outDirectory}\" " +
-            $"--outputpath \"{outDirectory}\\output\"";
+            "--multi 1 "
+            + $"--spoiler {RandomizerOptions.SpoilerLevel} "
+            + $"--player_files_path \"{outDirectory}\" "
+            + $"--outputpath \"{outDirectory}\\output\"";
         if (!RandomizerOptions.Seed.IsNullOrEmpty())
             args += $" --seed {RandomizerOptions.Seed}";
         if (RandoShopManager.RaceMode)
@@ -109,9 +110,12 @@ public static class SeedGenerator
             entry => true,
             0,
             null,
-            TextEntryButtonInfo.CharsetFlags.Space);
+            TextEntryButtonInfo.CharsetFlags.Space
+        );
 
-        generatePopup.Init(result ? "Seed successfully generated!" : "Seed generation failed. Ensure you've output a settings file.");
+        generatePopup.Init(
+            result ? "Seed successfully generated!" : "Seed generation failed. Ensure you've output a settings file."
+        );
         generatePopup.gameObject.SetActive(true);
         generating = false;
     }
@@ -126,6 +130,7 @@ public static class SeedGenerator
             _ => UserConfig.FillerColor,
         };
     }
+
     public static string GetOfflineDialog(long locId)
     {
         var itemInfo = ArchipelagoClient.ServerData.LocationData[locId].First();

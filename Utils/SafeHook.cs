@@ -6,7 +6,8 @@ public static class SafeHook
 {
     private static readonly Logger logger = Logger.GetLogger(typeof(SafeHook));
 
-    public static T Wrap<T>(T hook) where T : Delegate
+    public static T Wrap<T>(T hook)
+        where T : Delegate
     {
         Type delegateType = typeof(T);
         var invoke = delegateType.GetMethod("Invoke");
@@ -22,17 +23,51 @@ public static class SafeHook
         Type wrapperType = parameters.Length switch
         {
             2 => typeof(HookInvoker2<,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType),
-            3 => typeof(HookInvoker3<,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType),
-            4 => typeof(HookInvoker4<,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType),
-            5 => typeof(HookInvoker5<,,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType, parameters[4].ParameterType),
-            6 => typeof(HookInvoker6<,,,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType, parameters[4].ParameterType, parameters[5].ParameterType),
-            7 => typeof(HookInvoker7<,,,,,,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType, parameters[2].ParameterType, parameters[3].ParameterType, parameters[4].ParameterType, parameters[5].ParameterType, parameters[6].ParameterType),
+            3 => typeof(HookInvoker3<,,>).MakeGenericType(
+                parameters[0].ParameterType,
+                parameters[1].ParameterType,
+                parameters[2].ParameterType
+            ),
+            4 => typeof(HookInvoker4<,,,>).MakeGenericType(
+                parameters[0].ParameterType,
+                parameters[1].ParameterType,
+                parameters[2].ParameterType,
+                parameters[3].ParameterType
+            ),
+            5 => typeof(HookInvoker5<,,,,>).MakeGenericType(
+                parameters[0].ParameterType,
+                parameters[1].ParameterType,
+                parameters[2].ParameterType,
+                parameters[3].ParameterType,
+                parameters[4].ParameterType
+            ),
+            6 => typeof(HookInvoker6<,,,,,>).MakeGenericType(
+                parameters[0].ParameterType,
+                parameters[1].ParameterType,
+                parameters[2].ParameterType,
+                parameters[3].ParameterType,
+                parameters[4].ParameterType,
+                parameters[5].ParameterType
+            ),
+            7 => typeof(HookInvoker7<,,,,,,>).MakeGenericType(
+                parameters[0].ParameterType,
+                parameters[1].ParameterType,
+                parameters[2].ParameterType,
+                parameters[3].ParameterType,
+                parameters[4].ParameterType,
+                parameters[5].ParameterType,
+                parameters[6].ParameterType
+            ),
             _ => null,
         };
 
         if (wrapperType == null)
         {
-            logger.Warning("Unsupported delegate type: {0} (parameter count: {1})", delegateType.FullName, parameters.Length);
+            logger.Warning(
+                "Unsupported delegate type: {0} (parameter count: {1})",
+                delegateType.FullName,
+                parameters.Length
+            );
             return hook;
         }
 
@@ -177,4 +212,3 @@ public static class SafeHook
         }
     }
 }
-

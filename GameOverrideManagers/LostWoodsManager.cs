@@ -18,6 +18,7 @@ public static class LostWoodsManager
         // if (ShouldBeSolved || tempSolve)
         orig(self);
     }
+
     public static void SolveLostWoods()
     {
         tempSolve = true;
@@ -37,8 +38,7 @@ public static class LostWoodsManager
 
     public static void UnsolveLostWoods()
     {
-        var lostWoodsSolved =
-            typeof(LostWoods).GetField("solved", BindingFlags.NonPublic | BindingFlags.Instance);
+        var lostWoodsSolved = typeof(LostWoods).GetField("solved", BindingFlags.NonPublic | BindingFlags.Instance);
         if (lostWoodsSolved != null)
         {
             lostWoodsSolved.SetValue(Object.FindObjectsOfType<LostWoods>(), true);

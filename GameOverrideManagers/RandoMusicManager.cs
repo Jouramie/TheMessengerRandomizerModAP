@@ -37,7 +37,8 @@ public static class RandoMusicManager
         bool loop,
         float fadeInDuration,
         float playbackTime,
-        GameObject customAudioObject)
+        GameObject customAudioObject
+    )
     {
         if (audioObjectDefinition == null)
             return null;
@@ -52,8 +53,11 @@ public static class RandoMusicManager
         {
             self.levelMusicShuffle = ShuffleMusic;
         }
-        if (!audioObjectDefinition.IsMusic() || !ShuffleMusic ||
-            !Manager<LevelManager>.Instance.GetCurrentLevelEnum().Equals(ELevel.Level_13_TowerOfTimeHQ))
+        if (
+            !audioObjectDefinition.IsMusic()
+            || !ShuffleMusic
+            || !Manager<LevelManager>.Instance.GetCurrentLevelEnum().Equals(ELevel.Level_13_TowerOfTimeHQ)
+        )
         {
             return orig(self, audioObjectDefinition, loop, fadeInDuration, playbackTime, customAudioObject);
         }

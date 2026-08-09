@@ -54,7 +54,8 @@ public static class ArchipelagoClient
 
     public static void ConnectAsync()
     {
-        if (attemptingConnection || Authenticated) return;
+        if (attemptingConnection || Authenticated)
+            return;
         attemptingConnection = true;
         logger.Log("Connecting to {0}:{1} as {2}", ServerData.Uri, ServerData.Port, ServerData.SlotName);
         ThreadPool.QueueUserWorkItem(_ => Connect(OnConnected));
@@ -62,7 +63,8 @@ public static class ArchipelagoClient
 
     public static void ConnectAsync(SubMenuButtonInfo connectButton)
     {
-        if (attemptingConnection || Authenticated) return;
+        if (attemptingConnection || Authenticated)
+            return;
         attemptingConnection = true;
         if (ServerData == null)
             ServerData = new ArchipelagoData();
@@ -76,7 +78,8 @@ public static class ArchipelagoClient
         {
             Session.Locations.CompleteLocationChecksAsync(
                 _ => ServerData.CheckedLocations = Session.Locations.AllLocationsChecked.ToList(),
-                ServerData.CheckedLocations.ToArray());
+                ServerData.CheckedLocations.ToArray()
+            );
         }
 
         attemptingConnection = false;
@@ -84,8 +87,14 @@ public static class ArchipelagoClient
 
     private static void OnConnected(string outputText, SubMenuButtonInfo connectButton)
     {
-        TextEntryPopup successPopup = InitTextEntryPopup(connectButton.addedTo, string.Empty,
-            _ => true, 0, null, CharsetFlags.Space);
+        TextEntryPopup successPopup = InitTextEntryPopup(
+            connectButton.addedTo,
+            string.Empty,
+            _ => true,
+            0,
+            null,
+            CharsetFlags.Space
+        );
 
         successPopup.Init(outputText);
         successPopup.gameObject.SetActive(true);
@@ -119,7 +128,8 @@ public static class ArchipelagoClient
 
     public static string Connect()
     {
-        if (Authenticated) return "already connected";
+        if (Authenticated)
+            return "already connected";
 
         try
         {
@@ -136,7 +146,8 @@ public static class ArchipelagoClient
 
     private static string TryConnect()
     {
-        if (ItemsAndLocationsHandler.ItemsLookup == null) ItemsAndLocationsHandler.Initialize();
+        if (ItemsAndLocationsHandler.ItemsLookup == null)
+            ItemsAndLocationsHandler.Initialize();
         var needSlotData = ServerData.SlotData == null;
         LoginResult result;
 
@@ -180,9 +191,9 @@ public static class ArchipelagoClient
             {
                 logger.Exception(e);
                 outputText =
-                    "Something went wrong.\n" +
-                    "Please submit a bug report with the log.txt, " +
-                    "which can be found by the game executable.";
+                    "Something went wrong.\n"
+                    + "Please submit a bug report with the log.txt, "
+                    + "which can be found by the game executable.";
                 Authenticated = false;
                 roomUpdate = true;
                 Disconnect();
@@ -192,8 +203,8 @@ public static class ArchipelagoClient
             DeathLinkHandler = new DeathLinkInterface();
 
             ThreadPool.QueueUserWorkItem(_ =>
-                Session.Locations.CompleteLocationChecksAsync(null,
-                    ServerData.CheckedLocations.ToArray()));
+                Session.Locations.CompleteLocationChecksAsync(null, ServerData.CheckedLocations.ToArray())
+            );
 
             HasConnected = true;
             outputText = $"Successfully connected to {ServerData.Uri}:{ServerData.Port} as {ServerData.SlotName}!";
@@ -202,8 +213,7 @@ public static class ArchipelagoClient
         {
             LoginFailure failure = (LoginFailure)result;
             outputText = $"Failed to connect to {ServerData.Uri}:{ServerData.Port} as {ServerData.SlotName}\n";
-            outputText +=
-                failure.Errors.Aggregate(outputText, (current, error) => current + $"\n    {error}");
+            outputText += failure.Errors.Aggregate(outputText, (current, error) => current + $"\n    {error}");
 
             logger.Error(outputText);
 
@@ -222,9 +232,7 @@ public static class ArchipelagoClient
 
     public static string ColorizePlayerName(int player)
     {
-        var color = player.Equals(Session.ConnectionInfo.Slot)
-            ? UserConfig.PlayerColor
-            : UserConfig.OtherPlayerColor;
+        var color = player.Equals(Session.ConnectionInfo.Slot) ? UserConfig.PlayerColor : UserConfig.OtherPlayerColor;
         return $"<color=#{color}>{Session.Players.GetPlayerAlias(player)}</color>";
     }
 
@@ -237,14 +245,19 @@ public static class ArchipelagoClient
     private static string ConvertHintMessage(HintItemSendLogMessage hintMessage)
     {
         var colorizedMessage = hintMessage.ToString();
-        colorizedMessage = colorizedMessage.Replace(hintMessage.Sender.Name,
-            ColorizePlayerName(hintMessage.Sender.Slot));
-        colorizedMessage = colorizedMessage.Replace(hintMessage.Receiver.Name,
-            ColorizePlayerName(hintMessage.Receiver.Slot));
-        colorizedMessage = colorizedMessage.Replace(hintMessage.Item.LocationDisplayName,
-            hintMessage.Item.ColorizeLocation());
-        colorizedMessage = colorizedMessage.Replace(hintMessage.Item.ItemDisplayName,
-            hintMessage.Item.Colorize());
+        colorizedMessage = colorizedMessage.Replace(
+            hintMessage.Sender.Name,
+            ColorizePlayerName(hintMessage.Sender.Slot)
+        );
+        colorizedMessage = colorizedMessage.Replace(
+            hintMessage.Receiver.Name,
+            ColorizePlayerName(hintMessage.Receiver.Slot)
+        );
+        colorizedMessage = colorizedMessage.Replace(
+            hintMessage.Item.LocationDisplayName,
+            hintMessage.Item.ColorizeLocation()
+        );
+        colorizedMessage = colorizedMessage.Replace(hintMessage.Item.ItemDisplayName, hintMessage.Item.Colorize());
         logger.Log(colorizedMessage);
         return colorizedMessage;
     }
@@ -254,13 +267,17 @@ public static class ArchipelagoClient
         logger.Log(message);
         if (FilterAPMessages)
         {
-
             switch (message)
             {
                 case HintItemSendLogMessage hintMessage:
-                    if (hintMessage.IsFound || !hintMessage.IsRelatedToActivePlayer || !HintPopUps ||
-                        RandomizerStateManager.SeenHints.Contains(hintMessage.Item.ItemId) ||
-                        ItemsAndLocationsHandler.ShopLocation(hintMessage.Item.LocationId, out var shopLoc)) break;
+                    if (
+                        hintMessage.IsFound
+                        || !hintMessage.IsRelatedToActivePlayer
+                        || !HintPopUps
+                        || RandomizerStateManager.SeenHints.Contains(hintMessage.Item.ItemId)
+                        || ItemsAndLocationsHandler.ShopLocation(hintMessage.Item.LocationId, out var shopLoc)
+                    )
+                        break;
                     RandomizerStateManager.SeenHints.Add(hintMessage.Item.ItemId);
                     messageQueue.Enqueue(hintMessage.ToString());
                     DialogQueue.Enqueue(ConvertHintMessage(hintMessage));
@@ -276,8 +293,11 @@ public static class ArchipelagoClient
         }
         else
         {
-            if (HintPopUps && message is HintItemSendLogMessage hintMessage &&
-                !ItemsAndLocationsHandler.ShopLocation(hintMessage.Item.LocationId, out var shopLoc))
+            if (
+                HintPopUps
+                && message is HintItemSendLogMessage hintMessage
+                && !ItemsAndLocationsHandler.ShopLocation(hintMessage.Item.LocationId, out var shopLoc)
+            )
                 DialogQueue.Enqueue(ConvertHintMessage(hintMessage));
             messageQueue.Enqueue(message.ToString());
         }
@@ -285,20 +305,23 @@ public static class ArchipelagoClient
 
     public static void SyncLocations()
     {
-        if (RandomizerStateManager.Instance.CurrentFileSlot == 0) return;
+        if (RandomizerStateManager.Instance.CurrentFileSlot == 0)
+            return;
         var checkedLocations = Session.Locations.AllLocationsChecked;
-        if (ServerData.CheckedLocations.Count == checkedLocations.Count) return;
+        if (ServerData.CheckedLocations.Count == checkedLocations.Count)
+            return;
         foreach (var location in checkedLocations)
         {
             try
             {
-                if (ServerData.CheckedLocations.Contains(location)) continue;
+                if (ServerData.CheckedLocations.Contains(location))
+                    continue;
                 var locName = Session.Locations.GetLocationNameFromId(location);
                 if (locName.Contains("Seal"))
                 {
-                    var roomKey =
-                        ItemsAndLocationsHandler.ArchipelagoLocations.Find(
-                            loc => loc.PrettyLocationName.Equals(locName)).LocationName;
+                    var roomKey = ItemsAndLocationsHandler
+                        .ArchipelagoLocations.Find(loc => loc.PrettyLocationName.Equals(locName))
+                        .LocationName;
                     Manager<ProgressionManager>.Instance.SetChallengeRoomAsCompleted(roomKey);
                 }
                 else if (ItemsAndLocationsHandler.ShopLocation(location, out var shopLoc))
@@ -314,8 +337,7 @@ public static class ArchipelagoClient
                         logger.Exception(e1);
                         try
                         {
-                            var shopID = (EShopUpgradeID)Enum.Parse(typeof(EShopUpgradeID),
-                                shopLoc.PrettyLocationName);
+                            var shopID = (EShopUpgradeID)Enum.Parse(typeof(EShopUpgradeID), shopLoc.PrettyLocationName);
                             Manager<InventoryManager>.Instance.SetShopUpgradeAsUnlocked(shopID);
                         }
                         catch (Exception e2)
@@ -388,14 +410,15 @@ public static class ArchipelagoClient
 
     public static bool CanRelease()
     {
-        if (!Authenticated) return false;
+        if (!Authenticated)
+            return false;
         try
         {
             return Session.RoomState.ReleasePermissions switch
             {
                 Permissions.Goal => ClientFinished(),
                 Permissions.Enabled => true,
-                _ => false
+                _ => false,
             };
         }
         catch (Exception e)
@@ -411,14 +434,15 @@ public static class ArchipelagoClient
 
     public static bool CanCollect()
     {
-        if (!Authenticated) return false;
+        if (!Authenticated)
+            return false;
         try
         {
             return Session.RoomState.CollectPermissions switch
             {
                 Permissions.Goal => ClientFinished(),
                 Permissions.Enabled => true,
-                _ => false
+                _ => false,
             };
         }
         catch (Exception e)
@@ -437,7 +461,6 @@ public static class ArchipelagoClient
         return Session.RoomState.HintCost;
     }
 
-
     public static bool CanHint()
     {
         return Authenticated && GetHintCost() <= Session.RoomState.HintPoints;
@@ -445,10 +468,12 @@ public static class ArchipelagoClient
 
     public static string UpdateStatusText()
     {
-        if (!roomUpdate) return statusText;
+        if (!roomUpdate)
+            return statusText;
         roomUpdate = false;
         statusText = string.Empty;
-        if (!DisplayStatus) return statusText;
+        if (!DisplayStatus)
+            return statusText;
         if (Authenticated)
         {
             statusText = $"Connected to Archipelago v{Session.RoomState.Version}";
@@ -468,7 +493,8 @@ public static class ArchipelagoClient
     public static string UpdateMessagesText()
     {
         var text = string.Empty;
-        if (messageQueue.Count <= 0) return text;
+        if (messageQueue.Count <= 0)
+            return text;
         if (DisplayAPMessages)
             text = (string)messageQueue.Dequeue();
         return text;

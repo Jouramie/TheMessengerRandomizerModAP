@@ -65,7 +65,10 @@ public class HintMenu
         {
             var view = this;
             OptionScreen optionScreen = Manager<UIManager>.Instance.GetView<OptionScreen>();
-            Transform parent = view.transform.Find("Container").Find("BackgroundFrame").Find("OptionsFrame")
+            Transform parent = view
+                .transform.Find("Container")
+                .Find("BackgroundFrame")
+                .Find("OptionsFrame")
                 .Find("OptionMenuButtons");
             foreach (OptionsButtonInfo button in OptionButtons)
             {
@@ -76,15 +79,20 @@ public class HintMenu
                         button.gameObject = Instantiate(optionScreen.fullscreenOption, parent);
                         break;
                     case SubMenuButtonInfo _:
-                        button.gameObject = Instantiate(optionScreen.controlsButton.transform.parent.gameObject,
-                            parent);
+                        button.gameObject = Instantiate(
+                            optionScreen.controlsButton.transform.parent.gameObject,
+                            parent
+                        );
                         break;
                     case MultipleOptionButtonInfo _:
                         button.gameObject = Instantiate(optionScreen.languageOption, parent);
                         break;
                     default:
-                        CourierLogger.Log(LogType.Warning, "OptionsMenu",
-                            button.GetType() + " not a known type of OptionsButtonInfo!");
+                        CourierLogger.Log(
+                            LogType.Warning,
+                            "OptionsMenu",
+                            button.GetType() + " not a known type of OptionsButtonInfo!"
+                        );
                         break;
                 }
 
@@ -94,8 +102,9 @@ public class HintMenu
                 string str = getText?.Invoke() ?? "Nameless Modded Options Button";
                 buttonGameObject.name = str;
                 button.addedTo = view;
-                foreach (TextMeshProUGUI componentsInChild in button.gameObject
-                             .GetComponentsInChildren<TextMeshProUGUI>())
+                foreach (
+                    TextMeshProUGUI componentsInChild in button.gameObject.GetComponentsInChildren<TextMeshProUGUI>()
+                )
                 {
                     if (componentsInChild.name.Equals("OptionState") || componentsInChild.name.Equals("Text"))
                         button.stateTextMesh = componentsInChild;
@@ -117,7 +126,7 @@ public class HintMenu
             parent.Find("Back")?.SetAsLastSibling();
         }
 
-        public new static HintScreen BuildModOptionScreen(OptionScreen optionScreen)
+        public static new HintScreen BuildModOptionScreen(OptionScreen optionScreen)
         {
             GameObject gameObject = new GameObject();
             HintScreen randoScreen = gameObject.AddComponent<HintScreen>();
@@ -130,8 +139,11 @@ public class HintMenu
                 newScreen.transform.GetChild(i).SetParent(randoScreen.transform, false);
             }
 
-            randoScreen.optionMenuButtons = randoScreen.transform.Find("Container").Find("BackgroundFrame")
-                .Find("OptionsFrame").Find("OptionMenuButtons");
+            randoScreen.optionMenuButtons = randoScreen
+                .transform.Find("Container")
+                .Find("BackgroundFrame")
+                .Find("OptionsFrame")
+                .Find("OptionMenuButtons");
             randoScreen.backButton = randoScreen.optionMenuButtons.Find("Back");
             // Delete OptionScreen buttons except for the Back button
             foreach (Transform child in randoScreen.optionMenuButtons.GetChildren())
@@ -176,13 +188,15 @@ public class HintMenu
             InitOptionsViewWithModButtons();
 
             // Make the border frames blue
-            Sprite borderSprite = backgroundFrame.GetComponent<Image>().sprite =
-                Courier.EmbeddedSprites["Mod.Courier.UI.mod_options_frame"];
+            Sprite borderSprite = backgroundFrame.GetComponent<Image>().sprite = Courier.EmbeddedSprites[
+                "Mod.Courier.UI.mod_options_frame"
+            ];
             borderSprite.bounds.extents.Set(1.7f, 1.7f, 0.1f);
             borderSprite.texture.filterMode = FilterMode.Point;
 
-            borderSprite = backgroundFrame.Find("OptionsFrame").GetComponent<Image>().sprite =
-                Courier.EmbeddedSprites["Mod.Courier.UI.mod_options_frame"];
+            borderSprite = backgroundFrame.Find("OptionsFrame").GetComponent<Image>().sprite = Courier.EmbeddedSprites[
+                "Mod.Courier.UI.mod_options_frame"
+            ];
             borderSprite.bounds.extents.Set(1.7f, 1.7f, 0.1f);
             borderSprite.texture.filterMode = FilterMode.Point;
 
@@ -191,15 +205,19 @@ public class HintMenu
             SetInitialSelection();
 
             // Make the selection frames blue
-            foreach (Image image in transform.GetComponentsInChildren<Image>()
-                         .Where(c => c.name.Equals("SelectionFrame")))
+            foreach (
+                Image image in transform.GetComponentsInChildren<Image>().Where(c => c.name.Equals("SelectionFrame"))
+            )
             {
                 try
                 {
                     if (image.overrideSprite != null && image.overrideSprite.name != "Empty")
                     {
-                        RenderTexture rt = new RenderTexture(image.overrideSprite.texture.width,
-                            image.overrideSprite.texture.height, 0);
+                        RenderTexture rt = new RenderTexture(
+                            image.overrideSprite.texture.width,
+                            image.overrideSprite.texture.height,
+                            0
+                        );
                         RenderTexture.active = rt;
                         Graphics.Blit(image.overrideSprite.texture, rt);
 
@@ -220,17 +238,26 @@ public class HintMenu
                         res.SetPixels(pxls);
                         res.Apply();
 
-                        Sprite sprite = image.overrideSprite = Sprite.Create(res,
-                            new Rect(0, 0, res.width, res.height), new Vector2(16, 16), 20, 1,
-                            SpriteMeshType.FullRect, new Vector4(5, 5, 5, 5));
+                        Sprite sprite = image.overrideSprite = Sprite.Create(
+                            res,
+                            new Rect(0, 0, res.width, res.height),
+                            new Vector2(16, 16),
+                            20,
+                            1,
+                            SpriteMeshType.FullRect,
+                            new Vector4(5, 5, 5, 5)
+                        );
                         sprite.bounds.extents.Set(.8f, .8f, 0.1f);
                         sprite.texture.filterMode = FilterMode.Point;
                     }
                 }
                 catch (Exception e)
                 {
-                    CourierLogger.Log(LogType.Exception, "ConnectScreen",
-                        "Image not Read/Writeable when recoloring selection frames in ModOptionScreen");
+                    CourierLogger.Log(
+                        LogType.Exception,
+                        "ConnectScreen",
+                        "Image not Read/Writeable when recoloring selection frames in ModOptionScreen"
+                    );
                     e.LogDetailed();
                 }
             }
@@ -271,15 +298,15 @@ public class HintMenu
 
             StartCoroutine(WaitAndSelectInitialButton());
             Vector2 sizeDelta = backgroundFrame.sizeDelta;
-            backgroundFrame.sizeDelta =
-                new Vector2(sizeDelta.x, 110 + heightPerButton * OptionsCount());
+            backgroundFrame.sizeDelta = new Vector2(sizeDelta.x, 110 + heightPerButton * OptionsCount());
         }
 
         // ReSharper disable Unity.PerformanceAnalysis
         private void SetInitialSelection()
         {
-            GameObject defaultSelectionButton =
-                (initialSelection ? initialSelection : defaultSelection).transform.Find("Button").gameObject;
+            GameObject defaultSelectionButton = (initialSelection ? initialSelection : defaultSelection)
+                .transform.Find("Button")
+                .gameObject;
             defaultSelectionButton.transform.GetComponent<UIObjectAudioHandler>().playAudio = false;
             EventSystem.current.SetSelectedGameObject(defaultSelectionButton);
             defaultSelectionButton.GetComponent<Button>().OnSelect(null);
@@ -299,8 +326,11 @@ public class HintMenu
                 return OptionsCount();
             foreach (OptionsButtonInfo buttonInfo in OptionButtons)
             {
-                if (buttonInfo.gameObject.transform.Find("Button").gameObject
-                    .Equals(EventSystem.current.currentSelectedGameObject))
+                if (
+                    buttonInfo
+                        .gameObject.transform.Find("Button")
+                        .gameObject.Equals(EventSystem.current.currentSelectedGameObject)
+                )
                 {
                     return EnabledModOptionsBeforeButton(buttonInfo);
                 }
@@ -317,9 +347,8 @@ public class HintMenu
             }
 
             Vector3 windowOffset =
-                new Vector3(0,
-                    Math.Min(GetSelectedButtonIndex(), Math.Max(0, OptionsCount() - 10)) *
-                    .9f) - new Vector3(0, Math.Max(0, OptionsCount() - 11) * .45f);
+                new Vector3(0, Math.Min(GetSelectedButtonIndex(), Math.Max(0, OptionsCount() - 10)) * .9f)
+                - new Vector3(0, Math.Max(0, OptionsCount() - 11) * .45f);
             transform.position = defaultPos + windowOffset;
 
             foreach (OptionsButtonInfo buttonInfo in OptionButtons)
@@ -339,15 +368,19 @@ public class HintMenu
 
             // Make the selection frames blue
             // I should figure out if I can avoid doing this in LateUpdate()
-            foreach (Image image in transform.GetComponentsInChildren<Image>()
-                         .Where(c => c.name.Equals("SelectionFrame")))
+            foreach (
+                Image image in transform.GetComponentsInChildren<Image>().Where(c => c.name.Equals("SelectionFrame"))
+            )
             {
                 try
                 {
                     if (image.overrideSprite != null && image.overrideSprite.name.Equals("ShopItemSelectionFrame"))
                     {
-                        RenderTexture rt = new RenderTexture(image.overrideSprite.texture.width,
-                            image.overrideSprite.texture.height, 0);
+                        RenderTexture rt = new RenderTexture(
+                            image.overrideSprite.texture.width,
+                            image.overrideSprite.texture.height,
+                            0
+                        );
                         RenderTexture.active = rt;
                         Graphics.Blit(image.overrideSprite.texture, rt);
 
@@ -368,17 +401,26 @@ public class HintMenu
                         res.SetPixels(pxls);
                         res.Apply();
 
-                        Sprite sprite = image.overrideSprite = Sprite.Create(res,
-                            new Rect(0, 0, res.width, res.height), new Vector2(16, 16), 20, 1,
-                            SpriteMeshType.FullRect, new Vector4(5, 5, 5, 5));
+                        Sprite sprite = image.overrideSprite = Sprite.Create(
+                            res,
+                            new Rect(0, 0, res.width, res.height),
+                            new Vector2(16, 16),
+                            20,
+                            1,
+                            SpriteMeshType.FullRect,
+                            new Vector4(5, 5, 5, 5)
+                        );
                         sprite.bounds.extents.Set(.8f, .8f, 0.1f);
                         sprite.texture.filterMode = FilterMode.Point;
                     }
                 }
                 catch (Exception e)
                 {
-                    CourierLogger.Log(LogType.Exception, "RandoScreen",
-                        "Image not Read/Writeable when recoloring selection frames in ModOptionScreen");
+                    CourierLogger.Log(
+                        LogType.Exception,
+                        "RandoScreen",
+                        "Image not Read/Writeable when recoloring selection frames in ModOptionScreen"
+                    );
                     e.LogDetailed();
                 }
             }
@@ -407,11 +449,16 @@ public class HintMenu
         {
             Close(false);
             Manager<UIManager>.Instance.GetView<OptionScreen>().gameObject.SetActive(true);
-            ArchipelagoHintMenuButton.gameObject.transform.Find("Button").GetComponent<UIObjectAudioHandler>()
+            ArchipelagoHintMenuButton
+                .gameObject.transform.Find("Button")
+                .GetComponent<UIObjectAudioHandler>()
                 .playAudio = false;
-            EventSystem.current.SetSelectedGameObject(ArchipelagoHintMenuButton.gameObject.transform.Find("Button")
-                .gameObject);
-            ArchipelagoHintMenuButton.gameObject.transform.Find("Button").GetComponent<UIObjectAudioHandler>()
+            EventSystem.current.SetSelectedGameObject(
+                ArchipelagoHintMenuButton.gameObject.transform.Find("Button").gameObject
+            );
+            ArchipelagoHintMenuButton
+                .gameObject.transform.Find("Button")
+                .GetComponent<UIObjectAudioHandler>()
                 .playAudio = true;
         }
 
@@ -422,8 +469,7 @@ public class HintMenu
         }
     }
 
-    private static void RegisterRandoButton(OptionsButtonInfo buttonInfo) =>
-        HintScreen.OptionButtons.Add(buttonInfo);
+    private static void RegisterRandoButton(OptionsButtonInfo buttonInfo) => HintScreen.OptionButtons.Add(buttonInfo);
 
     public static SubMenuButtonInfo RegisterSubRandoButton(Func<string> GetText, UnityAction onClick)
     {
@@ -432,15 +478,20 @@ public class HintMenu
         return buttonInfo;
     }
 
-    public static TextEntryButtonInfo RegisterTextRandoButton(Func<string> getText, Func<string, bool> onEntry,
-        int maxCharacter = 15, Func<string> getEntryText = null, Func<string> getInitialText = null,
-        TextEntryButtonInfo.CharsetFlags charset = TextEntryButtonInfo.CharsetFlags.Letter |
-                                                   TextEntryButtonInfo.CharsetFlags.Number |
-                                                   TextEntryButtonInfo.CharsetFlags.Dash |
-                                                   TextEntryButtonInfo.CharsetFlags.Space)
+    public static TextEntryButtonInfo RegisterTextRandoButton(
+        Func<string> getText,
+        Func<string, bool> onEntry,
+        int maxCharacter = 15,
+        Func<string> getEntryText = null,
+        Func<string> getInitialText = null,
+        TextEntryButtonInfo.CharsetFlags charset =
+            TextEntryButtonInfo.CharsetFlags.Letter
+            | TextEntryButtonInfo.CharsetFlags.Number
+            | TextEntryButtonInfo.CharsetFlags.Dash
+            | TextEntryButtonInfo.CharsetFlags.Space
+    )
     {
-        var buttonInfo =
-            new TextEntryButtonInfo(getText, onEntry, maxCharacter, getEntryText, getInitialText, charset);
+        var buttonInfo = new TextEntryButtonInfo(getText, onEntry, maxCharacter, getEntryText, getInitialText, charset);
         RegisterRandoButton(buttonInfo);
         return buttonInfo;
     }
@@ -459,7 +510,8 @@ public class HintMenu
                     UpdateHintEntry(hint);
                 else
                 {
-                    if (hint.Found) continue;
+                    if (hint.Found)
+                        continue;
                     if (hint.Status.Equals(HintStatus.Found))
                         hint.Status = HintStatus.Unspecified;
                     AddNewHintEntry(hint);
@@ -474,8 +526,11 @@ public class HintMenu
 
     private static void AddNewHintEntry(Hint hint)
     {
-        if (hint.FindingPlayer.Equals(ArchipelagoClient.Session.ConnectionInfo.Slot) &&
-            ItemsAndLocationsHandler.ShopLocation(hint.LocationId, out var shopLoc)) return;
+        if (
+            hint.FindingPlayer.Equals(ArchipelagoClient.Session.ConnectionInfo.Slot)
+            && ItemsAndLocationsHandler.ShopLocation(hint.LocationId, out var shopLoc)
+        )
+            return;
 
         var newHint = new HintButtonInfo(null, null, null, null, null, hint);
         RegisterRandoButton(newHint);
@@ -506,9 +561,7 @@ public class HintMenu
 
     public static void BuildHintMenu()
     {
-
-        ArchipelagoHintMenuButton =
-            Courier.UI.RegisterSubMenuOptionButton(() => "Hint Menu", DisplayHintMenu);
+        ArchipelagoHintMenuButton = Courier.UI.RegisterSubMenuOptionButton(() => "Hint Menu", DisplayHintMenu);
         ArchipelagoHintMenuButton.IsEnabled = () => ArchipelagoClient.Authenticated;
         AddBaseButtons();
     }
@@ -520,7 +573,8 @@ public class HintMenu
             () => "Hint for an item",
             APRandomizerMain.OnSelectArchipelagoHint,
             30,
-            () => "Enter item name:");
+            () => "Enter item name:"
+        );
         archipelagoHintButton.IsEnabled = ArchipelagoClient.CanHint;
 
         var blankSpace = RegisterSubRandoButton(() => "", null);

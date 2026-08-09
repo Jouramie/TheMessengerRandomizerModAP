@@ -43,7 +43,8 @@ public class ArchipelagoData
 
     public static bool LoadData(int slot)
     {
-        if (ArchipelagoClient.Offline) return false;
+        if (ArchipelagoClient.Offline)
+            return false;
         logger.Log($"Loading Archipelago data for slot {slot}");
         ArchipelagoClient.ServerData ??= new ArchipelagoData();
         return ArchipelagoClient.ServerData.loadData(slot);
@@ -52,8 +53,11 @@ public class ArchipelagoData
     // ReSharper disable once InconsistentNaming
     private bool loadData(int slot)
     {
-        if (!RandomizerStateManager.Instance.APSave.TryGetValue(slot, out var tempServerData) ||
-            tempServerData.SeedName == null || tempServerData.SeedName.Equals("Unknown"))
+        if (
+            !RandomizerStateManager.Instance.APSave.TryGetValue(slot, out var tempServerData)
+            || tempServerData.SeedName == null
+            || tempServerData.SeedName.Equals("Unknown")
+        )
             return false;
         try
         {
@@ -68,14 +72,16 @@ public class ArchipelagoData
                     Index = tempServerData.Index;
                     PowerSealsCollected = tempServerData.PowerSealsCollected;
                     CheckedLocations = tempServerData.CheckedLocations ?? [];
-                    RandoBossManager.DefeatedBosses = DefeatedBosses =
-                        tempServerData.DefeatedBosses ?? [];
+                    RandoBossManager.DefeatedBosses = DefeatedBosses = tempServerData.DefeatedBosses ?? [];
                     ReceivedItems = tempServerData.ReceivedItems ?? [];
                     AvailableTeleports = tempServerData.AvailableTeleports ?? [false, false];
 
                     ThreadPool.QueueUserWorkItem(_ =>
-                        ArchipelagoClient.Session.Locations.CompleteLocationChecksAsync(null,
-                            CheckedLocations.ToArray()));
+                        ArchipelagoClient.Session.Locations.CompleteLocationChecksAsync(
+                            null,
+                            CheckedLocations.ToArray()
+                        )
+                    );
                     logger.Log("connected from main menu, but continuing a seed.");
                     logger.Log($"items in remote queue: {ArchipelagoClient.ItemQueue.Count}");
                     logger.Log($"saved index: {Index}");

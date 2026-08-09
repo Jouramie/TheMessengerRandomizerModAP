@@ -25,12 +25,14 @@ public class RandomizerStateManager
     public int CurrentFileSlot { set; get; }
 
     public RandoPowerSealManager PowerSealManager;
+
     // ReSharper disable once UnassignedField.Global
     // gets assigned externally
     public RandoBossManager BossManager;
     public static List<long> SeenHints = [];
 
     public bool SkipMusicBox;
+
     // ReSharper disable once UnassignedField.Global
     // useful for debugging
     public bool SkipPhantom;
@@ -58,9 +60,13 @@ public class RandomizerStateManager
                 { 2, new ArchipelagoData() },
                 { 3, new ArchipelagoData() },
             };
-            if (ArchipelagoClient.Authenticated) InitializeSeed();
+            if (ArchipelagoClient.Authenticated)
+                InitializeSeed();
         }
-        catch (Exception e) { logger.Exception(e); }
+        catch (Exception e)
+        {
+            logger.Exception(e);
+        }
     }
 
     public static void InitializeSeed()
@@ -68,8 +74,10 @@ public class RandomizerStateManager
         var slotData = ArchipelagoClient.ServerData.SlotData;
         SeenHints = [];
 
-        if (ArchipelagoClient.ServerData.SeedName.IsNullOrEmpty() ||
-            ArchipelagoClient.ServerData.SeedName.Equals("Unknown"))
+        if (
+            ArchipelagoClient.ServerData.SeedName.IsNullOrEmpty()
+            || ArchipelagoClient.ServerData.SeedName.Equals("Unknown")
+        )
         {
             SeedRandom = new Random();
         }
@@ -83,7 +91,10 @@ public class RandomizerStateManager
             var raceMode = ArchipelagoClient.Session.DataStorage[Scope.ReadOnly, "race_mode"];
             RandoShopManager.RaceMode = raceMode is not null && (bool)raceMode;
             ArchipelagoClient.Session.DataStorage[Scope.Slot, "Events"].Initialize(new List<string>());
-            if ((Instance.ScoutedLocations == null || Instance.ScoutedLocations.Count < 1) && ArchipelagoClient.Authenticated)
+            if (
+                (Instance.ScoutedLocations == null || Instance.ScoutedLocations.Count < 1)
+                && ArchipelagoClient.Authenticated
+            )
             {
                 ArchipelagoClient.Session.Locations.ScoutLocationsAsync(
                     SetupScoutedLocations,
@@ -93,8 +104,9 @@ public class RandomizerStateManager
             ArchipelagoClient.Session.DataStorage.TrackHints(HintMenu.onHintsUpdated);
         }
 
-        ArchipelagoData.DeathLink = Convert.ToBoolean(slotData.TryGetValue("deathlink", out var deathLink)
-            ? deathLink : slotData["death_link"]);
+        ArchipelagoData.DeathLink = Convert.ToBoolean(
+            slotData.TryGetValue("deathlink", out var deathLink) ? deathLink : slotData["death_link"]
+        );
 
         Instance.PowerSealManager = new RandoPowerSealManager(Convert.ToInt32(slotData["required_seals"]));
         Instance.SkipMusicBox = !Convert.ToBoolean(slotData["music_box"]);
@@ -117,7 +129,7 @@ public class RandomizerStateManager
                 "HowlingGrottoPortal",
                 "SunkenShrinePortal",
                 "SearingCragsPortal",
-                "GlacialPeakPortal"
+                "GlacialPeakPortal",
             ];
         }
 
@@ -144,20 +156,24 @@ public class RandomizerStateManager
                 foreach (var pairing in transitionPairs)
                 {
                     var orig = LevelConstants.TransitionNames[pairing[0]];
-                    var replacement = LevelConstants.EntranceNameToRandoLevel[LevelConstants.TransitionNames[pairing[1]]];
+                    var replacement = LevelConstants.EntranceNameToRandoLevel[
+                        LevelConstants.TransitionNames[pairing[1]]
+                    ];
                     RandoLevelManager.RandoLevelMapping[orig] = replacement;
                     logger.Log("Replacing transition to {0} by {1}", orig, LevelConstants.TransitionNames[pairing[1]]);
                 }
             }
         }
 
-        if (ArchipelagoClient.Session.Locations.AllLocations.Any(location =>
-              ItemsAndLocationsHandler.IDtoLocationsLookup.TryGetValue(location, out var loc)
-              && loc.LocationName.StartsWith("Elemental Skylands - Shutdown")))
+        if (
+            ArchipelagoClient.Session.Locations.AllLocations.Any(location =>
+                ItemsAndLocationsHandler.IDtoLocationsLookup.TryGetValue(location, out var loc)
+                && loc.LocationName.StartsWith("Elemental Skylands - Shutdown")
+            )
+        )
         {
             logger.Log("Found at least one location for skylands generator shutdown, meaning generators are shuffled");
             skylandsGeneratorManager.AreGeneratorsShuffled = true;
-
         }
         else
         {
@@ -176,12 +192,14 @@ public class RandomizerStateManager
         //Unsafe teleport states are shops/hq/boss fights
         try
         {
-            return !(Manager<TotHQ>.Instance.root.gameObject.activeInHierarchy ||
-                     Manager<Shop>.Instance.gameObject.activeInHierarchy ||
-                     Manager<GameManager>.Instance.IsCutscenePlaying() ||
-                     Manager<PlayerManager>.Instance.Player.IsInvincible() ||
-                     Manager<PlayerManager>.Instance.Player.InputBlocked() ||
-                     Manager<PlayerManager>.Instance.Player.IsKnockedBack);
+            return !(
+                Manager<TotHQ>.Instance.root.gameObject.activeInHierarchy
+                || Manager<Shop>.Instance.gameObject.activeInHierarchy
+                || Manager<GameManager>.Instance.IsCutscenePlaying()
+                || Manager<PlayerManager>.Instance.Player.IsInvincible()
+                || Manager<PlayerManager>.Instance.Player.InputBlocked()
+                || Manager<PlayerManager>.Instance.Player.IsKnockedBack
+            );
         }
         catch (Exception)
         {
@@ -199,15 +217,16 @@ public class RandomizerStateManager
     {
         locationID = 0;
 
-        if (!ArchipelagoClient.HasConnected) return false;
+        if (!ArchipelagoClient.HasConnected)
+            return false;
         try
         {
-            locationID =
-                ItemsAndLocationsHandler.LocationFromEItem(vanillaLocationItem);
-            if (locationID == 0) return false;
+            locationID = ItemsAndLocationsHandler.LocationFromEItem(vanillaLocationItem);
+            if (locationID == 0)
+                return false;
             logger.Log("Checking if {0}, id: {1} is randomized.", vanillaLocationItem, locationID);
-            return (ScoutedLocations != null && ScoutedLocations.ContainsKey(locationID)) ||
-                   ArchipelagoClient.ServerData.LocationData.ContainsKey(locationID);
+            return (ScoutedLocations != null && ScoutedLocations.ContainsKey(locationID))
+                || ArchipelagoClient.ServerData.LocationData.ContainsKey(locationID);
         }
         catch (Exception e)
         {
@@ -219,8 +238,8 @@ public class RandomizerStateManager
 
     public static bool HasCompletedCheck(long locationID)
     {
-        return ArchipelagoClient.ServerData.CheckedLocations != null &&
-               ArchipelagoClient.ServerData.CheckedLocations.Contains(locationID);
+        return ArchipelagoClient.ServerData.CheckedLocations != null
+            && ArchipelagoClient.ServerData.CheckedLocations.Contains(locationID);
     }
 
     public static void InitializeNewSecondQuest(SaveGameSelectionScreen saveScreen, int slot)
@@ -244,12 +263,17 @@ public class RandomizerStateManager
             playerLocationSceneName = ELevel.Level_13_TowerOfTimeHQ.ToString(),
             loadedLevelPlayerPosition = new Vector3(485.03f, -101.5f, 0f),
             loadedLevelCheckpointIndex = -1,
-            playerFacingDirection = 1
+            playerFacingDirection = 1,
         };
         var flagsToSet = new[]
         {
-            "CloudStepTutorialDone", "RuxxtinEncounter_1", "RuxxtinEncounter_2", "ManfredChase_1_Done",
-            "ManfredChase_2_Done", "ManfredChase_3_Done", "TOTHQ_SmallMageFirstInterractionDone"
+            "CloudStepTutorialDone",
+            "RuxxtinEncounter_1",
+            "RuxxtinEncounter_2",
+            "ManfredChase_1_Done",
+            "ManfredChase_2_Done",
+            "ManfredChase_3_Done",
+            "TOTHQ_SmallMageFirstInterractionDone",
         };
         foreach (var flag in flagsToSet)
         {
@@ -338,7 +362,11 @@ public class RandomizerStateManager
         progManager.cutscenesPlayed = skipCutscenes;
 
         progManager.actionSequenceDone =
-            ["AwardGrimplouSequence(Clone)", "AwardGlidouSequence(Clone)", "AwardGraplouSequence(Clone)"];
+        [
+            "AwardGrimplouSequence(Clone)",
+            "AwardGlidouSequence(Clone)",
+            "AwardGraplouSequence(Clone)",
+        ];
         // copy everything from the managers to the save slot
         saveManager.GetCurrentSaveGameSlot().UpdateSaveGameData();
         saveManager.Save();
@@ -384,7 +412,8 @@ public class RandomizerStateManager
             var fileNameParts = gameFile.Split('_');
             foreach (var part in fileNameParts)
             {
-                if (!double.TryParse(part, out _)) continue;
+                if (!double.TryParse(part, out _))
+                    continue;
                 ArchipelagoClient.ServerData.SeedName = part;
                 break;
             }
@@ -394,8 +423,8 @@ public class RandomizerStateManager
             logger.Log("Casting slot data");
             ArchipelagoClient.ServerData.SlotData = gameData["slot_data"].ToObject<Dictionary<string, object>>();
             logger.Log("Casting loc data");
-            ArchipelagoClient.ServerData.LocationData =
-                gameData["loc_data"].ToObject<Dictionary<long, Dictionary<string, List<long>>>>();
+            ArchipelagoClient.ServerData.LocationData = gameData["loc_data"]
+                .ToObject<Dictionary<long, Dictionary<string, List<long>>>>();
             ArchipelagoClient.HasConnected = ArchipelagoClient.Offline = true;
             InitializeSeed();
         }
@@ -404,6 +433,7 @@ public class RandomizerStateManager
             logger.Exception(e);
         }
     }
+
     public static int ReceivedItemsCount()
     {
         return ArchipelagoClient.ServerData.ReceivedItems.Sum(item => item.Value);

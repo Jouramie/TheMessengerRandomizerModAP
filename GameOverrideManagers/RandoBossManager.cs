@@ -7,6 +7,7 @@ using MessengerRando.Utils;
 using UnityEngine;
 using Logger = MessengerRando.Utils.Logger;
 using Object = UnityEngine.Object;
+
 // ReSharper disable StringLiteralTypo
 
 namespace MessengerRando.GameOverrideManagers;
@@ -46,7 +47,7 @@ public abstract class RandoBossManager
         "DemonArtificier",
         "ButterflyMatriarch",
         "ClockworkConcierge",
-        "Phantom"
+        "Phantom",
     };
 
     private static readonly Dictionary<long, string> IDToBossMap = new Dictionary<long, string>
@@ -69,7 +70,7 @@ public abstract class RandoBossManager
         { "DemonGeneral", "DemonGeneralIntroCutscene" },
         { "DemonArtificier", "DemonArtificierIntroCutscene" },
         { "ButterflyMatriarch", "ButterflyMatriarchIntroCutscene" },
-        { "Phantom", "PhantomIntroCutscene" }
+        { "Phantom", "PhantomIntroCutscene" },
     };
 
     private static readonly Dictionary<string, string> RoomToVanillaBoss = new Dictionary<string, string>
@@ -83,7 +84,7 @@ public abstract class RandoBossManager
         // { "108140228244", "TowerGolem" },
         { "140172-44-28", "DemonGeneral" },
         { "396428-12436", "DemonArtificier" },
-        { "-308-276420", "ButterflyMatriarch" }
+        { "-308-276420", "ButterflyMatriarch" },
     };
 
     private static readonly Dictionary<string, BossLocation> BossLocations = new Dictionary<string, BossLocation>
@@ -91,7 +92,7 @@ public abstract class RandoBossManager
         { "LeafGolem", new BossLocation(ELevel.Level_02_AutumnHills, new Vector2(908, -27), EBits.BITS_8) },
         { "Necromancer", new BossLocation(ELevel.Level_04_Catacombs, new Vector2(752, -75), EBits.BITS_8) },
         { "EmeraldGolem", new BossLocation(ELevel.Level_05_A_HowlingGrotto, new Vector2(560, -123), EBits.BITS_8) },
-        { "QueenOfQuills", new BossLocation( ELevel.Level_07_QuillshroomMarsh, new Vector2(1100, -43), EBits.BITS_8) },
+        { "QueenOfQuills", new BossLocation(ELevel.Level_07_QuillshroomMarsh, new Vector2(1100, -43), EBits.BITS_8) },
         // { "Colos_Susses", new BossLocation(ELevel.Level_08_SearingCrags, new Vector2(364, 311), EBits.BITS_8) },
         // { "Manfred", new BossLocation(ELevel.Level_11_A_CloudRuins, new Vector2(1165, -26), EBits.BITS_16)},
         // { "Tower Golem", new BossLocation(ELevel.Level_10_A_TowerOfTime, new Vector2(108, 237), EBits.BITS_16) },
@@ -121,7 +122,8 @@ public abstract class RandoBossManager
 
     private static void AdjustPlayerInBossRoom(string bossName)
     {
-        if (!BossLocations.TryGetValue(bossName, out var newLocation)) return;
+        if (!BossLocations.TryGetValue(bossName, out var newLocation))
+            return;
         if (Manager<LevelManager>.Instance.GetCurrentLevelEnum().Equals(newLocation.BossRegion))
         {
             Manager<PlayerManager>.Instance.Player.transform.position = newLocation.PlayerPosition;
@@ -130,16 +132,20 @@ public abstract class RandoBossManager
         else
         {
             bossOverride = true;
-            RandoLevelManager.TeleportInArea(newLocation.BossRegion, newLocation.PlayerPosition,
-                newLocation.PlayerDimension);
+            RandoLevelManager.TeleportInArea(
+                newLocation.BossRegion,
+                newLocation.PlayerPosition,
+                newLocation.PlayerDimension
+            );
         }
     }
 
     public static bool HasBossDefeated(string bossName)
     {
         if (bossOverride)
-            bossName = RandomizerStateManager.Instance.BossManager.origToNewBoss
-                .First(name => name.Value.Equals(bossName)).Key;
+            bossName = RandomizerStateManager
+                .Instance.BossManager.origToNewBoss.First(name => name.Value.Equals(bossName))
+                .Key;
 #if DEBUG
         logger.Log("Checking if {0} is defeated.", bossName);
 #endif
@@ -181,17 +187,22 @@ public abstract class RandoBossManager
         {
             var newPosition = BossLocations[bossName];
 
-            RandoLevelManager.TeleportInArea(newPosition.BossRegion, newPosition.PlayerPosition,
-                newPosition.PlayerDimension);
+            RandoLevelManager.TeleportInArea(
+                newPosition.BossRegion,
+                newPosition.PlayerPosition,
+                newPosition.PlayerDimension
+            );
         }
     }
 
     public static bool ShouldFightBoss(string bossName)
     {
-        if (bossOverride) return false;
+        if (bossOverride)
+            return false;
         var currentLevel = Manager<LevelManager>.Instance.GetCurrentLevelEnum();
         logger.Log("Entered {0}'s room. Has Defeated: {1}", bossName, HasBossDefeated(bossName));
-        if (HasBossDefeated(bossName) || !currentLevel.Equals(BossLocations[bossName].BossRegion)) return false;
+        if (HasBossDefeated(bossName) || !currentLevel.Equals(BossLocations[bossName].BossRegion))
+            return false;
 
         var teleporting = RandomizerStateManager.Instance.BossManager != null;
         logger.Log("Should teleport: {0}", teleporting);
@@ -251,8 +262,9 @@ public abstract class RandoBossManager
 
     protected RandoBossManager(Dictionary<string, string> bossMapping)
     {
-        Manager<ProgressionManager>.Instance.bossesDefeated =
-            Manager<ProgressionManager>.Instance.allTimeBossesDefeated = new List<string>();
+        Manager<ProgressionManager>.Instance.bossesDefeated = Manager<ProgressionManager>
+            .Instance
+            .allTimeBossesDefeated = new List<string>();
         origToNewBoss = bossMapping;
     }
 

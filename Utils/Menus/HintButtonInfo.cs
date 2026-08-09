@@ -12,10 +12,15 @@ public class HintButtonInfo : ToggleButtonInfo
 {
     private Hint hint;
 
-
-    public HintButtonInfo(Func<string> text, UnityAction onClick, Func<ToggleButtonInfo, bool> GetState,
-        Func<string, string> GetOnText, Func<string, string> GetOffText, Hint hint) : base(text, onClick, GetState,
-        GetOnText, GetOffText)
+    public HintButtonInfo(
+        Func<string> text,
+        UnityAction onClick,
+        Func<ToggleButtonInfo, bool> GetState,
+        Func<string, string> GetOnText,
+        Func<string, string> GetOffText,
+        Hint hint
+    )
+        : base(text, onClick, GetState, GetOnText, GetOffText)
     {
         this.hint = hint;
         this.onClick = UpdateHintStatus;
@@ -29,11 +34,14 @@ public class HintButtonInfo : ToggleButtonInfo
 
     private string GetHintEntryText()
     {
-        if (!ArchipelagoClient.Authenticated) return "";
+        if (!ArchipelagoClient.Authenticated)
+            return "";
         var findingPlayerInfo = ArchipelagoClient.Session.Players.GetPlayerInfo(hint.FindingPlayer);
         var receivingPlayerInfo = ArchipelagoClient.Session.Players.GetPlayerInfo(hint.ReceivingPlayer);
-        var locName =
-            ArchipelagoClient.Session.Locations.GetLocationNameFromId(hint.LocationId, findingPlayerInfo.Game);
+        var locName = ArchipelagoClient.Session.Locations.GetLocationNameFromId(
+            hint.LocationId,
+            findingPlayerInfo.Game
+        );
         var itemName = ArchipelagoClient.Session.Items.GetItemName(hint.ItemId, receivingPlayerInfo.Game);
 
         var slot = ArchipelagoClient.Session.ConnectionInfo.Slot;
@@ -46,22 +54,27 @@ public class HintButtonInfo : ToggleButtonInfo
                 return $"Your {coloredItemName} can be found at " + GetLocationColor(locName);
             }
 
-            return $"{ArchipelagoClient.ColorizePlayerName(hint.ReceivingPlayer)}'s " +
-                   $"{coloredItemName} can be found at " + GetLocationColor(locName);
+            return $"{ArchipelagoClient.ColorizePlayerName(hint.ReceivingPlayer)}'s "
+                + $"{coloredItemName} can be found at "
+                + GetLocationColor(locName);
         }
 
-        return
-            $"Your {coloredItemName} is in {ArchipelagoClient.ColorizePlayerName(hint.FindingPlayer)}'s world " +
-            $"at " + GetLocationColor(locName);
+        return $"Your {coloredItemName} is in {ArchipelagoClient.ColorizePlayerName(hint.FindingPlayer)}'s world "
+            + $"at "
+            + GetLocationColor(locName);
     }
 
     private static string GetItemColor(string itemName, ItemFlags flags)
     {
         var colorString = "<color=#";
-        if ((flags & ItemFlags.Advancement) != 0) colorString += UserConfig.AdvancementColor;
-        else if ((flags & ItemFlags.NeverExclude) != 0) colorString += UserConfig.UsefulColor;
-        else if ((flags & ItemFlags.Trap) != 0) colorString += UserConfig.TrapColor;
-        else colorString += UserConfig.FillerColor;
+        if ((flags & ItemFlags.Advancement) != 0)
+            colorString += UserConfig.AdvancementColor;
+        else if ((flags & ItemFlags.NeverExclude) != 0)
+            colorString += UserConfig.UsefulColor;
+        else if ((flags & ItemFlags.Trap) != 0)
+            colorString += UserConfig.TrapColor;
+        else
+            colorString += UserConfig.FillerColor;
         colorString += $">{itemName}</color>";
         return colorString;
     }
@@ -92,7 +105,8 @@ public class HintButtonInfo : ToggleButtonInfo
 
     private void UpdateHintStatus()
     {
-        if (hint.ReceivingPlayer != ArchipelagoClient.Session.ConnectionInfo.Slot) return;
+        if (hint.ReceivingPlayer != ArchipelagoClient.Session.ConnectionInfo.Slot)
+            return;
         switch (hint.Status)
         {
             case HintStatus.Unspecified:
@@ -111,8 +125,14 @@ public class HintButtonInfo : ToggleButtonInfo
 
         if (ArchipelagoClient.Session.RoomState.GeneratorVersion >= new Version(0, 6, 0))
         {
-            ArchipelagoClient.Session.Socket.SendPacket(new UpdateHintPacket
-                { Location = hint.LocationId, Player = hint.ReceivingPlayer, Status = hint.Status });
+            ArchipelagoClient.Session.Socket.SendPacket(
+                new UpdateHintPacket
+                {
+                    Location = hint.LocationId,
+                    Player = hint.ReceivingPlayer,
+                    Status = hint.Status,
+                }
+            );
         }
         UpdateStateText();
     }

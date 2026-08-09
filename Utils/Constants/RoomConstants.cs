@@ -87,35 +87,38 @@ public static class RoomConstants
 
     public static readonly Dictionary<string, RandoRoom> RoomLookup = new Dictionary<string, RandoRoom>
     {
-        {"room name", new RandoRoom("roomKey") },
+        { "room name", new RandoRoom("roomKey") },
     };
 
-    public static readonly Dictionary<RandoRoom, string> RoomNameLookup =
-        RoomLookup.ToDictionary(x => x.Value, x => x.Key);
+    public static readonly Dictionary<RandoRoom, string> RoomNameLookup = RoomLookup.ToDictionary(
+        x => x.Value,
+        x => x.Key
+    );
 
-
-    public static readonly Dictionary<string, List<RoomTransition>> TransitionLookup =
-        new Dictionary<string, List<RoomTransition>>
+    public static readonly Dictionary<string, List<RoomTransition>> TransitionLookup = new Dictionary<
+        string,
+        List<RoomTransition>
+    >
+    {
         {
+            "room name",
+            new List<RoomTransition>
             {
-                "room name", new List<RoomTransition>
-                {
-                    new RoomTransition("Up", new Vector3()),
-                    new RoomTransition("Left", new Vector3()),
-                    new RoomTransition("Down", new Vector3()),
-                    new RoomTransition("Right", new Vector3())
-                }
-            },
+                new RoomTransition("Up", new Vector3()),
+                new RoomTransition("Left", new Vector3()),
+                new RoomTransition("Down", new Vector3()),
+                new RoomTransition("Right", new Vector3()),
+            }
+        },
+        {
+            "room name",
+            new List<RoomTransition>
             {
-                "room name", new List<RoomTransition>
-                {
-                    new RoomTransition("Up", new Vector3()),
-                    new RoomTransition("Down", new Vector3()),
-                    new RoomTransition("Left", new Vector3()),
-                    new RoomTransition("Right", new Vector3())
-                }
-            },
-
-        };
-
+                new RoomTransition("Up", new Vector3()),
+                new RoomTransition("Down", new Vector3()),
+                new RoomTransition("Left", new Vector3()),
+                new RoomTransition("Right", new Vector3()),
+            }
+        },
+    };
 }

@@ -1,7 +1,6 @@
 ﻿using Mod.Courier;
 using Mod.Courier.Module;
 
-
 namespace MessengerRando.Utils;
 
 //This class will be responsible for handling the randomization of items to locations and generating the mapping dictionary.

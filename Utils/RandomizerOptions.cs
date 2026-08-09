@@ -10,8 +10,10 @@ namespace MessengerRando.Utils;
 public static class RandomizerOptions
 {
     private static readonly Logger logger = Logger.GetLogger(typeof(RandomizerOptions));
+
     // name
     public static string Name = "Ninja";
+
     public static bool OnNameEntry(string input)
     {
         Name = input;
@@ -20,6 +22,7 @@ public static class RandomizerOptions
 
     // seed
     public static string Seed = "";
+
     public static bool OnSeedEntry(string input)
     {
         Seed = input;
@@ -43,12 +46,14 @@ public static class RandomizerOptions
         "No Spoiler",
         "Spoiler without playthrough or paths",
         "Spoiler with playthrough",
-        "Spoiler with playthrough and paths"
+        "Spoiler with playthrough and paths",
     ];
+
     public static string GetSpoilerText()
     {
         return SpoilerText[SpoilerLevel];
     }
+
     public static void ChangeSpoiler()
     {
         SpoilerLevel = SpoilerLevel == 3 ? 0 : SpoilerLevel + 1;
@@ -58,29 +63,69 @@ public static class RandomizerOptions
 
     public static void OnOptionsOverrideEntry(string input)
     {
-        if (input.Length < 1) return;
+        if (input.Length < 1)
+            return;
         var bytes = Encoding.UTF8.GetBytes(input);
         try
         {
-            if (input.Length < 18 ||
-                bytes[0] != 0 || bytes[0] != 1 || bytes[0] != 2 || // accessibility
-                bytes[1] != 0 || bytes[1] != 1 ||/* bytes[0] != 2 || bytes[0] != 3 ||*/ // logic
-                bytes[2] != 0 || bytes[2] != 1 || // shards
-                bytes[3] != 0 || bytes[3] != 1 || // lim move
-                bytes[4] != 0 || bytes[4] != 1 || // early med
-                bytes[5] != 3 || bytes[5] != 4 || bytes[5] != 5 || bytes[5] != 6 || // avail portals
-                bytes[6] != 0 || bytes[6] != 1 || bytes[6] != 2 || bytes[6] != 3 || // port shuffle
-                bytes[7] != 0 || bytes[7] != 1 || bytes[7] != 2 || // transition shuffle
-                bytes[8] != 0 || bytes[8] != 1 || // goal
-                bytes[9] != 0 || bytes[9] != 1 || // gauntlet
-                bytes[10] != 0 || bytes[10] != 1 || bytes[10] != 2 || bytes[10] != 3 || bytes[10] != 4 || bytes[10] != 5 || bytes[10] != 6 // notes
-                )
+            if (
+                input.Length < 18
+                || bytes[0] != 0
+                || bytes[0] != 1
+                || bytes[0] != 2
+                || // accessibility
+                bytes[1] != 0
+                || bytes[1] != 1
+                || /* bytes[0] != 2 || bytes[0] != 3 ||*/ // logic
+                bytes[2] != 0
+                || bytes[2] != 1
+                || // shards
+                bytes[3] != 0
+                || bytes[3] != 1
+                || // lim move
+                bytes[4] != 0
+                || bytes[4] != 1
+                || // early med
+                bytes[5] != 3
+                || bytes[5] != 4
+                || bytes[5] != 5
+                || bytes[5] != 6
+                || // avail portals
+                bytes[6] != 0
+                || bytes[6] != 1
+                || bytes[6] != 2
+                || bytes[6] != 3
+                || // port shuffle
+                bytes[7] != 0
+                || bytes[7] != 1
+                || bytes[7] != 2
+                || // transition shuffle
+                bytes[8] != 0
+                || bytes[8] != 1
+                || // goal
+                bytes[9] != 0
+                || bytes[9] != 1
+                || // gauntlet
+                bytes[10] != 0
+                || bytes[10] != 1
+                || bytes[10] != 2
+                || bytes[10] != 3
+                || bytes[10] != 4
+                || bytes[10] != 5
+                || bytes[10] != 6 // notes
+            )
                 throw new RandomizerException($"Invalid OptionsOverride input: {input}");
         }
         catch (Exception e)
         {
-            var errorPopup = InitTextEntryPopup(RandoMenu.randoScreen, string.Empty,
-                _ => true, 0, null, CharsetFlags.Space);
+            var errorPopup = InitTextEntryPopup(
+                RandoMenu.randoScreen,
+                string.Empty,
+                _ => true,
+                0,
+                null,
+                CharsetFlags.Space
+            );
             errorPopup.Init("Invalid input. Please check the code and try again.");
             logger.Exception(e);
             return;
@@ -95,12 +140,14 @@ public static class RandomizerOptions
     [
         "Locations Accessibility",
         "Items Accessibility",
-        "Minimal Accessibility"
+        "Minimal Accessibility",
     ];
+
     public static string GetAccessibilityText()
     {
         return AccessibilityText[accessibility];
     }
+
     public static void ChangeAccessibility()
     {
         accessibility = accessibility == 2 ? 0 : accessibility + 1;
@@ -108,17 +155,13 @@ public static class RandomizerOptions
 
     // logic
     private static int logic;
-    private static readonly List<string> LogicText =
-    [
-        "Normal Logic",
-        "Hard Logic",
-        "Challenging Logic",
-        "oob Logic"
-    ];
+    private static readonly List<string> LogicText = ["Normal Logic", "Hard Logic", "Challenging Logic", "oob Logic"];
+
     public static string GetLogicText()
     {
         return LogicText[logic];
     }
+
     public static void ChangeLogic()
     {
         switch (logic)
@@ -126,7 +169,7 @@ public static class RandomizerOptions
             case 3:
                 logic = 0;
                 break;
-            case 1:  // TODO reimplement challenging and oob logic
+            case 1: // TODO reimplement challenging and oob logic
                 logic = 0;
                 break;
             default:
@@ -146,10 +189,12 @@ public static class RandomizerOptions
 
     // available portals
     private static int availablePortals = 6;
+
     public static string GetAvailablePortalsText()
     {
         return $"Available Portals: {availablePortals}";
     }
+
     public static void ChangeAvailablePortals()
     {
         availablePortals = availablePortals == 6 ? 3 : availablePortals + 1;
@@ -162,12 +207,14 @@ public static class RandomizerOptions
         "No Portal Shuffle",
         "Shuffle Portals with Shops",
         "Shuffle Portals with Shops and Checkpoints",
-        "Shuffle Portals Anywhere"
+        "Shuffle Portals Anywhere",
     ];
+
     public static string GetPortalShuffleText()
     {
         return PortalShuffleText[portalShuffle];
     }
+
     public static void ChangePortalShuffle()
     {
         portalShuffle = portalShuffle == 3 ? 0 : portalShuffle + 1;
@@ -179,12 +226,14 @@ public static class RandomizerOptions
     [
         "No Transition Shuffle",
         "Couple Shuffled Transitions",
-        "De-Coupled Shuffled Transitions"
+        "De-Coupled Shuffled Transitions",
     ];
+
     public static string GetTransitionText()
     {
         return TransitionShuffleText[transitionShuffle];
     }
+
     public static void ChangeTransitionShuffle()
     {
         transitionShuffle = transitionShuffle == 2 ? 0 : transitionShuffle + 1;
@@ -198,10 +247,12 @@ public static class RandomizerOptions
 
     // needed notes
     private static int notes = 6;
+
     public static string GetNotesText()
     {
         return $"Notes Needed for Music Box: {notes}";
     }
+
     public static void ChangeNotes()
     {
         notes = notes == 6 ? 1 : notes + 1;
@@ -209,6 +260,7 @@ public static class RandomizerOptions
 
     // total seals
     public static int TotalSeals = 85;
+
     public static bool OnTotalSealsEntry(string input)
     {
         TotalSeals = Math.Min(int.Parse(input), 85);
@@ -217,6 +269,7 @@ public static class RandomizerOptions
 
     // required seals
     public static int RequiredSeals = 100;
+
     public static bool OnRequiredSealsEntry(string input)
     {
         RequiredSeals = Math.Min(int.Parse(input), 100);
@@ -225,6 +278,7 @@ public static class RandomizerOptions
 
     // shop price modifier
     public static int ShopPriceMod = 100;
+
     public static bool OnShopPriceModEntry(string input)
     {
         ShopPriceMod = Math.Min(int.Parse(input), 400);
@@ -233,23 +287,22 @@ public static class RandomizerOptions
 
     public static Dictionary<string, string> GetOptions()
     {
-
         return new Dictionary<string, string>
         {
-            {"accessibility", accessibility.ToString()},
-            {"logic_level", logic.ToString()},
-            {"shuffle_shards", Shards ? "true" : "false"},
-            {"limited_movement", LimMovement ? "true" : "false"},
-            {"early_meditation", EarlyMed ? "true" : "false"},
-            {"available_portals", availablePortals.ToString()},
-            {"shuffle_portals", portalShuffle.ToString()},
-            {"shuffle_transitions", transitionShuffle.ToString()},
-            {"goal", Goal ? "1" : "0"},
-            {"music_box", MusicBox ? "true" : "false"},
-            {"notes_needed", notes.ToString()},
-            {"total_seals", TotalSeals.ToString()},
-            {"percent_seals_required", RequiredSeals.ToString()},
-            {"shop_price", ShopPriceMod.ToString()},
+            { "accessibility", accessibility.ToString() },
+            { "logic_level", logic.ToString() },
+            { "shuffle_shards", Shards ? "true" : "false" },
+            { "limited_movement", LimMovement ? "true" : "false" },
+            { "early_meditation", EarlyMed ? "true" : "false" },
+            { "available_portals", availablePortals.ToString() },
+            { "shuffle_portals", portalShuffle.ToString() },
+            { "shuffle_transitions", transitionShuffle.ToString() },
+            { "goal", Goal ? "1" : "0" },
+            { "music_box", MusicBox ? "true" : "false" },
+            { "notes_needed", notes.ToString() },
+            { "total_seals", TotalSeals.ToString() },
+            { "percent_seals_required", RequiredSeals.ToString() },
+            { "shop_price", ShopPriceMod.ToString() },
         };
     }
 }

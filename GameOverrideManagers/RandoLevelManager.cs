@@ -45,7 +45,8 @@ public static class RandoLevelManager
     {
         logger.Log("Comparing positions: {0}, {1}", pos1, pos2);
         var comparison = pos2 - pos1;
-        if (comparison < 0) comparison *= -1;
+        if (comparison < 0)
+            comparison *= -1;
         return comparison <= 50;
     }
 
@@ -58,7 +59,8 @@ public static class RandoLevelManager
             logger.Log("Last Level: {0}", lastLevel);
             logger.Log("Current Level: {0}", currentLevel);
 
-            if (RandoLevelMapping == null) return new LevelConstants.RandoLevel(ELevel.NONE, new Vector3());
+            if (RandoLevelMapping == null)
+                return new LevelConstants.RandoLevel(ELevel.NONE, new Vector3());
 
             string entrance;
             // this can happen if the player goes to tower from future then back to future
@@ -75,8 +77,12 @@ public static class RandoLevelManager
                 entrance = "Tower of Time - Left";
                 RandoPortalManager.EnteredTower = false;
             }
-            else if (!LevelConstants.TransitionToEntranceName.TryGetValue(
-                         new LevelConstants.Transition(lastLevel, currentLevel), out entrance))
+            else if (
+                !LevelConstants.TransitionToEntranceName.TryGetValue(
+                    new LevelConstants.Transition(lastLevel, currentLevel),
+                    out entrance
+                )
+            )
                 return new LevelConstants.RandoLevel(ELevel.NONE, new Vector3());
 
             if (LevelConstants.SpecialEntranceNames.Contains(entrance))
@@ -132,7 +138,12 @@ public static class RandoLevelManager
             {
                 sourceExit = "Elemental Skylands - Right exit";
             }
-            else if (!LevelConstants.TransitionToEntranceName.TryGetValue(new LevelConstants.Transition(currentLevel, lastLevel), out sourceExit))
+            else if (
+                !LevelConstants.TransitionToEntranceName.TryGetValue(
+                    new LevelConstants.Transition(currentLevel, lastLevel),
+                    out sourceExit
+                )
+            )
             {
                 sourceExit = entrance;
             }
@@ -143,7 +154,10 @@ public static class RandoLevelManager
             TrackerManager.AddVisitedEntrance(sourceExit);
             return RandoLevelMapping[entrance];
         }
-        catch (Exception e) { logger.Log("Error while finding entrance: {0}", e); }
+        catch (Exception e)
+        {
+            logger.Log("Error while finding entrance: {0}", e);
+        }
         return new LevelConstants.RandoLevel(ELevel.NONE, new Vector3());
     }
 
@@ -186,16 +200,18 @@ public static class RandoLevelManager
         }
 
         var shouldTeleport =
-            (RandoPortalManager.PortalMapping != null && RandoPortalManager.PortalMapping.Count > 0 &&
-             RandoPortalManager.LeftHQPortal) || RandoLevelMapping is { Count: > 0 };
+            (
+                RandoPortalManager.PortalMapping != null
+                && RandoPortalManager.PortalMapping.Count > 0
+                && RandoPortalManager.LeftHQPortal
+            ) || RandoLevelMapping is { Count: > 0 };
 
         if (!shouldTeleport)
         {
             AddCurrentRegionToStorage(self);
         }
 
-        if (currentLevel.Equals(ELevel.Level_11_B_MusicBox) &&
-            RandomizerStateManager.Instance.SkipMusicBox)
+        if (currentLevel.Equals(ELevel.Level_11_B_MusicBox) && RandomizerStateManager.Instance.SkipMusicBox)
         {
             SkipMusicBox();
             return;
@@ -216,8 +232,7 @@ public static class RandoLevelManager
             return;
         }
 
-        if (currentLevel.Equals(ELevel.Level_14_CorruptedFuture) ||
-            currentLevel.Equals(ELevel.Level_10_A_TowerOfTime))
+        if (currentLevel.Equals(ELevel.Level_14_CorruptedFuture) || currentLevel.Equals(ELevel.Level_10_A_TowerOfTime))
         {
             //have to be handled by the portal manager
             return;
@@ -235,15 +250,13 @@ public static class RandoLevelManager
                 break;
         }
         if (RandoLevelMapping != null && !newLevel.LevelName.Equals(ELevel.NONE))
-            TeleportInArea(
-                newLevel.LevelName,
-                newLevel.PlayerPos,
-                newLevel.Dimension);
+            TeleportInArea(newLevel.LevelName, newLevel.PlayerPos, newLevel.Dimension);
     }
 
     private static void AddCurrentRegionToStorage(LevelManager self)
     {
-        if (!ArchipelagoClient.Authenticated) return;
+        if (!ArchipelagoClient.Authenticated)
+            return;
         // put the region we just loaded into in AP data storage for tracking
         if (self.lastLevelLoaded.Equals(ELevel.Level_13_TowerOfTimeHQ + "_Build"))
             TrackerManager.SetCurrentRegion(ELevel.Level_13_TowerOfTimeHQ);
@@ -267,10 +280,16 @@ public static class RandoLevelManager
 #endif
         CleanupBeforeTeleport();
         Manager<ProgressionManager>.Instance.checkpointSaveInfo.loadedLevelPlayerPosition = position;
-        if (dimension.Equals(EBits.NONE)) dimension = Manager<DimensionManager>.Instance.currentDimension;
-        LevelLoadingInfo levelLoadingInfo = new LevelLoadingInfo(area + "_Build",
-            true, true, LoadSceneMode.Single,
-            ELevelEntranceID.NONE, dimension);
+        if (dimension.Equals(EBits.NONE))
+            dimension = Manager<DimensionManager>.Instance.currentDimension;
+        LevelLoadingInfo levelLoadingInfo = new LevelLoadingInfo(
+            area + "_Build",
+            true,
+            true,
+            LoadSceneMode.Single,
+            ELevelEntranceID.NONE,
+            dimension
+        );
         teleporting = true;
         Manager<LevelManager>.Instance.LoadLevel(levelLoadingInfo);
     }
@@ -280,8 +299,10 @@ public static class RandoLevelManager
         TeleportInArea(teleportLocation.LevelName, teleportLocation.PlayerPos, teleportLocation.Dimension);
     }
 
-    public static void ElementalSkylandsInit(On.ElementalSkylandsLevelInitializer.orig_OnBeforeInitDone orig,
-        ElementalSkylandsLevelInitializer self)
+    public static void ElementalSkylandsInit(
+        On.ElementalSkylandsLevelInitializer.orig_OnBeforeInitDone orig,
+        ElementalSkylandsLevelInitializer self
+    )
     {
         if (RandoPortalManager.PortalMapping != null && RandoLevelMapping != null)
             self.startOnManfred = !KillManfred && teleporting;

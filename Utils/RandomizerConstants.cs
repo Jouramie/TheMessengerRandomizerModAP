@@ -42,6 +42,5 @@ class RandomizerConstants
         cutsceneMappings.Add("RuxxtinNoteAndAwardAmuletCutscene", EItems.RUXXTIN_AMULET);
 
         return cutsceneMappings;
-
     }
 }

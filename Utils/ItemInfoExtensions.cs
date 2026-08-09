@@ -43,18 +43,17 @@ public static class ItemInfoExtensions
 
     private static string PlayerColor(this ItemInfo item)
     {
-        return $"<color=#{UserConfig.OtherPlayerColor}>" +
-               $"{ArchipelagoClient.Session.Players.GetPlayerAlias(item.Player)}</color>";
+        return $"<color=#{UserConfig.OtherPlayerColor}>"
+            + $"{ArchipelagoClient.Session.Players.GetPlayerAlias(item.Player)}</color>";
     }
 
     public static string GetShopDescription(this ItemInfo item)
     {
         var description =
-            !ArchipelagoClient.Authenticated ||
-            item.Player.Slot.Equals(ArchipelagoClient.Session.ConnectionInfo.Slot)
+            !ArchipelagoClient.Authenticated || item.Player.Slot.Equals(ArchipelagoClient.Session.ConnectionInfo.Slot)
                 ? "Huh. How did this get here? "
                 : $"Looks like {item.PlayerColor()} lost this. ";
-        
+
         switch (item.GetSingleFlag())
         {
             case ItemFlags.Advancement:
@@ -81,14 +80,16 @@ public static class ItemInfoExtensions
             ItemFlags.Advancement => UserConfig.AdvancementColor,
             ItemFlags.NeverExclude => UserConfig.UsefulColor,
             ItemFlags.Trap => UserConfig.TrapColor,
-            _ => UserConfig.FillerColor
+            _ => UserConfig.FillerColor,
         };
     }
 
     private static ItemFlags GetSingleFlag(this ItemInfo item)
     {
-        if ((item.Flags & ItemFlags.Advancement) != 0) return ItemFlags.Advancement;
-        if ((item.Flags & ItemFlags.NeverExclude) != 0) return ItemFlags.NeverExclude;
+        if ((item.Flags & ItemFlags.Advancement) != 0)
+            return ItemFlags.Advancement;
+        if ((item.Flags & ItemFlags.NeverExclude) != 0)
+            return ItemFlags.NeverExclude;
         return (item.Flags & ItemFlags.Trap) != 0 ? ItemFlags.Trap : ItemFlags.None;
     }
 

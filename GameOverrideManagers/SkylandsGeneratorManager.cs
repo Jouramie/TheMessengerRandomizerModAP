@@ -32,12 +32,24 @@ public class SkylandsGeneratorManager
 
     public void ApplyHooks()
     {
-        On.ElementalSkylandGenerator.Start += Wrap<On.ElementalSkylandGenerator.hook_Start>(ElementalSkylandGenerator_Start);
-        On.ElementalSkylandGenerator.SetState += Wrap<On.ElementalSkylandGenerator.hook_SetState>(ElementalSkylandGenerator_SetState);
-        On.ElementalSkylandGenerator.OnLanternHit += Wrap<On.ElementalSkylandGenerator.hook_OnLanternHit>(ElementalSkylandGenerator_OnLanternHit);
-        On.ElementalSkylandGenerator.Shutdown += Wrap<On.ElementalSkylandGenerator.hook_Shutdown>(ElementalSkylandGenerator_Shutdown);
-        On.ElementalSkylandGenerator.OnDeactivateDone += Wrap<On.ElementalSkylandGenerator.hook_OnDeactivateDone>(ElementalSkylandGenerator_OnDeactivateDone);
-        On.ElementalSkylandGenerator.OnDisable += Wrap<On.ElementalSkylandGenerator.hook_OnDisable>(ElementalSkylandGenerator_OnDisable);
+        On.ElementalSkylandGenerator.Start += Wrap<On.ElementalSkylandGenerator.hook_Start>(
+            ElementalSkylandGenerator_Start
+        );
+        On.ElementalSkylandGenerator.SetState += Wrap<On.ElementalSkylandGenerator.hook_SetState>(
+            ElementalSkylandGenerator_SetState
+        );
+        On.ElementalSkylandGenerator.OnLanternHit += Wrap<On.ElementalSkylandGenerator.hook_OnLanternHit>(
+            ElementalSkylandGenerator_OnLanternHit
+        );
+        On.ElementalSkylandGenerator.Shutdown += Wrap<On.ElementalSkylandGenerator.hook_Shutdown>(
+            ElementalSkylandGenerator_Shutdown
+        );
+        On.ElementalSkylandGenerator.OnDeactivateDone += Wrap<On.ElementalSkylandGenerator.hook_OnDeactivateDone>(
+            ElementalSkylandGenerator_OnDeactivateDone
+        );
+        On.ElementalSkylandGenerator.OnDisable += Wrap<On.ElementalSkylandGenerator.hook_OnDisable>(
+            ElementalSkylandGenerator_OnDisable
+        );
     }
 
     public void ReceiveGeneratorShutdown(string generatorShutdownItem)
@@ -63,9 +75,16 @@ public class SkylandsGeneratorManager
         }
     }
 
-    private void ElementalSkylandGenerator_Start(On.ElementalSkylandGenerator.orig_Start orig, global::ElementalSkylandGenerator self)
+    private void ElementalSkylandGenerator_Start(
+        On.ElementalSkylandGenerator.orig_Start orig,
+        global::ElementalSkylandGenerator self
+    )
     {
-        if (!AreGeneratorsShuffled) { orig(self); return; }
+        if (!AreGeneratorsShuffled)
+        {
+            orig(self);
+            return;
+        }
 
         var generatorType = ToGeneratorType(self.name);
         LoadedGenerators[generatorType] = self;
@@ -74,10 +93,21 @@ public class SkylandsGeneratorManager
         orig(self);
     }
 
-    private void ElementalSkylandGenerator_SetState(On.ElementalSkylandGenerator.orig_SetState orig, global::ElementalSkylandGenerator self)
+    private void ElementalSkylandGenerator_SetState(
+        On.ElementalSkylandGenerator.orig_SetState orig,
+        global::ElementalSkylandGenerator self
+    )
     {
-        if (!AreGeneratorsShuffled) { orig(self); return; }
-        if (!ArchipelagoClient.HasConnected) { orig(self); return; }
+        if (!AreGeneratorsShuffled)
+        {
+            orig(self);
+            return;
+        }
+        if (!ArchipelagoClient.HasConnected)
+        {
+            orig(self);
+            return;
+        }
 
         var generatorType = ToGeneratorType(self.name);
         if (Manager<ProgressionManager>.Instance.IsFlagSet(self.deactivatedFlag))
@@ -87,8 +117,13 @@ public class SkylandsGeneratorManager
         }
 
         bool isLocationSent = IsLocationSent(generatorType);
-        if ((generatorType == GeneratorType.FIRE && AreAllGeneratorsShutdownReceived())
-            || (generatorType != GeneratorType.FIRE && (isLocationSent || Manager<ProgressionManager>.Instance.IsFlagSet(self.deactivatedFlag))))
+        if (
+            (generatorType == GeneratorType.FIRE && AreAllGeneratorsShutdownReceived())
+            || (
+                generatorType != GeneratorType.FIRE
+                && (isLocationSent || Manager<ProgressionManager>.Instance.IsFlagSet(self.deactivatedFlag))
+            )
+        )
         {
             logger.Log("Opening door for {0}", self.name);
             self.wall.gameObject.SetActive(value: false);
@@ -100,9 +135,18 @@ public class SkylandsGeneratorManager
         }
     }
 
-    private void ElementalSkylandGenerator_OnLanternHit(On.ElementalSkylandGenerator.orig_OnLanternHit orig, global::ElementalSkylandGenerator self, global::Hittable lantern, global::HitData hitData)
+    private void ElementalSkylandGenerator_OnLanternHit(
+        On.ElementalSkylandGenerator.orig_OnLanternHit orig,
+        global::ElementalSkylandGenerator self,
+        global::Hittable lantern,
+        global::HitData hitData
+    )
     {
-        if (!AreGeneratorsShuffled) { orig(self, lantern, hitData); return; }
+        if (!AreGeneratorsShuffled)
+        {
+            orig(self, lantern, hitData);
+            return;
+        }
 
         if (!(lantern as Lantern).Full)
         {
@@ -130,10 +174,21 @@ public class SkylandsGeneratorManager
         }
     }
 
-    private void ElementalSkylandGenerator_Shutdown(On.ElementalSkylandGenerator.orig_Shutdown orig, global::ElementalSkylandGenerator self)
+    private void ElementalSkylandGenerator_Shutdown(
+        On.ElementalSkylandGenerator.orig_Shutdown orig,
+        global::ElementalSkylandGenerator self
+    )
     {
-        if (!AreGeneratorsShuffled) { orig(self); return; }
-        if (!ArchipelagoClient.HasConnected) { orig(self); return; }
+        if (!AreGeneratorsShuffled)
+        {
+            orig(self);
+            return;
+        }
+        if (!ArchipelagoClient.HasConnected)
+        {
+            orig(self);
+            return;
+        }
 
         SendLocation(self);
 
@@ -144,9 +199,16 @@ public class SkylandsGeneratorManager
         }
     }
 
-    private void ElementalSkylandGenerator_OnDeactivateDone(On.ElementalSkylandGenerator.orig_OnDeactivateDone orig, global::ElementalSkylandGenerator self)
+    private void ElementalSkylandGenerator_OnDeactivateDone(
+        On.ElementalSkylandGenerator.orig_OnDeactivateDone orig,
+        global::ElementalSkylandGenerator self
+    )
     {
-        if (!AreGeneratorsShuffled) { orig(self); return; }
+        if (!AreGeneratorsShuffled)
+        {
+            orig(self);
+            return;
+        }
         if (AreAllGeneratorsShutdownReceived())
         {
             OpenFireGeneratorDoor();
@@ -161,9 +223,16 @@ public class SkylandsGeneratorManager
         self.StartCoroutine((IEnumerator)ReflectionHelpers.InvokeMethodWithReturn(self, "ShakeCamCoroutine"));
     }
 
-    private void ElementalSkylandGenerator_OnDisable(On.ElementalSkylandGenerator.orig_OnDisable orig, global::ElementalSkylandGenerator self)
+    private void ElementalSkylandGenerator_OnDisable(
+        On.ElementalSkylandGenerator.orig_OnDisable orig,
+        global::ElementalSkylandGenerator self
+    )
     {
-        if (!AreGeneratorsShuffled) { orig(self); return; }
+        if (!AreGeneratorsShuffled)
+        {
+            orig(self);
+            return;
+        }
 
         var generatorType = ToGeneratorType(self.name);
         LoadedGenerators[generatorType] = null;
@@ -200,6 +269,7 @@ public class SkylandsGeneratorManager
         Manager<AudioManager>.Instance.PlaySoundEffect(fireGenerator.wallDisappearSFX);
         fireGenerator.wall.SetActive(value: false);
     }
+
     private GeneratorType FindNextGeneratorToShutdown()
     {
         var manager = Manager<ProgressionManager>.Instance;
@@ -231,12 +301,15 @@ public class SkylandsGeneratorManager
             var g when g.Contains("Water") => GeneratorType.WATER,
             var g when g.Contains("Earth") => GeneratorType.EARTH,
             var g when g.Contains("Fire") => GeneratorType.FIRE,
-            _ => throw new Exception($"Unknown generator type for generator with name {generator}")
+            _ => throw new Exception($"Unknown generator type for generator with name {generator}"),
         };
     }
 }
 
 enum GeneratorType
 {
-    AIR, EARTH, WATER, FIRE
+    AIR,
+    EARTH,
+    WATER,
+    FIRE,
 }

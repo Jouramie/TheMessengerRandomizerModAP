@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace MessengerRando.Utils;
 
-
 public class Logger(string Tag)
 {
     public static Logger GetLogger(String tag)
@@ -77,12 +76,13 @@ public class Logger(string Tag)
         LogFormat(logType, null, message);
     }
 
-
     public void LogFormat(LogType logType, UnityEngine.Object context, string format, params object[] args)
     {
         var threadName = Thread.CurrentThread.Name ?? Thread.CurrentThread.ManagedThreadId.ToString();
-        if (context == null) Console.Write("({0}) [AP] [{1}] {2} [{3}] ", DateTime.Now, logType, threadName, Tag);
-        else Console.Write("({0}) [AP] [{1}] {2} [{3}: {4}] ", DateTime.Now, logType, threadName, Tag, context.name);
+        if (context == null)
+            Console.Write("({0}) [AP] [{1}] {2} [{3}] ", DateTime.Now, logType, threadName, Tag);
+        else
+            Console.Write("({0}) [AP] [{1}] {2} [{3}: {4}] ", DateTime.Now, logType, threadName, Tag, context.name);
         Console.WriteLine(format, args);
     }
 }

@@ -46,8 +46,10 @@ public class APRandomizerMain : CourierModule
 
     private TextEntryPopup closeLater;
     private float closeLaterTimer;
+
     //Set up save data
     public override Type ModuleSaveType => typeof(RandoSave);
+
     // ReSharper disable once MemberCanBePrivate.Global
     public RandoSave Save => (RandoSave)ModuleSave;
 
@@ -68,58 +70,109 @@ public class APRandomizerMain : CourierModule
 
         //Plug in my code :3
         On.InventoryManager.AddItem += SafeHook.Wrap<On.InventoryManager.hook_AddItem>(InventoryManager_AddItem);
-        On.ProgressionManager.SetChallengeRoomAsCompleted += SafeHook.Wrap<On.ProgressionManager.hook_SetChallengeRoomAsCompleted>(ProgressionManager_SetChallengeRoomAsCompleted);
+        On.ProgressionManager.SetChallengeRoomAsCompleted +=
+            SafeHook.Wrap<On.ProgressionManager.hook_SetChallengeRoomAsCompleted>(
+                ProgressionManager_SetChallengeRoomAsCompleted
+            );
         On.HasItem.IsTrue += SafeHook.Wrap<On.HasItem.hook_IsTrue>(HasItem_IsTrue);
-        On.AwardNoteCutscene.ShouldPlay += SafeHook.Wrap<On.AwardNoteCutscene.hook_ShouldPlay>(AwardNoteCutscene_ShouldPlay);
+        On.AwardNoteCutscene.ShouldPlay += SafeHook.Wrap<On.AwardNoteCutscene.hook_ShouldPlay>(
+            AwardNoteCutscene_ShouldPlay
+        );
         On.CutsceneHasPlayed.IsTrue += SafeHook.Wrap<On.CutsceneHasPlayed.hook_IsTrue>(CutsceneHasPlayed_IsTrue);
-        On.SaveGameSelectionScreen.OnLoadGame += SafeHook.Wrap<On.SaveGameSelectionScreen.hook_OnLoadGame>(SaveGameSelectionScreen_OnLoadGame);
-        On.SaveGameSelectionScreen.OnNewGame += SafeHook.Wrap<On.SaveGameSelectionScreen.hook_OnNewGame>(SaveGameSelectionScreen_OnNewGame);
-        On.SaveGameSelectionScreen.ConfirmSaveDelete += SafeHook.Wrap<On.SaveGameSelectionScreen.hook_ConfirmSaveDelete>(SaveGameSelectionScreen_ConfirmSaveDelete);
-        On.SaveGameSelectionScreen.OnDeleteChoiceDone += SafeHook.Wrap<On.SaveGameSelectionScreen.hook_OnDeleteChoiceDone>(SaveGameSelectionScreen_OnDelete);
-        On.SaveGameSelectionScreen.Update += SafeHook.Wrap<On.SaveGameSelectionScreen.hook_Update>(SaveSelectionScreen_OnUpdate);
+        On.SaveGameSelectionScreen.OnLoadGame += SafeHook.Wrap<On.SaveGameSelectionScreen.hook_OnLoadGame>(
+            SaveGameSelectionScreen_OnLoadGame
+        );
+        On.SaveGameSelectionScreen.OnNewGame += SafeHook.Wrap<On.SaveGameSelectionScreen.hook_OnNewGame>(
+            SaveGameSelectionScreen_OnNewGame
+        );
+        On.SaveGameSelectionScreen.ConfirmSaveDelete +=
+            SafeHook.Wrap<On.SaveGameSelectionScreen.hook_ConfirmSaveDelete>(SaveGameSelectionScreen_ConfirmSaveDelete);
+        On.SaveGameSelectionScreen.OnDeleteChoiceDone +=
+            SafeHook.Wrap<On.SaveGameSelectionScreen.hook_OnDeleteChoiceDone>(SaveGameSelectionScreen_OnDelete);
+        On.SaveGameSelectionScreen.Update += SafeHook.Wrap<On.SaveGameSelectionScreen.hook_Update>(
+            SaveSelectionScreen_OnUpdate
+        );
         On.NameSavePopup.Update += SafeHook.Wrap<On.NameSavePopup.hook_Update>(OnNameSaveUpdate);
-        On.BackToTitleScreen.GoBackToTitleScreen += SafeHook.Wrap<On.BackToTitleScreen.hook_GoBackToTitleScreen>(PauseScreen_OnQuitToTitle);
-        On.NecrophobicWorkerCutscene.Play += SafeHook.Wrap<On.NecrophobicWorkerCutscene.hook_Play>(NecrophobicWorkerCutscene_Play);
+        On.BackToTitleScreen.GoBackToTitleScreen += SafeHook.Wrap<On.BackToTitleScreen.hook_GoBackToTitleScreen>(
+            PauseScreen_OnQuitToTitle
+        );
+        On.NecrophobicWorkerCutscene.Play += SafeHook.Wrap<On.NecrophobicWorkerCutscene.hook_Play>(
+            NecrophobicWorkerCutscene_Play
+        );
         IL.RuxxtinNoteAndAwardAmuletCutscene.Play += RuxxtinNoteAndAwardAmuletCutscene_Play;
         On.DialogCutscene.Play += SafeHook.Wrap<On.DialogCutscene.hook_Play>(DialogCutscene_Play);
-        On.CatacombLevelInitializer.OnBeforeInitDone += SafeHook.Wrap<On.CatacombLevelInitializer.hook_OnBeforeInitDone>(CatacombLevelInitializer_OnBeforeInitDone);
-        On.DialogManager.LoadDialogs_ELanguage += SafeHook.Wrap<On.DialogManager.hook_LoadDialogs_ELanguage>(DialogChanger.LoadDialogs_Elanguage);
+        On.CatacombLevelInitializer.OnBeforeInitDone +=
+            SafeHook.Wrap<On.CatacombLevelInitializer.hook_OnBeforeInitDone>(CatacombLevelInitializer_OnBeforeInitDone);
+        On.DialogManager.LoadDialogs_ELanguage += SafeHook.Wrap<On.DialogManager.hook_LoadDialogs_ELanguage>(
+            DialogChanger.LoadDialogs_Elanguage
+        );
         On.OptionScreen.OnEnable += SafeHook.Wrap<On.OptionScreen.hook_OnEnable>(OnOptionScreenEnable);
         On.LostWoods.SetAsSolved += SafeHook.Wrap<On.LostWoods.hook_SetAsSolved>(LostWoodsManager.OnSetAsSolved);
         // shop management
         On.UpgradeButtonData.GetPrice += SafeHook.Wrap<On.UpgradeButtonData.hook_GetPrice>(RandoShopManager.GetPrice);
         On.LocalizationManager.GetText += SafeHook.Wrap<On.LocalizationManager.hook_GetText>(RandoShopManager.GetText);
         // On.UpgradeButton.Refresh += SafeHook.WrapSafe<On.UpgradeButton.hook_Refresh>(RandoShopManager.UpgradeButton_Refresh);
-        On.BuyMoneyWrenchCutscene.OnBuyWrenchChoice += SafeHook.Wrap<On.BuyMoneyWrenchCutscene.hook_OnBuyWrenchChoice>(RandoShopManager.BuyMoneyWrench);
-        On.BuyMoneyWrenchCutscene.EndCutsceneOnDialogDone += SafeHook.Wrap<On.BuyMoneyWrenchCutscene.hook_EndCutsceneOnDialogDone>(RandoShopManager.EndMoneyWrenchCutscene);
-        On.MoneySinkUnclogCutscene.OnDialogOutDone += SafeHook.Wrap<On.MoneySinkUnclogCutscene.hook_OnDialogOutDone>(RandoShopManager.UnclogSink);
-        On.GoToSousSolCutscene.EndCutScene += SafeHook.Wrap<On.GoToSousSolCutscene.hook_EndCutScene>(RandoShopManager.GoToSousSol);
-        On.IronHoodShopScreen.GetFigurineData += SafeHook.Wrap<On.IronHoodShopScreen.hook_GetFigurineData>(RandoShopManager.GetFigurineData);
+        On.BuyMoneyWrenchCutscene.OnBuyWrenchChoice += SafeHook.Wrap<On.BuyMoneyWrenchCutscene.hook_OnBuyWrenchChoice>(
+            RandoShopManager.BuyMoneyWrench
+        );
+        On.BuyMoneyWrenchCutscene.EndCutsceneOnDialogDone +=
+            SafeHook.Wrap<On.BuyMoneyWrenchCutscene.hook_EndCutsceneOnDialogDone>(
+                RandoShopManager.EndMoneyWrenchCutscene
+            );
+        On.MoneySinkUnclogCutscene.OnDialogOutDone += SafeHook.Wrap<On.MoneySinkUnclogCutscene.hook_OnDialogOutDone>(
+            RandoShopManager.UnclogSink
+        );
+        On.GoToSousSolCutscene.EndCutScene += SafeHook.Wrap<On.GoToSousSolCutscene.hook_EndCutScene>(
+            RandoShopManager.GoToSousSol
+        );
+        On.IronHoodShopScreen.GetFigurineData += SafeHook.Wrap<On.IronHoodShopScreen.hook_GetFigurineData>(
+            RandoShopManager.GetFigurineData
+        );
         On.SousSol.UnlockFigurine += SafeHook.Wrap<On.SousSol.hook_UnlockFigurine>(RandoShopManager.UnlockFigurine);
         On.Shop.Init += SafeHook.Wrap<On.Shop.hook_Init>(RandoShopManager.ShopInit);
         On.JukeboxTrack.IsUnlocked += SafeHook.Wrap<On.JukeboxTrack.hook_IsUnlocked>((orig, self) => true);
-        On.UpgradeButtonData.IsStoryUnlocked += SafeHook.Wrap<On.UpgradeButtonData.hook_IsStoryUnlocked>(RandoShopManager.IsStoryUnlocked);
+        On.UpgradeButtonData.IsStoryUnlocked += SafeHook.Wrap<On.UpgradeButtonData.hook_IsStoryUnlocked>(
+            RandoShopManager.IsStoryUnlocked
+        );
         On.AudioManager.PlayMusic += SafeHook.Wrap<On.AudioManager.hook_PlayMusic>(RandoMusicManager.OnPlayMusic);
         // boss management
-        On.ProgressionManager.HasDefeatedBoss += SafeHook.Wrap<On.ProgressionManager.hook_HasDefeatedBoss>((orig, self, bossName) => RandoBossManager.HasBossDefeated(bossName));
-        On.ProgressionManager.HasEverDefeatedBoss += SafeHook.Wrap<On.ProgressionManager.hook_HasEverDefeatedBoss>((orig, self, bossName) => RandoBossManager.HasBossDefeated(bossName));
-        On.ProgressionManager.SetBossAsDefeated += SafeHook.Wrap<On.ProgressionManager.hook_SetBossAsDefeated>((orig, self, bossName) => RandoBossManager.SetBossAsDefeated(bossName));
+        On.ProgressionManager.HasDefeatedBoss += SafeHook.Wrap<On.ProgressionManager.hook_HasDefeatedBoss>(
+            (orig, self, bossName) => RandoBossManager.HasBossDefeated(bossName)
+        );
+        On.ProgressionManager.HasEverDefeatedBoss += SafeHook.Wrap<On.ProgressionManager.hook_HasEverDefeatedBoss>(
+            (orig, self, bossName) => RandoBossManager.HasBossDefeated(bossName)
+        );
+        On.ProgressionManager.SetBossAsDefeated += SafeHook.Wrap<On.ProgressionManager.hook_SetBossAsDefeated>(
+            (orig, self, bossName) => RandoBossManager.SetBossAsDefeated(bossName)
+        );
         // level teleporting etc management
         On.Level.ChangeRoom += SafeHook.Wrap<On.Level.hook_ChangeRoom>(RandoRoomManager.Level_ChangeRoom);
         On.LevelManager.LoadLevel += SafeHook.Wrap<On.LevelManager.hook_LoadLevel>(RandoLevelManager.LoadLevel);
-        On.LevelManager.EndLevelLoading += SafeHook.Wrap<On.LevelManager.hook_EndLevelLoading>(RandoLevelManager.EndLevelLoading);
-        On.ElementalSkylandsLevelInitializer.OnBeforeInitDone += SafeHook.Wrap<On.ElementalSkylandsLevelInitializer.hook_OnBeforeInitDone>(RandoLevelManager.ElementalSkylandsInit);
+        On.LevelManager.EndLevelLoading += SafeHook.Wrap<On.LevelManager.hook_EndLevelLoading>(
+            RandoLevelManager.EndLevelLoading
+        );
+        On.ElementalSkylandsLevelInitializer.OnBeforeInitDone +=
+            SafeHook.Wrap<On.ElementalSkylandsLevelInitializer.hook_OnBeforeInitDone>(
+                RandoLevelManager.ElementalSkylandsInit
+            );
         // On.PortalOpeningCutscene.OnOpenPortalEvent += RandoPortalManager.OpenPortalEvent;
         On.TotHQ.LeaveToLevel += SafeHook.Wrap<On.TotHQ.hook_LeaveToLevel>(RandoPortalManager.LeaveHQ);
-        On.TowerOfTimePortal.LoadLevel += SafeHook.Wrap<On.TowerOfTimePortal.hook_LoadLevel>(RandoPortalManager.TowerOfTimePortal_LoadLevel);
+        On.TowerOfTimePortal.LoadLevel += SafeHook.Wrap<On.TowerOfTimePortal.hook_LoadLevel>(
+            RandoPortalManager.TowerOfTimePortal_LoadLevel
+        );
         // generator deactivation management
         skylandsGeneratorManager.ApplyHooks();
         //These functions let us override and manage power seals ourselves with 'fake' items
-        On.ProgressionManager.TotalPowerSealCollected += SafeHook.Wrap<On.ProgressionManager.hook_TotalPowerSealCollected>(ProgressionManager_TotalPowerSealCollected);
-        On.ShopChestOpenCutscene.OnChestOpened += SafeHook.Wrap<On.ShopChestOpenCutscene.hook_OnChestOpened>((orig, self) =>
-            RandomizerStateManager.Instance.PowerSealManager?.OnShopChestOpen(orig, self));
-        On.ShopChestChangeShurikenCutscene.Play += SafeHook.Wrap<On.ShopChestChangeShurikenCutscene.hook_Play>((orig, self) =>
-            RandomizerStateManager.Instance.PowerSealManager?.OnShopChestOpen(orig, self));
+        On.ProgressionManager.TotalPowerSealCollected +=
+            SafeHook.Wrap<On.ProgressionManager.hook_TotalPowerSealCollected>(
+                ProgressionManager_TotalPowerSealCollected
+            );
+        On.ShopChestOpenCutscene.OnChestOpened += SafeHook.Wrap<On.ShopChestOpenCutscene.hook_OnChestOpened>(
+            (orig, self) => RandomizerStateManager.Instance.PowerSealManager?.OnShopChestOpen(orig, self)
+        );
+        On.ShopChestChangeShurikenCutscene.Play += SafeHook.Wrap<On.ShopChestChangeShurikenCutscene.hook_Play>(
+            (orig, self) => RandomizerStateManager.Instance.PowerSealManager?.OnShopChestOpen(orig, self)
+        );
         //update loops for Archipelago
         Courier.Events.PlayerController.OnUpdate += SafeHook.Wrap(PlayerController_OnUpdate);
         On.InGameHud.OnGUI += SafeHook.Wrap<On.InGameHud.hook_OnGUI>(InGameHud_OnGUI);
@@ -129,12 +182,16 @@ public class APRandomizerMain : CourierModule
         // On.MegaTimeShard.NextState += RandoTimeShardManager.NextState;
         // On.MegaTimeShard.ReceiveHit += RandoTimeShardManager.ReceiveHit;
         On.MegaTimeShard.OnBreakDone += SafeHook.Wrap<On.MegaTimeShard.hook_OnBreakDone>(MegaTimeShard_OnBreakDone);
-        On.DialogSequence.GetDialogList += SafeHook.Wrap<On.DialogSequence.hook_GetDialogList>(DialogSequence_GetDialogList);
+        On.DialogSequence.GetDialogList += SafeHook.Wrap<On.DialogSequence.hook_GetDialogList>(
+            DialogSequence_GetDialogList
+        );
         On.Cutscene.Play += SafeHook.Wrap<On.Cutscene.hook_Play>(Cutscene_Play);
         On.PlayerController.Awake += SafeHook.Wrap<On.PlayerController.hook_Awake>(OnPlayerController_Awake);
         //temp add
 #if DEBUG
-        On.PhantomIntroCutscene.OnEnterRoom += SafeHook.Wrap<On.PhantomIntroCutscene.hook_OnEnterRoom>(PhantomIntro_OnEnterRoom); //this lets us skip the phantom fight
+        On.PhantomIntroCutscene.OnEnterRoom += SafeHook.Wrap<On.PhantomIntroCutscene.hook_OnEnterRoom>(
+            PhantomIntro_OnEnterRoom
+        ); //this lets us skip the phantom fight
         On.UIManager.ShowView += SafeHook.Wrap<On.UIManager.hook_ShowView>(UIManager_ShowView);
         On.MusicBox.SetNotesState += SafeHook.Wrap<On.MusicBox.hook_SetNotesState>(MusicBox_SetNotesState);
 #endif
@@ -194,7 +251,10 @@ public class APRandomizerMain : CourierModule
         {
             UserConfig.ReadConfig(ModPath);
         }
-        catch (Exception e) { logger.Exception(e); }
+        catch (Exception e)
+        {
+            logger.Exception(e);
+        }
         ArchipelagoMenu.BuildArchipelagoMenu();
         RandoMenu.BuildRandoMenu();
         HintMenu.BuildHintMenu();
@@ -203,8 +263,7 @@ public class APRandomizerMain : CourierModule
     List<DialogInfo> DialogSequence_GetDialogList(On.DialogSequence.orig_GetDialogList orig, DialogSequence self)
     {
         //Using this function to add some of my own dialog stuff to the game.
-        if (ArchipelagoClient.HasConnected &&
-            new[] { "ARCHIPELAGO_ITEM", "DEATH_LINK" }.Contains(self.dialogID))
+        if (ArchipelagoClient.HasConnected && new[] { "ARCHIPELAGO_ITEM", "DEATH_LINK" }.Contains(self.dialogID))
         {
             var dialogInfoList = new List<DialogInfo>();
             var dialog = new DialogInfo();
@@ -226,11 +285,20 @@ public class APRandomizerMain : CourierModule
         return orig(self);
     }
 
-    void InventoryManager_AddItem(On.InventoryManager.orig_AddItem orig, InventoryManager self, EItems itemId, int quantity)
+    void InventoryManager_AddItem(
+        On.InventoryManager.orig_AddItem orig,
+        InventoryManager self,
+        EItems itemId,
+        int quantity
+    )
     {
         if (!itemId.Equals(EItems.TIME_SHARD))
         {
-            logger.Log("Called InventoryManager_AddItem method. Looking to give x{0} amount of item '{1}'.", quantity, itemId);
+            logger.Log(
+                "Called InventoryManager_AddItem method. Looking to give x{0} amount of item '{1}'.",
+                quantity,
+                itemId
+            );
             if (quantity == ItemsAndLocationsHandler.APQuantity)
             {
                 orig(self, itemId, 1);
@@ -238,9 +306,11 @@ public class APRandomizerMain : CourierModule
             }
             if (randoStateManager.IsLocationRandomized(itemId, out var randoItemCheck))
             {
-                if (itemId.Equals(EItems.CANDLE) &&
-                    randoStateManager.IsLocationRandomized(EItems.TEA_SEED, out var seedCheck) &&
-                    !RandomizerStateManager.HasCompletedCheck(seedCheck))
+                if (
+                    itemId.Equals(EItems.CANDLE)
+                    && randoStateManager.IsLocationRandomized(EItems.TEA_SEED, out var seedCheck)
+                    && !RandomizerStateManager.HasCompletedCheck(seedCheck)
+                )
                 {
                     ItemsAndLocationsHandler.SendLocationCheck(seedCheck);
                 }
@@ -250,16 +320,18 @@ public class APRandomizerMain : CourierModule
         }
         //Call original add with items
         orig(self, itemId, quantity);
-
     }
 
-    void ProgressionManager_SetChallengeRoomAsCompleted(On.ProgressionManager.orig_SetChallengeRoomAsCompleted orig, ProgressionManager self, string roomKey)
+    void ProgressionManager_SetChallengeRoomAsCompleted(
+        On.ProgressionManager.orig_SetChallengeRoomAsCompleted orig,
+        ProgressionManager self,
+        string roomKey
+    )
     {
         //if this is a rando file, go ahead and give the item we expect to get
         if (ArchipelagoClient.HasConnected)
         {
-            var powerSealLocation =
-                ItemsAndLocationsHandler.ArchipelagoLocations.Find(loc => loc.Equals(roomKey));
+            var powerSealLocation = ItemsAndLocationsHandler.ArchipelagoLocations.Find(loc => loc.Equals(roomKey));
             ItemsAndLocationsHandler.SendLocationCheck(powerSealLocation);
         }
         //For now calling the orig method once we are done so the game still things we are collecting seals. We can change this later.
@@ -270,12 +342,23 @@ public class APRandomizerMain : CourierModule
     {
         bool hasItem = false;
         //Check to make sure this is an item that was randomized and make sure we are not ignoring this specific trigger check
-        if (ArchipelagoClient.HasConnected && randoStateManager.IsLocationRandomized(self.item, out var check) && !RandomizerConstants.GetSpecialTriggerNames().Contains(self.Owner.name))
+        if (
+            ArchipelagoClient.HasConnected
+            && randoStateManager.IsLocationRandomized(self.item, out var check)
+            && !RandomizerConstants.GetSpecialTriggerNames().Contains(self.Owner.name)
+        )
         {
-            if (self.transform.parent != null && "InteractionZone".Equals(self.Owner.name) && RandomizerConstants.GetSpecialTriggerNames().Contains(self.transform.parent.name) && EItems.KEY_OF_LOVE != self.item)
+            if (
+                self.transform.parent != null
+                && "InteractionZone".Equals(self.Owner.name)
+                && RandomizerConstants.GetSpecialTriggerNames().Contains(self.transform.parent.name)
+                && EItems.KEY_OF_LOVE != self.item
+            )
             {
                 //Special triggers that need to use normal logic, call orig method. This also includes the trigger check for the key of love on the sunken door because yeah.
-                logger.Log($"While checking if player HasItem in an interaction zone, found parent object '{self.transform.parent.name}' in ignore logic. Calling orig HasItem logic.");
+                logger.Log(
+                    $"While checking if player HasItem in an interaction zone, found parent object '{self.transform.parent.name}' in ignore logic. Calling orig HasItem logic."
+                );
                 return orig(self);
             }
 
@@ -290,10 +373,10 @@ public class APRandomizerMain : CourierModule
             {
                 var seed = ItemsAndLocationsHandler.LocationFromEItem(EItems.TEA_SEED);
                 var leaves = ItemsAndLocationsHandler.LocationFromEItem(EItems.TEA_LEAVES);
-                itemQuantity = RandomizerStateManager.HasCompletedCheck(seed) &&
-                               RandomizerStateManager.HasCompletedCheck(leaves)
-                    ? 1
-                    : 0;
+                itemQuantity =
+                    RandomizerStateManager.HasCompletedCheck(seed) && RandomizerStateManager.HasCompletedCheck(leaves)
+                        ? 1
+                        : 0;
             }
 
             switch (self.conditionOperator)
@@ -317,9 +400,10 @@ public class APRandomizerMain : CourierModule
             return hasItem;
         }
         logger.Log("HasItem check was not randomized. Doing vanilla checks.");
-        logger.Log($"Is randomized file : '{ArchipelagoClient.HasConnected}' | Is location '{self.item}' randomized: '{randoStateManager.IsLocationRandomized(self.item, out check)}' | Not in the special triggers list: '{!RandomizerConstants.GetSpecialTriggerNames().Contains(self.Owner.name)}'|");
+        logger.Log(
+            $"Is randomized file : '{ArchipelagoClient.HasConnected}' | Is location '{self.item}' randomized: '{randoStateManager.IsLocationRandomized(self.item, out check)}' | Not in the special triggers list: '{!RandomizerConstants.GetSpecialTriggerNames().Contains(self.Owner.name)}'|"
+        );
         return orig(self);
-
     }
 
     bool AwardNoteCutscene_ShouldPlay(On.AwardNoteCutscene.orig_ShouldPlay orig, AwardNoteCutscene self)
@@ -335,16 +419,24 @@ public class APRandomizerMain : CourierModule
 
     bool CutsceneHasPlayed_IsTrue(On.CutsceneHasPlayed.orig_IsTrue orig, CutsceneHasPlayed self)
     {
-        if (RandomizerConstants.GetCutsceneMappings().ContainsKey(self.cutsceneId) &&
-            randoStateManager.IsLocationRandomized(RandomizerConstants.GetCutsceneMappings()[self.cutsceneId],
-                out var cutsceneCheck))
+        if (
+            RandomizerConstants.GetCutsceneMappings().ContainsKey(self.cutsceneId)
+            && randoStateManager.IsLocationRandomized(
+                RandomizerConstants.GetCutsceneMappings()[self.cutsceneId],
+                out var cutsceneCheck
+            )
+        )
         {
             return RandomizerStateManager.HasCompletedCheck(cutsceneCheck);
         }
         return orig(self);
     }
 
-    void SaveGameSelectionScreen_OnLoadGame(On.SaveGameSelectionScreen.orig_OnLoadGame orig, SaveGameSelectionScreen self, int slotIndex)
+    void SaveGameSelectionScreen_OnLoadGame(
+        On.SaveGameSelectionScreen.orig_OnLoadGame orig,
+        SaveGameSelectionScreen self,
+        int slotIndex
+    )
     {
         //slotIndex is 0-based, going to increment it locally to keep things simple.
         randoStateManager.CurrentFileSlot = slotIndex + 1;
@@ -358,8 +450,10 @@ public class APRandomizerMain : CourierModule
                 if (!ArchipelagoClient.Offline)
                 {
                     // need to wait for the scout response from the server
-                    while (ArchipelagoClient.Authenticated && (randoStateManager.ScoutedLocations == null ||
-                                                               randoStateManager.ScoutedLocations.Count < 1))
+                    while (
+                        ArchipelagoClient.Authenticated
+                        && (randoStateManager.ScoutedLocations == null || randoStateManager.ScoutedLocations.Count < 1)
+                    )
                     {
                         logger.Log("locations not scouted yet. waiting...");
                         Thread.Sleep(100);
@@ -371,18 +465,21 @@ public class APRandomizerMain : CourierModule
                 logger.Log("Current Inventory:");
                 foreach (var item in randoStateManager.APSave[randoStateManager.CurrentFileSlot].ReceivedItems.Keys)
                 {
-                    logger.Log($"{item}: {randoStateManager.APSave[randoStateManager.CurrentFileSlot].ReceivedItems[item]}");
+                    logger.Log(
+                        $"{item}: {randoStateManager.APSave[randoStateManager.CurrentFileSlot].ReceivedItems[item]}"
+                    );
                 }
             }
-            else if (ArchipelagoClient.Authenticated &&
-                     string.IsNullOrEmpty(randoStateManager.APSave[randoStateManager.CurrentFileSlot].SlotName))
+            else if (
+                ArchipelagoClient.Authenticated
+                && string.IsNullOrEmpty(randoStateManager.APSave[randoStateManager.CurrentFileSlot].SlotName)
+            )
             {
                 ArchipelagoClient.ServerData.StartNewSeed();
                 //We force a reload of all dialog when loading the game
                 try
                 {
-                    Manager<DialogManager>.Instance.LoadDialogs(Manager<LocalizationManager>.Instance
-                        .CurrentLanguage);
+                    Manager<DialogManager>.Instance.LoadDialogs(Manager<LocalizationManager>.Instance.CurrentLanguage);
                 }
                 catch (Exception e)
                 {
@@ -403,8 +500,9 @@ public class APRandomizerMain : CourierModule
         if (!ArchipelagoClient.HasConnected)
         {
             logger.Log(
-                $"This file slot ({randoStateManager.CurrentFileSlot}) has no seed generated or is not " +
-                "a randomized file. Resetting the mappings and putting game items back to normal.");
+                $"This file slot ({randoStateManager.CurrentFileSlot}) has no seed generated or is not "
+                    + "a randomized file. Resetting the mappings and putting game items back to normal."
+            );
             ArchipelagoClient.ServerData = new ArchipelagoData();
         }
         else
@@ -417,7 +515,11 @@ public class APRandomizerMain : CourierModule
         RandoMusicManager.BuildMusicLibrary();
     }
 
-    void SaveGameSelectionScreen_OnNewGame(On.SaveGameSelectionScreen.orig_OnNewGame orig, SaveGameSelectionScreen self, SaveSlotUI slot)
+    void SaveGameSelectionScreen_OnNewGame(
+        On.SaveGameSelectionScreen.orig_OnNewGame orig,
+        SaveGameSelectionScreen self,
+        SaveSlotUI slot
+    )
     {
         logger.Log("trying to load new game");
         if (ArchipelagoClient.Authenticated)
@@ -439,7 +541,8 @@ public class APRandomizerMain : CourierModule
             foreach (var arg in Environment.GetCommandLineArgs())
             {
                 logger.Log(arg);
-                if (!arg.Contains("archipelago")) continue;
+                if (!arg.Contains("archipelago"))
+                    continue;
                 var uri = new Uri(arg);
                 ArchipelagoClient.ServerData = new ArchipelagoData();
                 var userInfo = uri.UserInfo.Split(':');
@@ -461,11 +564,14 @@ public class APRandomizerMain : CourierModule
             }
             orig(self, slot);
             self.nameSavePopup.OnLetterErased();
-            closeLater =
-                InitTextEntryPopup(self,
-                    "Not connected to an Archipelago server. Please connect before continuing.",
-                    _ => true, 0, null,
-                    CharsetFlags.Space);
+            closeLater = InitTextEntryPopup(
+                self,
+                "Not connected to an Archipelago server. Please connect before continuing.",
+                _ => true,
+                0,
+                null,
+                CharsetFlags.Space
+            );
             closeLater.Init("");
             closeLater.gameObject.SetActive(true);
             closeLaterTimer = 0f;
@@ -474,23 +580,27 @@ public class APRandomizerMain : CourierModule
         {
             orig(self, slot);
             self.nameSavePopup.OnLetterErased();
-            closeLater =
-                InitTextEntryPopup(self,
-                    "",
-                    _ => true, 0, null,
-                    CharsetFlags.Space);
+            closeLater = InitTextEntryPopup(self, "", _ => true, 0, null, CharsetFlags.Space);
             closeLater.Init("Not connected to an Archipelago server. Please connect before continuing.");
             closeLater.gameObject.SetActive(true);
             closeLaterTimer = 0f;
         }
     }
 
-    private void SaveGameSelectionScreen_ConfirmSaveDelete(On.SaveGameSelectionScreen.orig_ConfirmSaveDelete orig, SaveGameSelectionScreen self, SaveSlotUI slot)
+    private void SaveGameSelectionScreen_ConfirmSaveDelete(
+        On.SaveGameSelectionScreen.orig_ConfirmSaveDelete orig,
+        SaveGameSelectionScreen self,
+        SaveSlotUI slot
+    )
     {
         orig(self, slot);
     }
 
-    private void SaveGameSelectionScreen_OnDelete(On.SaveGameSelectionScreen.orig_OnDeleteChoiceDone orig, SaveGameSelectionScreen self, bool delete)
+    private void SaveGameSelectionScreen_OnDelete(
+        On.SaveGameSelectionScreen.orig_OnDeleteChoiceDone orig,
+        SaveGameSelectionScreen self,
+        bool delete
+    )
     {
         if (delete)
         {
@@ -526,15 +636,22 @@ public class APRandomizerMain : CourierModule
     }
 
     //Fixing necro cutscene check
-    void CatacombLevelInitializer_OnBeforeInitDone(On.CatacombLevelInitializer.orig_OnBeforeInitDone orig, CatacombLevelInitializer self)
+    void CatacombLevelInitializer_OnBeforeInitDone(
+        On.CatacombLevelInitializer.orig_OnBeforeInitDone orig,
+        CatacombLevelInitializer self
+    )
     {
         //check to see if we already have the item at Necro check
         if (ArchipelagoClient.HasConnected)
         {
-            if (!RandomizerStateManager.HasCompletedCheck(
-                    ItemsAndLocationsHandler.LocationsLookup[new LocationRO("Necro")]))
+            if (
+                !RandomizerStateManager.HasCompletedCheck(
+                    ItemsAndLocationsHandler.LocationsLookup[new LocationRO("Necro")]
+                )
+            )
                 self.necrophobicWorkerCutscene.Play();
-            else self.necrophobicWorkerCutscene.phobekin.gameObject.SetActive(false);
+            else
+                self.necrophobicWorkerCutscene.phobekin.gameObject.SetActive(false);
             //Call our overriden fixing function
             RandoCatacombLevelInitializer.FixPlayerStuckInChallengeRoom();
         }
@@ -543,11 +660,13 @@ public class APRandomizerMain : CourierModule
             //we are not rando here, call orig method
             orig(self);
         }
-
     }
 
     // Breaking into Necro cutscene to fix things
-    private static void NecrophobicWorkerCutscene_Play(On.NecrophobicWorkerCutscene.orig_Play orig, NecrophobicWorkerCutscene self)
+    private static void NecrophobicWorkerCutscene_Play(
+        On.NecrophobicWorkerCutscene.orig_Play orig,
+        NecrophobicWorkerCutscene self
+    )
     {
         //Cutscene moves Ninja around, lets see if i can stop it by making that "location" the current location the player is.
         if (ArchipelagoClient.HasConnected)
@@ -563,7 +682,6 @@ public class APRandomizerMain : CourierModule
         {
             cursor.EmitDelegate<Func<EItems, EItems>>(GetRandoItemByItem);
         }
-
     }
 
     void MegaTimeShard_OnBreakDone(On.MegaTimeShard.orig_OnBreakDone orig, MegaTimeShard self)
@@ -574,8 +692,10 @@ public class APRandomizerMain : CourierModule
         orig(self);
     }
 
-    int ProgressionManager_TotalPowerSealCollected(On.ProgressionManager.orig_TotalPowerSealCollected orig,
-        ProgressionManager self)
+    int ProgressionManager_TotalPowerSealCollected(
+        On.ProgressionManager.orig_TotalPowerSealCollected orig,
+        ProgressionManager self
+    )
     {
         return randoStateManager.PowerSealManager?.AmountPowerSealsCollected() ?? orig(self);
     }
@@ -589,10 +709,11 @@ public class APRandomizerMain : CourierModule
             if (RandoPortalManager.StartingPortals != null)
             {
                 var progManager = Manager<ProgressionManager>.Instance;
-                foreach (var portal in RandoPortalManager.StartingPortals.Where(
-                             portal => !portal.StartsWith("Autumn")
-                                       && !portal.StartsWith("Howling")
-                                       && !portal.StartsWith("Glacial")))
+                foreach (
+                    var portal in RandoPortalManager.StartingPortals.Where(portal =>
+                        !portal.StartsWith("Autumn") && !portal.StartsWith("Howling") && !portal.StartsWith("Glacial")
+                    )
+                )
                 {
                     var cutsceneName = $"{portal.Replace(" ", "")}OpeningCutscene";
                     progManager.cutscenesPlayed.Add(cutsceneName);
@@ -602,8 +723,7 @@ public class APRandomizerMain : CourierModule
 
         if (ArchipelagoClient.EventsICareAbout.Contains(eventName) && ArchipelagoClient.Authenticated)
         {
-            ArchipelagoClient.Session.DataStorage[Scope.Slot, "Events"] +=
-                new List<string> { eventName };
+            ArchipelagoClient.Session.DataStorage[Scope.Slot, "Events"] += new List<string> { eventName };
         }
 
         if (eventName.EndsWith("PortalOpeningCutscene"))
@@ -620,8 +740,11 @@ public class APRandomizerMain : CourierModule
         trackerManager.ReconciliateUnlockedPortals();
     }
 
-    void PhantomIntro_OnEnterRoom(On.PhantomIntroCutscene.orig_OnEnterRoom orig, PhantomIntroCutscene self,
-        bool teleportedInRoom)
+    void PhantomIntro_OnEnterRoom(
+        On.PhantomIntroCutscene.orig_OnEnterRoom orig,
+        PhantomIntroCutscene self,
+        bool teleportedInRoom
+    )
     {
         if (randoStateManager.SkipPhantom)
         {
@@ -634,11 +757,19 @@ public class APRandomizerMain : CourierModule
         }
     }
 
-
-    View UIManager_ShowView(On.UIManager.orig_ShowView orig, UIManager self, Type viewType,
-        EScreenLayers layer, IViewParams screenParams, bool transitionIn, AnimatorUpdateMode animUpdateMode)
+    View UIManager_ShowView(
+        On.UIManager.orig_ShowView orig,
+        UIManager self,
+        Type viewType,
+        EScreenLayers layer,
+        IViewParams screenParams,
+        bool transitionIn,
+        AnimatorUpdateMode animUpdateMode
+    )
     {
-        logger.Log($"ShowView {viewType} layer {layer} params [{screenParams}] transitionIn {transitionIn} updateMode {animUpdateMode}");
+        logger.Log(
+            $"ShowView {viewType} layer {layer} params [{screenParams}] transitionIn {transitionIn} updateMode {animUpdateMode}"
+        );
         return orig(self, viewType, layer, screenParams, transitionIn, animUpdateMode);
     }
 
@@ -666,7 +797,9 @@ public class APRandomizerMain : CourierModule
 
     public static void OnToggleWindmillShuriken()
     {
-        Manager<ProgressionManager>.Instance.useWindmillShuriken = !Manager<ProgressionManager>.Instance.useWindmillShuriken;
+        Manager<ProgressionManager>.Instance.useWindmillShuriken = !Manager<ProgressionManager>
+            .Instance
+            .useWindmillShuriken;
         InGameHud view = Manager<UIManager>.Instance.GetView<InGameHud>();
         view?.UpdateShurikenVisibility();
     }
@@ -687,20 +820,26 @@ public class APRandomizerMain : CourierModule
         logger.Log("Teleporting to Ninja Village.");
         RandoLevelManager.CleanupBeforeOptionsTeleport();
         //Load to Ninja Village
-        RandoLevelManager.TeleportInArea(new LevelConstants.RandoLevel(ELevel.Level_01_NinjaVillage, new Vector3(-153.3f, -56.5f)));
+        RandoLevelManager.TeleportInArea(
+            new LevelConstants.RandoLevel(ELevel.Level_01_NinjaVillage, new Vector3(-153.3f, -56.5f))
+        );
     }
 
     public static void OnSelectTeleportToSearing()
     {
         logger.Log("Teleporting to Searing Crags.");
         RandoLevelManager.CleanupBeforeOptionsTeleport();
-        RandoLevelManager.TeleportInArea(new LevelConstants.RandoLevel(ELevel.Level_08_SearingCrags, new Vector3(380.5f, 311)));
+        RandoLevelManager.TeleportInArea(
+            new LevelConstants.RandoLevel(ELevel.Level_08_SearingCrags, new Vector3(380.5f, 311))
+        );
     }
 
     public static bool OnSelectArchipelagoHost(string answer)
     {
-        if (answer == null) return true;
-        if (ArchipelagoClient.ServerData == null) ArchipelagoClient.ServerData = new ArchipelagoData();
+        if (answer == null)
+            return true;
+        if (ArchipelagoClient.ServerData == null)
+            ArchipelagoClient.ServerData = new ArchipelagoData();
         var uri = answer;
         ArchipelagoClient.ServerData.Uri = uri;
         return true;
@@ -708,8 +847,10 @@ public class APRandomizerMain : CourierModule
 
     public static bool OnSelectArchipelagoPort(string answer)
     {
-        if (answer == null) return true;
-        if (ArchipelagoClient.ServerData == null) ArchipelagoClient.ServerData = new ArchipelagoData();
+        if (answer == null)
+            return true;
+        if (ArchipelagoClient.ServerData == null)
+            ArchipelagoClient.ServerData = new ArchipelagoData();
         int.TryParse(answer, out var port);
         ArchipelagoClient.ServerData.Port = port;
         return true;
@@ -727,16 +868,20 @@ public class APRandomizerMain : CourierModule
 
     public static bool OnSelectArchipelagoName(string answer)
     {
-        if (answer == null) return true;
-        if (ArchipelagoClient.ServerData == null) ArchipelagoClient.ServerData = new ArchipelagoData();
+        if (answer == null)
+            return true;
+        if (ArchipelagoClient.ServerData == null)
+            ArchipelagoClient.ServerData = new ArchipelagoData();
         ArchipelagoClient.ServerData.SlotName = answer;
         return true;
     }
 
     public static bool OnSelectArchipelagoPass(string answer)
     {
-        if (answer == null) return true;
-        if (ArchipelagoClient.ServerData == null) ArchipelagoClient.ServerData = new ArchipelagoData();
+        if (answer == null)
+            return true;
+        if (ArchipelagoClient.ServerData == null)
+            ArchipelagoClient.ServerData = new ArchipelagoData();
         ArchipelagoClient.ServerData.Password = answer;
         return true;
     }
@@ -788,14 +933,18 @@ public class APRandomizerMain : CourierModule
     public static void OnToggleDeathLink()
     {
         ArchipelagoData.DeathLink = !ArchipelagoData.DeathLink;
-        if (ArchipelagoData.DeathLink) ArchipelagoClient.DeathLinkHandler.DeathLinkService.EnableDeathLink();
-        else ArchipelagoClient.DeathLinkHandler.DeathLinkService.DisableDeathLink();
+        if (ArchipelagoData.DeathLink)
+            ArchipelagoClient.DeathLinkHandler.DeathLinkService.EnableDeathLink();
+        else
+            ArchipelagoClient.DeathLinkHandler.DeathLinkService.DisableDeathLink();
     }
 
     public static bool OnSelectMessageTimer(string answer)
     {
-        if (answer == null) return true;
-        if (ArchipelagoClient.ServerData == null) ArchipelagoClient.ServerData = new ArchipelagoData();
+        if (answer == null)
+            return true;
+        if (ArchipelagoClient.ServerData == null)
+            ArchipelagoClient.ServerData = new ArchipelagoData();
         int.TryParse(answer, out var newTime);
         UpdateTime = newTime;
         return true;
@@ -849,7 +998,8 @@ public class APRandomizerMain : CourierModule
         //This updates every {updateTime} seconds
         updateTimer += Time.deltaTime;
         TrapManager.TrapTimer += Time.deltaTime;
-        if (!(updateTimer >= UpdateTime)) return;
+        if (!(updateTimer >= UpdateTime))
+            return;
         updateTimer = 0;
         UpdateArchipelagoState();
         apMessagesDisplay16.text = apMessagesDisplay8.text = ArchipelagoClient.UpdateMessagesText();
@@ -870,7 +1020,8 @@ public class APRandomizerMain : CourierModule
         }
 
         TrapManager.UpdateTrapStatus();
-        if (ArchipelagoClient.Offline) return;
+        if (ArchipelagoClient.Offline)
+            return;
         if (!ArchipelagoClient.Authenticated)
         {
             logger.Log("Attempting to reconnect to Archipelago Server...");
@@ -884,8 +1035,10 @@ public class APRandomizerMain : CourierModule
             return;
         }
 
-        if (!ItemsAndLocationsHandler.Synced) ItemsAndLocationsHandler.ReSync();
-        if (!trackerManager.Synced) trackerManager.ReSync();
+        if (!ItemsAndLocationsHandler.Synced)
+            ItemsAndLocationsHandler.ReSync();
+        if (!trackerManager.Synced)
+            trackerManager.ReSync();
     }
 
     private void InGameHud_OnGUI(On.InGameHud.orig_OnGUI orig, InGameHud self)
@@ -897,8 +1050,14 @@ public class APRandomizerMain : CourierModule
             apTextDisplay16 = Object.Instantiate(self.hud_16.coinCount, self.hud_16.gameObject.transform);
             apTextDisplay8.rectTransform.Translate(0f, -110f, 0f);
             apTextDisplay16.rectTransform.Translate(0f, -110f, 0f);
-            apTextDisplay8.rectTransform.sizeDelta = new Vector2(apTextDisplay8.rectTransform.sizeDelta.x + 100f, apTextDisplay8.rectTransform.sizeDelta.y);
-            apTextDisplay16.rectTransform.sizeDelta = new Vector2(apTextDisplay16.rectTransform.sizeDelta.x + 100f, apTextDisplay16.rectTransform.sizeDelta.y);
+            apTextDisplay8.rectTransform.sizeDelta = new Vector2(
+                apTextDisplay8.rectTransform.sizeDelta.x + 100f,
+                apTextDisplay8.rectTransform.sizeDelta.y
+            );
+            apTextDisplay16.rectTransform.sizeDelta = new Vector2(
+                apTextDisplay16.rectTransform.sizeDelta.x + 100f,
+                apTextDisplay16.rectTransform.sizeDelta.y
+            );
             apTextDisplay16.fontSize = apTextDisplay8.fontSize = UserConfig.StatusTextSize;
             apTextDisplay16.alignment = apTextDisplay8.alignment = TextAlignmentOptions.TopRight;
             apTextDisplay16.enableWordWrapping = apTextDisplay8.enableWordWrapping = true;
@@ -915,17 +1074,23 @@ public class APRandomizerMain : CourierModule
             apMessagesDisplay16.text = apMessagesDisplay8.text = string.Empty;
         }
 
-        if (ArchipelagoClient.Offline) return;
+        if (ArchipelagoClient.Offline)
+            return;
         //This updates every frame
         apTextDisplay16.fontSize = apTextDisplay8.fontSize = UserConfig.StatusTextSize;
         apMessagesDisplay16.fontSize = apMessagesDisplay8.fontSize = UserConfig.MessageTextSize;
         apTextDisplay16.text = apTextDisplay8.text = ArchipelagoClient.UpdateStatusText();
     }
 
-    private void SaveManager_DoActualSave(On.SaveManager.orig_DoActualSaving orig, SaveManager self, bool applySaveDelay = true)
+    private void SaveManager_DoActualSave(
+        On.SaveManager.orig_DoActualSaving orig,
+        SaveManager self,
+        bool applySaveDelay = true
+    )
     {
         orig(self, applySaveDelay);
-        if (!ArchipelagoClient.HasConnected) return;
+        if (!ArchipelagoClient.HasConnected)
+            return;
         Save?.Update();
         try
         {
@@ -952,15 +1117,22 @@ public class APRandomizerMain : CourierModule
         }
 
         // The game calls the save method after the ending cutscene before rolling credits
-        if (ArchipelagoClient.Authenticated
-            && Manager<LevelManager>.Instance.GetCurrentLevelEnum().Equals(ELevel.Level_Ending))
+        if (
+            ArchipelagoClient.Authenticated
+            && Manager<LevelManager>.Instance.GetCurrentLevelEnum().Equals(ELevel.Level_Ending)
+        )
         {
             ArchipelagoClient.UpdateClientStatus(ArchipelagoClientState.ClientGoal);
         }
     }
 
     [SafeHook(callOrigOnError: true)]
-    private void OnPlayerDie(On.PlayerController.orig_Die orig, PlayerController self, EDeathType deathType, Transform killedBy)
+    private void OnPlayerDie(
+        On.PlayerController.orig_Die orig,
+        PlayerController self,
+        EDeathType deathType,
+        Transform killedBy
+    )
     {
         TrapManager.ResetPlayerState();
         Manager<UIManager>.Instance.CloseAllScreensOfType<AwardItemPopup>(false);

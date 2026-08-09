@@ -7,8 +7,10 @@ public struct RandoItemRO
 {
     //some kind of unique identifier
     public string Name { get; }
+
     //the in game item they represent
     public EItems Item { get; }
+
     //amount to give
     public int Quantity { get; }
 
@@ -26,9 +28,7 @@ public struct RandoItemRO
 
     public override bool Equals(object obj)
     {
-        return obj is RandoItemRO rO &&
-               Name == rO.Name &&
-               Item == rO.Item;
+        return obj is RandoItemRO rO && Name == rO.Name && Item == rO.Item;
     }
 
     public bool Equals(EItems item)
@@ -51,20 +51,29 @@ public struct RandoItemRO
     /// <returns>RandoItemRO with the values passed in.</returns>
     public static RandoItemRO ParseString(string itemToParse)
     {
-
         if (itemToParse == null)
         {
             throw new ArgumentNullException(nameof(itemToParse));
         }
 
         string[] randoItemDetails = itemToParse.Split('-');
-        if (randoItemDetails.Length == 3 && Enum.IsDefined(typeof(EItems), randoItemDetails[1]) && int.TryParse(randoItemDetails[2], out var quantity))
+        if (
+            randoItemDetails.Length == 3
+            && Enum.IsDefined(typeof(EItems), randoItemDetails[1])
+            && int.TryParse(randoItemDetails[2], out var quantity)
+        )
         {
-            return new RandoItemRO(randoItemDetails[0], (EItems)Enum.Parse(typeof(EItems), randoItemDetails[1], true), quantity);
+            return new RandoItemRO(
+                randoItemDetails[0],
+                (EItems)Enum.Parse(typeof(EItems), randoItemDetails[1], true),
+                quantity
+            );
         }
         else
         {
-            throw new ArgumentException($"Passed string '{itemToParse}' invalid for parsing. Expect three values in format 'name-item-quantity'.");
+            throw new ArgumentException(
+                $"Passed string '{itemToParse}' invalid for parsing. Expect three values in format 'name-item-quantity'."
+            );
         }
     }
 }

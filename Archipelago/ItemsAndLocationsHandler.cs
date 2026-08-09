@@ -30,24 +30,25 @@ public static class ItemsAndLocationsHandler
     /// </summary>
     public static void Initialize()
     {
-
         long offset = BaseOffset;
         logger.Log("Building ItemsLookup...");
         ItemsLookup = new Dictionary<long, RandoItemRO>();
         foreach (var figurine in Enum.GetValues(typeof(EFigurine)))
             ArchipelagoItems.Add(new RandoItemRO(figurine.ToString(), EItems.NONE));
-        ArchipelagoItems.AddRange(new List<RandoItemRO>
-        {
-            new RandoItemRO("Money Wrench", EItems.MONEY_WRENCH),
-            new RandoItemRO("Teleport Trap", EItems.NONE),
-            new RandoItemRO("Prophecy Trap", EItems.NONE),
-            new RandoItemRO("Progressive Generator Shutdown", EItems.NONE),
-            new RandoItemRO("Darkness Trap", EItems.NONE),
-            new RandoItemRO("Health", EItems.POTION),
-            new RandoItemRO("Mana", EItems.MANA),
-            new RandoItemRO("Feather", EItems.FEATHER),
-            new RandoItemRO("Mask Fragment", EItems.MASK_PIECE),
-        });
+        ArchipelagoItems.AddRange(
+            new List<RandoItemRO>
+            {
+                new RandoItemRO("Money Wrench", EItems.MONEY_WRENCH),
+                new RandoItemRO("Teleport Trap", EItems.NONE),
+                new RandoItemRO("Prophecy Trap", EItems.NONE),
+                new RandoItemRO("Progressive Generator Shutdown", EItems.NONE),
+                new RandoItemRO("Darkness Trap", EItems.NONE),
+                new RandoItemRO("Health", EItems.POTION),
+                new RandoItemRO("Mana", EItems.MANA),
+                new RandoItemRO("Feather", EItems.FEATHER),
+                new RandoItemRO("Mask Fragment", EItems.MASK_PIECE),
+            }
+        );
 
         foreach (var item in ArchipelagoItems)
         {
@@ -79,8 +80,7 @@ public static class ItemsAndLocationsHandler
             LocationsLookup.Add(progLocation, offset);
             IDtoLocationsLookup.Add(offset, progLocation);
             logger.Log("{0}: {1}", progLocation.PrettyLocationName, offset);
-            if (progLocation.VanillaItem != EItems.NONE &&
-                !EItemsLocationsLookup.ContainsKey(progLocation.VanillaItem))
+            if (progLocation.VanillaItem != EItems.NONE && !EItemsLocationsLookup.ContainsKey(progLocation.VanillaItem))
                 EItemsLocationsLookup.Add(progLocation.VanillaItem, offset);
             ++offset;
         }
@@ -143,7 +143,7 @@ public static class ItemsAndLocationsHandler
         new RandoItemRO("Devil's Due", EItems.QUARBLE_DISCOUNT_50),
         new RandoItemRO("Time Sense", EItems.MAP_TIME_WARP),
         new RandoItemRO("Power Sense", EItems.MAP_POWER_SEAL_TOTAL),
-        new RandoItemRO("Focused Power Sense", EItems.MAP_POWER_SEAL_PINS)
+        new RandoItemRO("Focused Power Sense", EItems.MAP_POWER_SEAL_PINS),
     ];
 
     public static readonly List<LocationRO> ArchipelagoLocations =
@@ -243,7 +243,7 @@ public static class ItemsAndLocationsHandler
         new LocationRO("LeafGolem"),
         new LocationRO("Necromancer"),
         new LocationRO("EmeraldGolem"),
-        new LocationRO("QueenOfQuills")
+        new LocationRO("QueenOfQuills"),
     ];
 
     private static readonly List<LocationRO> ShopLocations =
@@ -266,7 +266,7 @@ public static class ItemsAndLocationsHandler
         new LocationRO("QUARBLE_DISCOUNT_50", EItems.QUARBLE_DISCOUNT_50),
         new LocationRO("TIME_WARP", EItems.MAP_TIME_WARP),
         new LocationRO("POWER_SEAL_WORLD_MAP", EItems.MAP_POWER_SEAL_TOTAL),
-        new LocationRO("POWER_SEAL", EItems.MAP_POWER_SEAL_PINS)
+        new LocationRO("POWER_SEAL", EItems.MAP_POWER_SEAL_PINS),
     ];
 
     private static readonly Dictionary<string, string> SpecialNames = new()
@@ -317,7 +317,8 @@ public static class ItemsAndLocationsHandler
     public static bool HasDialog(long locationID)
     {
         logger.Log("Checking if {0} has associated dialog", locationID);
-        if (!IDtoLocationsLookup.ContainsKey(locationID)) return false;
+        if (!IDtoLocationsLookup.ContainsKey(locationID))
+            return false;
         var location = LocationFromID(locationID).PrettyLocationName;
         try
         {
@@ -416,10 +417,12 @@ public static class ItemsAndLocationsHandler
                 if (ShopItem(randoItem.Item))
                 {
                     // don't award shuriken twice if we already got it from windmill shuriken
-                    if (randoItem.Item.Equals(EItems.SHURIKEN) &
-                        ArchipelagoClient.ServerData.ReceivedItems.ContainsKey(itemToUnlock)) return;
-                    if (!new List<EItems> { EItems.HEART_CONTAINER, EItems.SHURIKEN_UPGRADE }.Contains(
-                            randoItem.Item))
+                    if (
+                        randoItem.Item.Equals(EItems.SHURIKEN)
+                        & ArchipelagoClient.ServerData.ReceivedItems.ContainsKey(itemToUnlock)
+                    )
+                        return;
+                    if (!new List<EItems> { EItems.HEART_CONTAINER, EItems.SHURIKEN_UPGRADE }.Contains(randoItem.Item))
                     {
                         logger.Log("checking if {0} has been received already", itemToUnlock);
                         if (ArchipelagoClient.ServerData.ReceivedItems.ContainsKey(itemToUnlock))
@@ -428,8 +431,11 @@ public static class ItemsAndLocationsHandler
                             return;
                         }
                     }
-                    else if (ArchipelagoClient.ServerData.ReceivedItems.TryGetValue(itemToUnlock, out var count) &&
-                             count > 1) return;
+                    else if (
+                        ArchipelagoClient.ServerData.ReceivedItems.TryGetValue(itemToUnlock, out var count)
+                        && count > 1
+                    )
+                        return;
                     Manager<InventoryManager>.Instance.AddItem(randoItem.Item, quantity);
                     var view = Manager<UIManager>.Instance.GetView<InGameHud>();
                     view.UpdateMaxHeart();
@@ -456,7 +462,8 @@ public static class ItemsAndLocationsHandler
     public static void SendLocationCheck(LocationRO checkedLocation)
     {
         LocationsLookup.TryGetValue(checkedLocation, out var locationID);
-        if (ArchipelagoClient.ServerData.CheckedLocations.Contains(locationID)) return;
+        if (ArchipelagoClient.ServerData.CheckedLocations.Contains(locationID))
+            return;
         try
         {
             SendLocationCheck(locationID);
@@ -470,17 +477,21 @@ public static class ItemsAndLocationsHandler
 
     public static void SendLocationCheck(long locationID)
     {
-        if (!LocationsLookup.Values.Contains(locationID)) return;
+        if (!LocationsLookup.Values.Contains(locationID))
+            return;
         logger.Log("Checking if we need to modify the location {0} before sending", locationID);
         if (ArchipelagoClient.ServerData.CheckedLocations.Contains(locationID))
         {
             var loc = LocationFromID(locationID);
             if (SpecialNames.TryGetValue(loc.LocationName, out var name))
             {
-                LocationsLookup.TryGetValue(new LocationRO(name,
-                    (EItems)Enum.Parse(typeof(EItems), loc.PrettyLocationName)), out locationID);
+                LocationsLookup.TryGetValue(
+                    new LocationRO(name, (EItems)Enum.Parse(typeof(EItems), loc.PrettyLocationName)),
+                    out locationID
+                );
             }
-            else return;
+            else
+                return;
         }
         ArchipelagoClient.ServerData.CheckedLocations.Add(locationID);
 
@@ -488,9 +499,13 @@ public static class ItemsAndLocationsHandler
         if (ArchipelagoClient.Authenticated)
         {
             ThreadPool.QueueUserWorkItem(_ =>
-                ArchipelagoClient.Session.Locations.CompleteLocationChecksAsync(null,
-                    ArchipelagoClient.ServerData.CheckedLocations.ToArray()));
-            if (!RandoStateManager.ScoutedLocations.TryGetValue(locationID, out var item)) return;
+                ArchipelagoClient.Session.Locations.CompleteLocationChecksAsync(
+                    null,
+                    ArchipelagoClient.ServerData.CheckedLocations.ToArray()
+                )
+            );
+            if (!RandoStateManager.ScoutedLocations.TryGetValue(locationID, out var item))
+                return;
             if (!HasDialog(locationID))
             {
                 string dialog;
@@ -553,14 +568,18 @@ public static class ItemsAndLocationsHandler
         {
             var itemToUnlock = ArchipelagoClient.Session.Items.AllItemsReceived[i];
             var currentItem = itemToUnlock.ItemId;
-            if (!receivedItems.ContainsKey(currentItem)) receivedItems.Add(currentItem, 1);
-            else receivedItems[currentItem] += 1;
-            if (ArchipelagoClient.ServerData.ReceivedItems.ContainsKey(currentItem) &&
-                ArchipelagoClient.ServerData.ReceivedItems[currentItem] >= receivedItems[currentItem]) continue;
+            if (!receivedItems.ContainsKey(currentItem))
+                receivedItems.Add(currentItem, 1);
+            else
+                receivedItems[currentItem] += 1;
+            if (
+                ArchipelagoClient.ServerData.ReceivedItems.ContainsKey(currentItem)
+                && ArchipelagoClient.ServerData.ReceivedItems[currentItem] >= receivedItems[currentItem]
+            )
+                continue;
             logger.Log("Determined {0} missing while resyncing.", currentItem);
             Unlock(currentItem);
-            if (itemToUnlock.OwnItem() &&
-                HasDialog(itemToUnlock.LocationId))
+            if (itemToUnlock.OwnItem() && HasDialog(itemToUnlock.LocationId))
                 continue;
             ArchipelagoClient.DialogQueue.Enqueue(itemToUnlock.ToReadableString());
         }

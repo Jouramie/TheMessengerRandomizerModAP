@@ -27,7 +27,8 @@ public static class RandoShopManager
     public static int GetPrice(On.UpgradeButtonData.orig_GetPrice orig, UpgradeButtonData self)
     {
         //modify shop prices here
-        if (ShopPrices != null && ShopPrices.TryGetValue(self.upgradeID, out var price)) return price;
+        if (ShopPrices != null && ShopPrices.TryGetValue(self.upgradeID, out var price))
+            return price;
         return orig(self);
     }
 
@@ -58,8 +59,13 @@ public static class RandoShopManager
         Object.FindObjectOfType<SousSol>().UnlockFigurine(figurine);
     }
 
-    public static void GoToSousSol(On.GoToSousSolCutscene.orig_EndCutScene orig, GoToSousSolCutscene self,
-        bool camera, bool borders, bool transition)
+    public static void GoToSousSol(
+        On.GoToSousSolCutscene.orig_EndCutScene orig,
+        GoToSousSolCutscene self,
+        bool camera,
+        bool borders,
+        bool transition
+    )
     {
         orig(self, camera, borders, transition);
 
@@ -71,17 +77,23 @@ public static class RandoShopManager
         }
     }
 
-    public static ShopListItemData GetFigurineData(On.IronHoodShopScreen.orig_GetFigurineData orig,
+    public static ShopListItemData GetFigurineData(
+        On.IronHoodShopScreen.orig_GetFigurineData orig,
         IronHoodShopScreen self,
-        FigurineDefinition figurineDefinition)
+        FigurineDefinition figurineDefinition
+    )
     {
         var figurine = figurineDefinition.figurineID;
-        if (FigurePrices.TryGetValue(figurine, out var cost)) figurineDefinition.cost = cost;
+        if (FigurePrices.TryGetValue(figurine, out var cost))
+            figurineDefinition.cost = cost;
         return orig(self, figurineDefinition);
     }
 
-    public static void BuyMoneyWrench(On.BuyMoneyWrenchCutscene.orig_OnBuyWrenchChoice orig,
-        BuyMoneyWrenchCutscene self, DialogChoice choice)
+    public static void BuyMoneyWrench(
+        On.BuyMoneyWrenchCutscene.orig_OnBuyWrenchChoice orig,
+        BuyMoneyWrenchCutscene self,
+        DialogChoice choice
+    )
     {
         orig(self, choice);
         if (ArchipelagoClient.HasConnected && choice.ChoiceInfo.choiceId == "Yes")
@@ -90,22 +102,27 @@ public static class RandoShopManager
         }
     }
 
-    public static void EndMoneyWrenchCutscene(On.BuyMoneyWrenchCutscene.orig_EndCutsceneOnDialogDone orig,
-        BuyMoneyWrenchCutscene self, View dialogBox)
+    public static void EndMoneyWrenchCutscene(
+        On.BuyMoneyWrenchCutscene.orig_EndCutsceneOnDialogDone orig,
+        BuyMoneyWrenchCutscene self,
+        View dialogBox
+    )
     {
         orig(self, dialogBox);
         Manager<InventoryManager>.Instance.CollectTimeShard(wrenchPrice);
         wrenchPrice = 0;
     }
 
-    public static void UnclogSink(On.MoneySinkUnclogCutscene.orig_OnDialogOutDone orig,
-        MoneySinkUnclogCutscene self, View dialog)
+    public static void UnclogSink(
+        On.MoneySinkUnclogCutscene.orig_OnDialogOutDone orig,
+        MoneySinkUnclogCutscene self,
+        View dialog
+    )
     {
         orig(self, dialog);
         logger.Log("Unclogged that dang sink");
         var wrenchID = ItemsAndLocationsHandler.ItemFromEItem(EItems.MONEY_WRENCH);
-        if (!ArchipelagoClient.ServerData.ReceivedItems
-                .ContainsKey(wrenchID))
+        if (!ArchipelagoClient.ServerData.ReceivedItems.ContainsKey(wrenchID))
             Manager<ProgressionManager>.Instance.UnsetFlag(Flags.MoneySinkUnclogged);
     }
 
@@ -134,7 +151,8 @@ public static class RandoShopManager
 
     public static string GetText(On.LocalizationManager.orig_GetText orig, LocalizationManager self, string locid)
     {
-        if (!ArchipelagoClient.HasConnected) return orig(self, locid);
+        if (!ArchipelagoClient.HasConnected)
+            return orig(self, locid);
         var locType = TextType.None;
         var lookupName = string.Empty;
         if (locid.Contains("DESCRIPTION"))
@@ -158,18 +176,23 @@ public static class RandoShopManager
             return orig(self, locid);
         }
 
-        if (RaceMode || !ShopHints) return locType.Equals(TextType.Name) ? "Unknown Item" : "???";
+        if (RaceMode || !ShopHints)
+            return locType.Equals(TextType.Name) ? "Unknown Item" : "???";
 
         var locationID = ItemsAndLocationsHandler.LocationFromEItem(itemType);
         switch (itemType)
         {
             case EItems.HEART_CONTAINER when lookupName.Contains("SECOND"):
                 ItemsAndLocationsHandler.LocationsLookup.TryGetValue(
-                    new LocationRO("HP_UPGRADE_2", EItems.HEART_CONTAINER), out locationID);
+                    new LocationRO("HP_UPGRADE_2", EItems.HEART_CONTAINER),
+                    out locationID
+                );
                 break;
             case EItems.SHURIKEN_UPGRADE when lookupName.Contains("SECOND"):
-                ItemsAndLocationsHandler.LocationsLookup.TryGetValue(new LocationRO("SHURIKEN_UPGRADE_2",
-                    EItems.SHURIKEN_UPGRADE), out locationID);
+                ItemsAndLocationsHandler.LocationsLookup.TryGetValue(
+                    new LocationRO("SHURIKEN_UPGRADE_2", EItems.SHURIKEN_UPGRADE),
+                    out locationID
+                );
                 break;
         }
 
@@ -187,13 +210,15 @@ public static class RandoShopManager
             {
                 ThreadPool.QueueUserWorkItem(_ =>
                     ArchipelagoClient.Session.Locations.ScoutLocationsAsync(
-                        null, HintCreationPolicy.CreateAndAnnounceOnce, locationID));
+                        null,
+                        HintCreationPolicy.CreateAndAnnounceOnce,
+                        locationID
+                    )
+                );
             }
         }
 
-        return locType.Equals(TextType.Name)
-            ? itemOnLocation.Colorize()
-            : itemOnLocation.GetShopDescription();
+        return locType.Equals(TextType.Name) ? itemOnLocation.Colorize() : itemOnLocation.GetShopDescription();
     }
 
     private enum TextType

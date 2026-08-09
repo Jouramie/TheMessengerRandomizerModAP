@@ -31,6 +31,7 @@ public class RandoMenu
     public static SubMenuButtonInfo SpoilerLevel;
     public static SubMenuButtonInfo RaceMode;
     public static SubMenuButtonInfo BlankSpaceOne;
+
     // options
     public static SubMenuButtonInfo Accessibility;
     public static SubMenuButtonInfo Logic;
@@ -89,7 +90,10 @@ public class RandoMenu
         {
             var view = this;
             OptionScreen optionScreen = Manager<UIManager>.Instance.GetView<OptionScreen>();
-            Transform parent = view.transform.Find("Container").Find("BackgroundFrame").Find("OptionsFrame")
+            Transform parent = view
+                .transform.Find("Container")
+                .Find("BackgroundFrame")
+                .Find("OptionsFrame")
                 .Find("OptionMenuButtons");
             foreach (OptionsButtonInfo button in OptionButtons)
             {
@@ -99,15 +103,20 @@ public class RandoMenu
                         button.gameObject = Instantiate(optionScreen.fullscreenOption, parent);
                         break;
                     case SubMenuButtonInfo _:
-                        button.gameObject = Instantiate(optionScreen.controlsButton.transform.parent.gameObject,
-                            parent);
+                        button.gameObject = Instantiate(
+                            optionScreen.controlsButton.transform.parent.gameObject,
+                            parent
+                        );
                         break;
                     case MultipleOptionButtonInfo _:
                         button.gameObject = Instantiate(optionScreen.languageOption, parent);
                         break;
                     default:
-                        CourierLogger.Log(LogType.Warning, "OptionsMenu",
-                            button.GetType() + " not a known type of OptionsButtonInfo!");
+                        CourierLogger.Log(
+                            LogType.Warning,
+                            "OptionsMenu",
+                            button.GetType() + " not a known type of OptionsButtonInfo!"
+                        );
                         break;
                 }
 
@@ -117,8 +126,9 @@ public class RandoMenu
                 string str = getText?.Invoke() ?? "Nameless Modded Options Button";
                 buttonGameObject.name = str;
                 button.addedTo = view;
-                foreach (TextMeshProUGUI componentsInChild in button.gameObject
-                             .GetComponentsInChildren<TextMeshProUGUI>())
+                foreach (
+                    TextMeshProUGUI componentsInChild in button.gameObject.GetComponentsInChildren<TextMeshProUGUI>()
+                )
                 {
                     if (componentsInChild.name.Equals("OptionState") || componentsInChild.name.Equals("Text"))
                         button.stateTextMesh = componentsInChild;
@@ -140,7 +150,7 @@ public class RandoMenu
             parent.Find("Back")?.SetAsLastSibling();
         }
 
-        public new static RandoScreen BuildModOptionScreen(OptionScreen optionScreen)
+        public static new RandoScreen BuildModOptionScreen(OptionScreen optionScreen)
         {
             GameObject gameObject = new GameObject();
             RandoScreen randoScreen = gameObject.AddComponent<RandoScreen>();
@@ -153,8 +163,11 @@ public class RandoMenu
                 newScreen.transform.GetChild(i).SetParent(randoScreen.transform, false);
             }
 
-            randoScreen.optionMenuButtons = randoScreen.transform.Find("Container").Find("BackgroundFrame")
-                .Find("OptionsFrame").Find("OptionMenuButtons");
+            randoScreen.optionMenuButtons = randoScreen
+                .transform.Find("Container")
+                .Find("BackgroundFrame")
+                .Find("OptionsFrame")
+                .Find("OptionMenuButtons");
             randoScreen.backButton = randoScreen.optionMenuButtons.Find("Back");
             // Delete OptionScreen buttons except for the Back button
             foreach (Transform child in randoScreen.optionMenuButtons.GetChildren())
@@ -199,13 +212,15 @@ public class RandoMenu
             InitOptionsViewWithModButtons();
 
             // Make the border frames blue
-            Sprite borderSprite = backgroundFrame.GetComponent<Image>().sprite =
-                Courier.EmbeddedSprites["Mod.Courier.UI.mod_options_frame"];
+            Sprite borderSprite = backgroundFrame.GetComponent<Image>().sprite = Courier.EmbeddedSprites[
+                "Mod.Courier.UI.mod_options_frame"
+            ];
             borderSprite.bounds.extents.Set(1.7f, 1.7f, 0.1f);
             borderSprite.texture.filterMode = FilterMode.Point;
 
-            borderSprite = backgroundFrame.Find("OptionsFrame").GetComponent<Image>().sprite =
-                Courier.EmbeddedSprites["Mod.Courier.UI.mod_options_frame"];
+            borderSprite = backgroundFrame.Find("OptionsFrame").GetComponent<Image>().sprite = Courier.EmbeddedSprites[
+                "Mod.Courier.UI.mod_options_frame"
+            ];
             borderSprite.bounds.extents.Set(1.7f, 1.7f, 0.1f);
             borderSprite.texture.filterMode = FilterMode.Point;
 
@@ -214,15 +229,19 @@ public class RandoMenu
             SetInitialSelection();
 
             // Make the selection frames blue
-            foreach (Image image in transform.GetComponentsInChildren<Image>()
-                         .Where(c => c.name.Equals("SelectionFrame")))
+            foreach (
+                Image image in transform.GetComponentsInChildren<Image>().Where(c => c.name.Equals("SelectionFrame"))
+            )
             {
                 try
                 {
                     if (image.overrideSprite != null && image.overrideSprite.name != "Empty")
                     {
-                        RenderTexture rt = new RenderTexture(image.overrideSprite.texture.width,
-                            image.overrideSprite.texture.height, 0);
+                        RenderTexture rt = new RenderTexture(
+                            image.overrideSprite.texture.width,
+                            image.overrideSprite.texture.height,
+                            0
+                        );
                         RenderTexture.active = rt;
                         Graphics.Blit(image.overrideSprite.texture, rt);
 
@@ -243,17 +262,26 @@ public class RandoMenu
                         res.SetPixels(pxls);
                         res.Apply();
 
-                        Sprite sprite = image.overrideSprite = Sprite.Create(res,
-                            new Rect(0, 0, res.width, res.height), new Vector2(16, 16), 20, 1,
-                            SpriteMeshType.FullRect, new Vector4(5, 5, 5, 5));
+                        Sprite sprite = image.overrideSprite = Sprite.Create(
+                            res,
+                            new Rect(0, 0, res.width, res.height),
+                            new Vector2(16, 16),
+                            20,
+                            1,
+                            SpriteMeshType.FullRect,
+                            new Vector4(5, 5, 5, 5)
+                        );
                         sprite.bounds.extents.Set(.8f, .8f, 0.1f);
                         sprite.texture.filterMode = FilterMode.Point;
                     }
                 }
                 catch (Exception e)
                 {
-                    CourierLogger.Log(LogType.Exception, "RandoScreen",
-                        "Image not Read/Writeable when recoloring selection frames in ModOptionScreen");
+                    CourierLogger.Log(
+                        LogType.Exception,
+                        "RandoScreen",
+                        "Image not Read/Writeable when recoloring selection frames in ModOptionScreen"
+                    );
                     e.LogDetailed();
                 }
             }
@@ -294,15 +322,15 @@ public class RandoMenu
 
             StartCoroutine(WaitAndSelectInitialButton());
             Vector2 sizeDelta = backgroundFrame.sizeDelta;
-            backgroundFrame.sizeDelta =
-                new Vector2(sizeDelta.x, 110 + heightPerButton * OptionsCount());
+            backgroundFrame.sizeDelta = new Vector2(sizeDelta.x, 110 + heightPerButton * OptionsCount());
         }
 
         // ReSharper disable Unity.PerformanceAnalysis
         private void SetInitialSelection()
         {
-            GameObject defaultSelectionButton =
-                (initialSelection ? initialSelection : defaultSelection).transform.Find("Button").gameObject;
+            GameObject defaultSelectionButton = (initialSelection ? initialSelection : defaultSelection)
+                .transform.Find("Button")
+                .gameObject;
             defaultSelectionButton.transform.GetComponent<UIObjectAudioHandler>().playAudio = false;
             EventSystem.current.SetSelectedGameObject(defaultSelectionButton);
             defaultSelectionButton.GetComponent<Button>().OnSelect(null);
@@ -323,8 +351,11 @@ public class RandoMenu
                 return OptionsCount();
             foreach (OptionsButtonInfo buttonInfo in OptionButtons)
             {
-                if (buttonInfo.gameObject.transform.Find("Button").gameObject
-                    .Equals(EventSystem.current.currentSelectedGameObject))
+                if (
+                    buttonInfo
+                        .gameObject.transform.Find("Button")
+                        .gameObject.Equals(EventSystem.current.currentSelectedGameObject)
+                )
                 {
                     return EnabledModOptionsBeforeButton(buttonInfo);
                 }
@@ -341,9 +372,8 @@ public class RandoMenu
             }
 
             Vector3 windowOffset =
-                new Vector3(0,
-                    Math.Min(GetSelectedButtonIndex(), Math.Max(0, OptionsCount() - 10)) *
-                    .9f) - new Vector3(0, Math.Max(0, OptionsCount() - 11) * .45f);
+                new Vector3(0, Math.Min(GetSelectedButtonIndex(), Math.Max(0, OptionsCount() - 10)) * .9f)
+                - new Vector3(0, Math.Max(0, OptionsCount() - 11) * .45f);
             transform.position = defaultPos + windowOffset;
 
             foreach (OptionsButtonInfo buttonInfo in OptionButtons)
@@ -353,15 +383,19 @@ public class RandoMenu
 
             // Make the selection frames blue
             // I should figure out if I can avoid doing this in LateUpdate()
-            foreach (Image image in transform.GetComponentsInChildren<Image>()
-                         .Where(c => c.name.Equals("SelectionFrame")))
+            foreach (
+                Image image in transform.GetComponentsInChildren<Image>().Where(c => c.name.Equals("SelectionFrame"))
+            )
             {
                 try
                 {
                     if (image.overrideSprite != null && image.overrideSprite.name.Equals("ShopItemSelectionFrame"))
                     {
-                        RenderTexture rt = new RenderTexture(image.overrideSprite.texture.width,
-                            image.overrideSprite.texture.height, 0);
+                        RenderTexture rt = new RenderTexture(
+                            image.overrideSprite.texture.width,
+                            image.overrideSprite.texture.height,
+                            0
+                        );
                         RenderTexture.active = rt;
                         Graphics.Blit(image.overrideSprite.texture, rt);
 
@@ -382,17 +416,26 @@ public class RandoMenu
                         res.SetPixels(pxls);
                         res.Apply();
 
-                        Sprite sprite = image.overrideSprite = Sprite.Create(res,
-                            new Rect(0, 0, res.width, res.height), new Vector2(16, 16), 20, 1,
-                            SpriteMeshType.FullRect, new Vector4(5, 5, 5, 5));
+                        Sprite sprite = image.overrideSprite = Sprite.Create(
+                            res,
+                            new Rect(0, 0, res.width, res.height),
+                            new Vector2(16, 16),
+                            20,
+                            1,
+                            SpriteMeshType.FullRect,
+                            new Vector4(5, 5, 5, 5)
+                        );
                         sprite.bounds.extents.Set(.8f, .8f, 0.1f);
                         sprite.texture.filterMode = FilterMode.Point;
                     }
                 }
                 catch (Exception e)
                 {
-                    CourierLogger.Log(LogType.Exception, "RandoScreen",
-                        "Image not Read/Writeable when recoloring selection frames in ModOptionScreen");
+                    CourierLogger.Log(
+                        LogType.Exception,
+                        "RandoScreen",
+                        "Image not Read/Writeable when recoloring selection frames in ModOptionScreen"
+                    );
                     e.LogDetailed();
                 }
             }
@@ -422,12 +465,13 @@ public class RandoMenu
         {
             Close(false);
             Manager<UIManager>.Instance.GetView<OptionScreen>().gameObject.SetActive(true);
-            SoloRandoMenuButton.gameObject.transform.Find("Button").GetComponent<UIObjectAudioHandler>()
-                .playAudio = false;
-            EventSystem.current.SetSelectedGameObject(SoloRandoMenuButton.gameObject.transform.Find("Button")
-                .gameObject);
-            SoloRandoMenuButton.gameObject.transform.Find("Button").GetComponent<UIObjectAudioHandler>()
-                .playAudio = true;
+            SoloRandoMenuButton.gameObject.transform.Find("Button").GetComponent<UIObjectAudioHandler>().playAudio =
+                false;
+            EventSystem.current.SetSelectedGameObject(
+                SoloRandoMenuButton.gameObject.transform.Find("Button").gameObject
+            );
+            SoloRandoMenuButton.gameObject.transform.Find("Button").GetComponent<UIObjectAudioHandler>().playAudio =
+                true;
         }
 
         public override void Close(bool transitionOut)
@@ -437,8 +481,7 @@ public class RandoMenu
         }
     }
 
-    private static void RegisterRandoButton(OptionsButtonInfo buttonInfo) =>
-        RandoScreen.OptionButtons.Add(buttonInfo);
+    private static void RegisterRandoButton(OptionsButtonInfo buttonInfo) => RandoScreen.OptionButtons.Add(buttonInfo);
 
     public static SubMenuButtonInfo RegisterSubRandoButton(Func<string> GetText, UnityAction onClick)
     {
@@ -447,32 +490,48 @@ public class RandoMenu
         return buttonInfo;
     }
 
-    public static ToggleButtonInfo RegisterToggleRandoButton(Func<string> getText, UnityAction onClick,
-        Func<ToggleButtonInfo, bool> getState)
-    {
-        var buttonInfo = new ToggleButtonInfo(getText, onClick, getState,
-            optionScreen => Manager<LocalizationManager>.Instance.GetText(ModOptionScreen.onLocID),
-            optionScreen => Manager<LocalizationManager>.Instance.GetText(ModOptionScreen.offLocID));
-        RegisterRandoButton(buttonInfo);
-        return buttonInfo;
-    }
-
-    public static TextEntryButtonInfo RegisterTextRandoButton(Func<string> getText, Func<string, bool> onEntry,
-        int maxCharacter = 15, Func<string> getEntryText = null, Func<string> getInitialText = null,
-        TextEntryButtonInfo.CharsetFlags charset = TextEntryButtonInfo.CharsetFlags.Letter |
-                                                   TextEntryButtonInfo.CharsetFlags.Number |
-                                                   TextEntryButtonInfo.CharsetFlags.Dash |
-                                                   TextEntryButtonInfo.CharsetFlags.Space)
-    {
-        var buttonInfo =
-            new TextEntryButtonInfo(getText, onEntry, maxCharacter, getEntryText, getInitialText, charset);
-        RegisterRandoButton(buttonInfo);
-        return buttonInfo;
-    }
-
-    public static MultipleOptionButtonInfo RegisterMultipleRandoButton(Func<string> getText,
+    public static ToggleButtonInfo RegisterToggleRandoButton(
+        Func<string> getText,
         UnityAction onClick,
-        Action<int> onSwitch, Func<MultipleOptionButtonInfo, int> getIndex, Func<int, string> getTextForIndex)
+        Func<ToggleButtonInfo, bool> getState
+    )
+    {
+        var buttonInfo = new ToggleButtonInfo(
+            getText,
+            onClick,
+            getState,
+            optionScreen => Manager<LocalizationManager>.Instance.GetText(ModOptionScreen.onLocID),
+            optionScreen => Manager<LocalizationManager>.Instance.GetText(ModOptionScreen.offLocID)
+        );
+        RegisterRandoButton(buttonInfo);
+        return buttonInfo;
+    }
+
+    public static TextEntryButtonInfo RegisterTextRandoButton(
+        Func<string> getText,
+        Func<string, bool> onEntry,
+        int maxCharacter = 15,
+        Func<string> getEntryText = null,
+        Func<string> getInitialText = null,
+        TextEntryButtonInfo.CharsetFlags charset =
+            TextEntryButtonInfo.CharsetFlags.Letter
+            | TextEntryButtonInfo.CharsetFlags.Number
+            | TextEntryButtonInfo.CharsetFlags.Dash
+            | TextEntryButtonInfo.CharsetFlags.Space
+    )
+    {
+        var buttonInfo = new TextEntryButtonInfo(getText, onEntry, maxCharacter, getEntryText, getInitialText, charset);
+        RegisterRandoButton(buttonInfo);
+        return buttonInfo;
+    }
+
+    public static MultipleOptionButtonInfo RegisterMultipleRandoButton(
+        Func<string> getText,
+        UnityAction onClick,
+        Action<int> onSwitch,
+        Func<MultipleOptionButtonInfo, int> getIndex,
+        Func<int, string> getTextForIndex
+    )
     {
         var buttonInfo = new MultipleOptionButtonInfo(getText, onClick, onSwitch, getIndex, getTextForIndex);
         RegisterRandoButton(buttonInfo);
@@ -494,108 +553,120 @@ public class RandoMenu
 
     public static void BuildRandoMenu()
     {
-        SoloRandoMenuButton =
-            Courier.UI.RegisterSubMenuOptionButton(() => "Solo Randomizer", DisplayRandoMenu);
+        SoloRandoMenuButton = Courier.UI.RegisterSubMenuOptionButton(() => "Solo Randomizer", DisplayRandoMenu);
         SoloRandoMenuButton.IsEnabled = () =>
-            Manager<LevelManager>.Instance.GetCurrentLevelEnum().Equals(ELevel.NONE) &&
-            !ArchipelagoClient.HasConnected;
+            Manager<LevelManager>.Instance.GetCurrentLevelEnum().Equals(ELevel.NONE) && !ArchipelagoClient.HasConnected;
 
         Name = RegisterTextRandoButton(
             () => $"Name: {RandomizerOptions.Name}",
             RandomizerOptions.OnNameEntry,
             16,
             () => "Enter name to be used for generation",
-            charset: TextEntryButtonInfo.CharsetFlags.Dash | TextEntryButtonInfo.CharsetFlags.Dot | TextEntryButtonInfo.CharsetFlags.Letter |
-                     TextEntryButtonInfo.CharsetFlags.Number | TextEntryButtonInfo.CharsetFlags.Space);
+            charset: TextEntryButtonInfo.CharsetFlags.Dash
+                | TextEntryButtonInfo.CharsetFlags.Dot
+                | TextEntryButtonInfo.CharsetFlags.Letter
+                | TextEntryButtonInfo.CharsetFlags.Number
+                | TextEntryButtonInfo.CharsetFlags.Space
+        );
 
         SeedNumButton = RegisterTextRandoButton(
             () => $"Seed: {RandomizerOptions.Seed}",
             RandomizerOptions.OnSeedEntry,
             20,
             () => "Enter seed to be used for generation",
-            charset: TextEntryButtonInfo.CharsetFlags.Number);
+            charset: TextEntryButtonInfo.CharsetFlags.Number
+        );
 
-        GenerateSeed = RegisterSubRandoButton(
-            () => "Generate Seed Number",
-            RandomizerOptions.OnGenerateSeed);
+        GenerateSeed = RegisterSubRandoButton(() => "Generate Seed Number", RandomizerOptions.OnGenerateSeed);
 
-        SpoilerLevel = RegisterSubRandoButton(
-            RandomizerOptions.GetSpoilerText,
-            RandomizerOptions.ChangeSpoiler);
+        SpoilerLevel = RegisterSubRandoButton(RandomizerOptions.GetSpoilerText, RandomizerOptions.ChangeSpoiler);
 
         RaceMode = RegisterSubRandoButton(
             () => RandoShopManager.RaceMode ? "Disable Race Mode" : "Enable Race Mode",
-            () => RandoShopManager.RaceMode = !RandoShopManager.RaceMode);
+            () => RandoShopManager.RaceMode = !RandoShopManager.RaceMode
+        );
 
         BlankSpaceOne = RegisterSubRandoButton(null, null);
 
         Accessibility = RegisterSubRandoButton(
             RandomizerOptions.GetAccessibilityText,
-            RandomizerOptions.ChangeAccessibility);
+            RandomizerOptions.ChangeAccessibility
+        );
 
-        Logic =
-            RegisterSubRandoButton(RandomizerOptions.GetLogicText, RandomizerOptions.ChangeLogic);
+        Logic = RegisterSubRandoButton(RandomizerOptions.GetLogicText, RandomizerOptions.ChangeLogic);
 
         Shards = RegisterSubRandoButton(
             () => RandomizerOptions.Shards ? "Shuffle Mega Shards" : "No Mega Shards",
-            () => RandomizerOptions.Shards = !RandomizerOptions.Shards);
+            () => RandomizerOptions.Shards = !RandomizerOptions.Shards
+        );
 
         LimitedMovement = RegisterSubRandoButton(
             () => RandomizerOptions.LimMovement ? "Limited Movement" : "All Movement Available",
-            () => RandomizerOptions.LimMovement = !RandomizerOptions.LimMovement);
+            () => RandomizerOptions.LimMovement = !RandomizerOptions.LimMovement
+        );
 
         EarlyMed = RegisterSubRandoButton(
             () => RandomizerOptions.EarlyMed ? "Early Meditation" : "No Early Guaranteed Meditation",
-            () => RandomizerOptions.EarlyMed = !RandomizerOptions.EarlyMed);
+            () => RandomizerOptions.EarlyMed = !RandomizerOptions.EarlyMed
+        );
 
         AvailablePortals = RegisterSubRandoButton(
             RandomizerOptions.GetAvailablePortalsText,
-            RandomizerOptions.ChangeAvailablePortals);
+            RandomizerOptions.ChangeAvailablePortals
+        );
 
         ShufflePortals = RegisterSubRandoButton(
             RandomizerOptions.GetPortalShuffleText,
-            RandomizerOptions.ChangePortalShuffle);
+            RandomizerOptions.ChangePortalShuffle
+        );
 
         ShuffleTransitions = RegisterSubRandoButton(
             RandomizerOptions.GetTransitionText,
-            RandomizerOptions.ChangeTransitionShuffle);
+            RandomizerOptions.ChangeTransitionShuffle
+        );
 
         Goal = RegisterSubRandoButton(
             () => RandomizerOptions.Goal ? "Power Seal Hunt" : "Open Music Box",
-            () => RandomizerOptions.Goal = !RandomizerOptions.Goal);
+            () => RandomizerOptions.Goal = !RandomizerOptions.Goal
+        );
 
         MusicBox = RegisterSubRandoButton(
             () => RandomizerOptions.MusicBox ? "Do Music Box" : "Skip Music Box",
-            () => RandomizerOptions.MusicBox = !RandomizerOptions.MusicBox);
+            () => RandomizerOptions.MusicBox = !RandomizerOptions.MusicBox
+        );
 
-        NotesNeeded =
-            RegisterSubRandoButton(RandomizerOptions.GetNotesText, RandomizerOptions.ChangeNotes);
+        NotesNeeded = RegisterSubRandoButton(RandomizerOptions.GetNotesText, RandomizerOptions.ChangeNotes);
 
         AmountSeals = RegisterTextRandoButton(
             () => $"Total Power Seals Available: {RandomizerOptions.TotalSeals}",
             RandomizerOptions.OnTotalSealsEntry,
             2,
-            charset: TextEntryButtonInfo.CharsetFlags.Number);
+            charset: TextEntryButtonInfo.CharsetFlags.Number
+        );
 
         RequiredSeals = RegisterTextRandoButton(
             () => $"Percentage of Seals Required: {RandomizerOptions.RequiredSeals}",
             RandomizerOptions.OnRequiredSealsEntry,
             3,
-            charset: TextEntryButtonInfo.CharsetFlags.Number);
+            charset: TextEntryButtonInfo.CharsetFlags.Number
+        );
 
         ShopPrices = RegisterTextRandoButton(
             () => $"Randomized Shop Price Modifier: {RandomizerOptions.ShopPriceMod}",
             RandomizerOptions.OnShopPriceModEntry,
             3,
-            charset: TextEntryButtonInfo.CharsetFlags.Number);
+            charset: TextEntryButtonInfo.CharsetFlags.Number
+        );
 
         BlankSpaceTwo = RegisterSubRandoButton(null, null);
 
         ExportButton = RegisterSubRandoButton(
             () => "Export Randomizer options",
-            () => OptionsExporter.ExportAsync(ExportButton));
+            () => OptionsExporter.ExportAsync(ExportButton)
+        );
         GenerateButton = RegisterSubRandoButton(
             () => "Generate solo seed",
-            () => SeedGenerator.GenerateAsync(GenerateButton));
+            () => SeedGenerator.GenerateAsync(GenerateButton)
+        );
     }
 }

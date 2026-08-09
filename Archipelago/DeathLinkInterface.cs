@@ -54,10 +54,13 @@ public class DeathLinkInterface
     {
         try
         {
-            if (deathLinks.Count > 0) receivedDeath = true;
-            if (!receivedDeath) return;
+            if (deathLinks.Count > 0)
+                receivedDeath = true;
+            if (!receivedDeath)
+                return;
             var cause = deathLinks[0].Cause;
-            if (cause.IsNullOrEmpty()) cause = $"{deathLinks[0].Source} sent you pain from afar.";
+            if (cause.IsNullOrEmpty())
+                cause = $"{deathLinks[0].Source} sent you pain from afar.";
             DialogSequence receivedDeathDialog = ScriptableObject.CreateInstance<DialogSequence>();
             receivedDeathDialog.dialogID = "DEATH_LINK";
             receivedDeathDialog.name = cause;
@@ -78,10 +81,13 @@ public class DeathLinkInterface
     {
         try
         {
-            if (!ArchipelagoData.DeathLink || receivedDeath) return;
+            if (!ArchipelagoData.DeathLink || receivedDeath)
+                return;
             deathsSent++;
             logger.Log("Sharing death with your friends...");
-            var alias = ArchipelagoClient.Session.Players.GetPlayerAliasAndName(ArchipelagoClient.Session.ConnectionInfo.Slot);
+            var alias = ArchipelagoClient.Session.Players.GetPlayerAliasAndName(
+                ArchipelagoClient.Session.ConnectionInfo.Slot
+            );
             // logger.Log(killer.GetType());
             var cause = GetDeathLinkCause(deathType);
             DeathLinkService.SendDeathLink(new DeathLink(ArchipelagoClient.ServerData.SlotName, alias + cause));

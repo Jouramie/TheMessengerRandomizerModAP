@@ -23,7 +23,8 @@ public class TrackerManager
         Synced = true;
         logger.Log("Re-syncing tracker data from Data Storage");
 
-        visitedEntrances = ArchipelagoClient.Session.DataStorage[Scope.Slot, "VisitedEntrances"].To<List<string>>() ?? [];
+        visitedEntrances =
+            ArchipelagoClient.Session.DataStorage[Scope.Slot, "VisitedEntrances"].To<List<string>>() ?? [];
         unsentVisitedEntrances.RemoveWhere(visitedEntrances.Contains);
         if (unsentVisitedEntrances.Count > 0)
         {
@@ -34,15 +35,19 @@ public class TrackerManager
             unsentVisitedEntrances.Clear();
         }
 
-        if (needsUnlockedPortalsReconciliation) ReconciliateUnlockedPortals();
-        if (lastKnownCurrentRegion != ELevel.NONE) SetCurrentRegion(lastKnownCurrentRegion);
+        if (needsUnlockedPortalsReconciliation)
+            ReconciliateUnlockedPortals();
+        if (lastKnownCurrentRegion != ELevel.NONE)
+            SetCurrentRegion(lastKnownCurrentRegion);
     }
 
     public void AddVisitedEntrance(string entrance)
     {
-        if (visitedEntrances.Contains(entrance)) return;
+        if (visitedEntrances.Contains(entrance))
+            return;
 
-        if (ArchipelagoClient.Offline) return;
+        if (ArchipelagoClient.Offline)
+            return;
         if (!ArchipelagoClient.Authenticated)
         {
             Synced = false;
@@ -50,8 +55,10 @@ public class TrackerManager
             return;
         }
 
-        visitedEntrances = ArchipelagoClient.Session.DataStorage[Scope.Slot, "VisitedEntrances"].To<List<string>>() ?? [];
-        if (visitedEntrances.Contains(entrance)) return;
+        visitedEntrances =
+            ArchipelagoClient.Session.DataStorage[Scope.Slot, "VisitedEntrances"].To<List<string>>() ?? [];
+        if (visitedEntrances.Contains(entrance))
+            return;
 
         logger.Log("Adding visited entrance: {0}", entrance);
         visitedEntrances.Add(entrance);
@@ -63,7 +70,8 @@ public class TrackerManager
 
     public void ReconciliateUnlockedPortals()
     {
-        if (ArchipelagoClient.Offline) return;
+        if (ArchipelagoClient.Offline)
+            return;
         if (!ArchipelagoClient.Authenticated)
         {
             Synced = false;
@@ -72,18 +80,25 @@ public class TrackerManager
         }
 
         var unlockedPortals = RandoPortalManager.UnlockedPortals;
-        unlockedPortals.UnionWith(ArchipelagoClient.Session.DataStorage[Scope.Slot, "UnlockedPortals"].To<List<string>>() ?? []);
-        if (unlockedPortals.Count == 0) return;
+        unlockedPortals.UnionWith(
+            ArchipelagoClient.Session.DataStorage[Scope.Slot, "UnlockedPortals"].To<List<string>>() ?? []
+        );
+        if (unlockedPortals.Count == 0)
+            return;
 
         var unlockedPortalsList = unlockedPortals.ToList();
         unlockedPortalsList.Sort();
-        logger.Log("Updating unlocked portals with Data Storage. Unlocked portals are\n\t{0}", string.Join("\n\t", [.. unlockedPortalsList]));
+        logger.Log(
+            "Updating unlocked portals with Data Storage. Unlocked portals are\n\t{0}",
+            string.Join("\n\t", [.. unlockedPortalsList])
+        );
         ArchipelagoClient.Session.DataStorage[Scope.Slot, "UnlockedPortals"] = unlockedPortalsList;
     }
 
     public void SetCurrentRegion(ELevel level)
     {
-        if (ArchipelagoClient.Offline) return;
+        if (ArchipelagoClient.Offline)
+            return;
         if (!ArchipelagoClient.Authenticated)
         {
             Synced = false;

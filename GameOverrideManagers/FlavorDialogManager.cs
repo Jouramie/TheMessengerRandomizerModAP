@@ -28,16 +28,17 @@ public static class FlavorDialogManager
         {
             case "PROPHET_HEY":
                 var prophetHey = infoToReplace[0];
-                prophetHey.text =
-                    ProphetHeyReplacements[RandomizerStateManager.SeedRandom.Next(ProphetHeyReplacements.Count)];
+                prophetHey.text = ProphetHeyReplacements[
+                    RandomizerStateManager.SeedRandom.Next(ProphetHeyReplacements.Count)
+                ];
                 prophetHey.skippable = false;
                 break;
             case "PROPHET_INTRO_3":
                 ProphetDefinition = infoToReplace[0].characterDefinition;
                 MessengerDefinition = infoToReplace[1].characterDefinition;
-                var newText =
-                    ProphetIntroReplacements[
-                        RandomizerStateManager.SeedRandom.Next(ProphetIntroReplacements.Count)];
+                var newText = ProphetIntroReplacements[
+                    RandomizerStateManager.SeedRandom.Next(ProphetIntroReplacements.Count)
+                ];
                 // var toRemove = 0;
                 var newInfoList = new List<DialogInfo>();
                 foreach (var kvp in newText)
@@ -83,11 +84,7 @@ public static class FlavorDialogManager
         }
     }
 
-    static readonly List<string> DialogToReplace = new List<string>
-    {
-        "PROPHET_HEY",
-        "PROPHET_INTRO_3",
-    };
+    static readonly List<string> DialogToReplace = new List<string> { "PROPHET_HEY", "PROPHET_INTRO_3" };
 
     static readonly List<string> ProphetHeyReplacements = new List<string>
     {
@@ -140,13 +137,16 @@ public static class FlavorDialogManager
         new Dictionary<string, string>
         {
             { "Welcome, young Messenger", "Prophet" },
-            { "Who are you?" , "Messenger" },
-            { "I am your sister's cousin's father's brother's dog's veterinarian's nephew's parole officer's " +
-              "evil twin's best friend's long lost roommate's third favorite singer's tax consultant's " +
-              "chef's architect's dungeon master", "Prophet" },
+            { "Who are you?", "Messenger" },
+            {
+                "I am your sister's cousin's father's brother's dog's veterinarian's nephew's parole officer's "
+                    + "evil twin's best friend's long lost roommate's third favorite singer's tax consultant's "
+                    + "chef's architect's dungeon master",
+                "Prophet"
+            },
             { "And what does that make us?", "Messenger" },
             { "<event=OpenPortals>-CHARACTER LIMIT EXCEEDED-", "Prophet" },
             { "<color=#f30709>OVERFLOW ERROR</color>", "Prophet" },
-        }
+        },
     };
 }

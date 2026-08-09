@@ -10,7 +10,7 @@ namespace MessengerRando.Utils;
 
 /// <summary>
 /// A static class to handle replacement of Dialogs for items.
-/// Could be made better by adding the award text string to the LocationRO for each item 
+/// Could be made better by adding the award text string to the LocationRO for each item
 /// </summary>
 public static class DialogChanger
 {
@@ -18,7 +18,7 @@ public static class DialogChanger
     public static readonly Dictionary<EItems, string> ItemDialogID = new Dictionary<EItems, string>
     {
         { EItems.KEY_OF_LOVE, "AWARD_KEY_OF_LOVE" },
-        { EItems.KEY_OF_COURAGE, "AWARD_KEY_OF_COURAGE"},
+        { EItems.KEY_OF_COURAGE, "AWARD_KEY_OF_COURAGE" },
         { EItems.KEY_OF_CHAOS, "AWARD_KEY_OF_CHAOS" },
         { EItems.KEY_OF_SYMBIOSIS, "AWARD_KEY_OF_SYMBIOSIS" },
         { EItems.KEY_OF_STRENGTH, "AWARD_KEY_OF_STRENGTH" },
@@ -61,36 +61,50 @@ public static class DialogChanger
     /// <param name="orig"></param>
     /// <param name="self"></param>
     /// <param name="language"></param>
-    public static void LoadDialogs_Elanguage(On.DialogManager.orig_LoadDialogs_ELanguage orig, DialogManager self, ELanguage language)
+    public static void LoadDialogs_Elanguage(
+        On.DialogManager.orig_LoadDialogs_ELanguage orig,
+        DialogManager self,
+        ELanguage language
+    )
     {
-
         //Loads all the original dialog
         orig(self, language);
 
-        if (!ArchipelagoClient.HasConnected) return;
+        if (!ArchipelagoClient.HasConnected)
+            return;
         //Sets the field info so we can use reflection to get and set the private field.
-        FieldInfo dialogByLocIDField = typeof(DialogManager).GetField("dialogByLocID", BindingFlags.NonPublic | BindingFlags.Instance);
+        FieldInfo dialogByLocIDField = typeof(DialogManager).GetField(
+            "dialogByLocID",
+            BindingFlags.NonPublic | BindingFlags.Instance
+        );
 
         //Gets all loaded dialogs and makes a copy
         if (dialogByLocIDField != null)
         {
-            Dictionary<string, List<DialogInfo>> Loc = dialogByLocIDField.GetValue(self) as Dictionary<string, List<DialogInfo>>;
+            Dictionary<string, List<DialogInfo>> Loc =
+                dialogByLocIDField.GetValue(self) as Dictionary<string, List<DialogInfo>>;
             if (Loc != null)
             {
                 //Loop through each dialog replacement - Will output the replacements to log for debugging
-                foreach (var replaceableKey in Loc.Select(kvp => kvp.Key).Where(toBeReplaced => ItemDialogID.ContainsValue(toBeReplaced)))
+                foreach (
+                    var replaceableKey in Loc.Select(kvp => kvp.Key)
+                        .Where(toBeReplaced => ItemDialogID.ContainsValue(toBeReplaced))
+                )
                 {
-                    //Sets them to be all center and no portrait (This really only applies to phobekins but was 
+                    //Sets them to be all center and no portrait (This really only applies to phobekins but was
                     Loc[replaceableKey][0].autoClose = true;
                     Loc[replaceableKey][0].autoCloseDelay = 0;
                     Loc[replaceableKey][0].characterDefinition = null;
                     Loc[replaceableKey][0].forcedPortraitOrientation = 0;
                     Loc[replaceableKey][0].position = EDialogPosition.CENTER;
                     Loc[replaceableKey][0].skippable = false;
-                    if ((RandomizerStateManager.Instance.ScoutedLocations != null || ArchipelagoClient.Offline) &&
-                        RandomizerStateManager.Instance.IsLocationRandomized(
+                    if (
+                        (RandomizerStateManager.Instance.ScoutedLocations != null || ArchipelagoClient.Offline)
+                        && RandomizerStateManager.Instance.IsLocationRandomized(
                             ItemDialogID.First(x => x.Value.Equals(replaceableKey)).Key,
-                            out var locationID))
+                            out var locationID
+                        )
+                    )
                     {
                         if (ArchipelagoClient.Offline)
                         {
@@ -127,8 +141,8 @@ public static class DialogChanger
         {
             Type type = typeof(LocalizationManager);
             FieldInfo field = type.GetField("onLanguageChanged", BindingFlags.NonPublic | BindingFlags.Instance);
-            MulticastDelegate eventDelegate = field?.GetValue(Manager<LocalizationManager>.Instance) as MulticastDelegate;
-
+            MulticastDelegate eventDelegate =
+                field?.GetValue(Manager<LocalizationManager>.Instance) as MulticastDelegate;
 
             if (eventDelegate != null)
             {

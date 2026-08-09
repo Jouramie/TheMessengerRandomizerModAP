@@ -13,15 +13,16 @@ public class LocationRO
         VanillaItem = item;
     }
 
-    public LocationRO(string name) : this(name, name) { }
+    public LocationRO(string name)
+        : this(name, name) { }
 
     //overrides for archipelago since logic is already handled
-    public LocationRO(string name, EItems item) : this(name, item.ToString(), item) { }
+    public LocationRO(string name, EItems item)
+        : this(name, item.ToString(), item) { }
 
     public override bool Equals(object obj)
     {
-        return obj is LocationRO rO &&
-               LocationName == rO.LocationName;
+        return obj is LocationRO rO && LocationName == rO.LocationName;
     }
 
     public bool Equals(string locName)

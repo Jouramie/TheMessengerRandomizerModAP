@@ -60,22 +60,26 @@ public static class TrapManager
         var dialogInfoList = new List<DialogInfo>();
         var dialogToAdd = ProphecyTrapDialog[RandomizerStateManager.SeedRandom.Next(ProphecyTrapDialog.Count)];
         var count = 0;
-        foreach (var info in dialogToAdd.Select(text => new DialogInfo
-        {
-            text = text,
-            textID = $"PROPHECY_{count}",
-            characterDefinition = FlavorDialogManager.ProphetDefinition,
-            skippable = false,
-            autoClose = true,
-            autoCloseDelay = 1
-        }))
+        foreach (
+            var info in dialogToAdd.Select(text => new DialogInfo
+            {
+                text = text,
+                textID = $"PROPHECY_{count}",
+                characterDefinition = FlavorDialogManager.ProphetDefinition,
+                skippable = false,
+                autoClose = true,
+                autoCloseDelay = 1,
+            })
+        )
         {
             count++;
 
             dialogInfoList.Add(info);
         }
-        FieldInfo dialogInfoListField =
-            typeof(DialogSequence).GetField("dialogInfoList", BindingFlags.NonPublic | BindingFlags.Instance);
+        FieldInfo dialogInfoListField = typeof(DialogSequence).GetField(
+            "dialogInfoList",
+            BindingFlags.NonPublic | BindingFlags.Instance
+        );
         dialogInfoListField.SetValue(dialogBox, dialogInfoList);
 
         var popupParams = new DialogBoxParams(dialogBox);
@@ -87,14 +91,13 @@ public static class TrapManager
     public static void TryTeleportPlayer()
     {
         var level = Manager<LevelManager>.Instance;
-        if (AvailableTrapLevels.Contains(level.GetCurrentLevelEnum()) &&
-            RandomizerStateManager.IsSafeTeleportState())
+        if (AvailableTrapLevels.Contains(level.GetCurrentLevelEnum()) && RandomizerStateManager.IsSafeTeleportState())
         {
             PreTeleLocation = Manager<ProgressionManager>.Instance.checkpointSaveInfo.loadedLevelPlayerPosition;
             teleTrapped = true;
-            var teleportLoc =
-                TeleportTrapLocations.Where(randoLevel =>
-                    randoLevel.LevelName.Equals(level.GetCurrentLevelEnum())).ToList()[0];
+            var teleportLoc = TeleportTrapLocations
+                .Where(randoLevel => randoLevel.LevelName.Equals(level.GetCurrentLevelEnum()))
+                .ToList()[0];
             RandoLevelManager.TeleportInArea(teleportLoc);
         }
         else
@@ -105,21 +108,26 @@ public static class TrapManager
 
     private static void CheckQueuedTeleport()
     {
-        if (queuedTeleports == 0) return;
-        if (!RandomizerStateManager.IsSafeTeleportState()) return;
+        if (queuedTeleports == 0)
+            return;
+        if (!RandomizerStateManager.IsSafeTeleportState())
+            return;
         var level = Manager<LevelManager>.Instance;
-        if (!AvailableTrapLevels.Contains(level.GetCurrentLevelEnum())) return;
+        if (!AvailableTrapLevels.Contains(level.GetCurrentLevelEnum()))
+            return;
         PreTeleLocation = Manager<ProgressionManager>.Instance.checkpointSaveInfo.loadedLevelPlayerPosition;
         teleTrapped = true;
         queuedTeleports--;
         var teleportLoc = TeleportTrapLocations
-            .Where(randoLevel => randoLevel.LevelName.Equals(level.GetCurrentLevelEnum())).ToList()[0];
+            .Where(randoLevel => randoLevel.LevelName.Equals(level.GetCurrentLevelEnum()))
+            .ToList()[0];
         RandoLevelManager.TeleportInArea(teleportLoc);
     }
 
     public static void ResetPlayerState()
     {
-        if (!teleTrapped) return;
+        if (!teleTrapped)
+            return;
         Manager<ProgressionManager>.Instance.checkpointSaveInfo.loadedLevelPlayerPosition = PreTeleLocation;
         teleTrapped = false;
     }
@@ -146,7 +154,8 @@ public static class TrapManager
 
     public static void EndDarkness()
     {
-        if (!currentlyDark) return;
+        if (!currentlyDark)
+            return;
         if (queuedDarkness > 0)
         {
             queuedDarkness--;
@@ -165,7 +174,7 @@ public static class TrapManager
         new()
         {
             "*ahem* AS WAS FORETOLD IN THE VISIONS. <color=#6844fc>HE</color> CARRIES FORTH THE <color=#00fcfc>MESSAGE</color> FOR ALL THOSE TO BEAR WITNESS",
-            "AND THUS HE MASTERED TIME ITSELF (though maybe not those pesky pits as much)."
+            "AND THUS HE MASTERED TIME ITSELF (though maybe not those pesky pits as much).",
         },
         new()
         {
@@ -182,8 +191,8 @@ public static class TrapManager
             "HE BECAME SO POWERFUL... THE ONLY THING HE WAS AFRAID OF WAS LOSING HIS POWER, WHICH EVENTUALLY, OF COURSE, HE DID.",
             "UNFORTUNATELY, HE TAUGHT HIS APPRENTICE EVERYTHING HE KNEW, THEN HIS APPRENTICE KILLED HIM IN HIS SLEEP.",
             "<color=#E2A720>IRONIC</color>.",
-            "HE COULD SAVE OTHERS FROM DEATH, BUT NOT HIMSELF."
-        }
+            "HE COULD SAVE OTHERS FROM DEATH, BUT NOT HIMSELF.",
+        },
     };
 
     private static readonly List<LevelConstants.RandoLevel> TeleportTrapLocations =
@@ -193,15 +202,17 @@ public static class TrapManager
         new LevelConstants.RandoLevel(ELevel.Level_07_QuillshroomMarsh, new Vector3(797, -38)),
         new LevelConstants.RandoLevel(ELevel.Level_05_B_SunkenShrine, new Vector3(162, -109)),
         new LevelConstants.RandoLevel(ELevel.Level_05_A_HowlingGrotto, new Vector3(253, -75)),
-        new LevelConstants.RandoLevel(ELevel.Level_02_AutumnHills, new Vector3(458, -50))
+        new LevelConstants.RandoLevel(ELevel.Level_02_AutumnHills, new Vector3(458, -50)),
     ];
 
-    private static readonly List<ELevel> AvailableTrapLevels =
-        TeleportTrapLocations.Select(level => level.LevelName).ToList();
+    private static readonly List<ELevel> AvailableTrapLevels = TeleportTrapLocations
+        .Select(level => level.LevelName)
+        .ToList();
 
     public static void UpdateTrapStatus()
     {
-        if (TrapTimer < trapTime) return;
+        if (TrapTimer < trapTime)
+            return;
         TrapTimer = 0;
         EndDarkness();
         CheckQueuedTeleport();

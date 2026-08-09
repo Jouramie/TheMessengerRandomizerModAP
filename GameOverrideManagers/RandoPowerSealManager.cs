@@ -1,6 +1,5 @@
 ﻿using System;
 using MessengerRando.Archipelago;
-using UnityEngine;
 using Logger = MessengerRando.Utils.Logger;
 using Object = UnityEngine.Object;
 
@@ -9,6 +8,7 @@ namespace MessengerRando.GameOverrideManagers;
 public class RandoPowerSealManager
 {
     private static readonly Logger logger = Logger.GetLogger<RandoPowerSealManager>();
+
     public RandoPowerSealManager(int requiredPowerSeals)
     {
         if (requiredPowerSeals == 0)
@@ -17,7 +17,6 @@ public class RandoPowerSealManager
     }
 
     public void AddPowerSeal() => ArchipelagoClient.ServerData.PowerSealsCollected++;
-
 
     public void OnShopChestOpen(On.ShopChestOpenCutscene.orig_OnChestOpened orig, ShopChestOpenCutscene self)
     {
