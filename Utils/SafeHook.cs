@@ -12,36 +12,37 @@ public static class SafeHook
         Type delegateType = typeof(T);
         var invoke = delegateType.GetMethod("Invoke");
 
-        if (invoke.ReturnType != typeof(void))
-        {
-            logger.Warning("Unsupported delegate type: {0} (return type is not void)", delegateType.FullName);
-            return hook;
-        }
-
         var parameters = invoke.GetParameters();
-
         Type wrapperType = parameters.Length switch
         {
-            2 => typeof(HookInvoker2<,>).MakeGenericType(parameters[0].ParameterType, parameters[1].ParameterType),
-            3 => typeof(HookInvoker3<,,>).MakeGenericType(
+            2 => typeof(HookInvoker2<,,>).MakeGenericType(
+                invoke.ReturnType,
+                parameters[0].ParameterType,
+                parameters[1].ParameterType
+            ),
+            3 => typeof(HookInvoker3<,,,>).MakeGenericType(
+                invoke.ReturnType,
                 parameters[0].ParameterType,
                 parameters[1].ParameterType,
                 parameters[2].ParameterType
             ),
-            4 => typeof(HookInvoker4<,,,>).MakeGenericType(
+            4 => typeof(HookInvoker4<,,,,>).MakeGenericType(
+                invoke.ReturnType,
                 parameters[0].ParameterType,
                 parameters[1].ParameterType,
                 parameters[2].ParameterType,
                 parameters[3].ParameterType
             ),
-            5 => typeof(HookInvoker5<,,,,>).MakeGenericType(
+            5 => typeof(HookInvoker5<,,,,,>).MakeGenericType(
+                invoke.ReturnType,
                 parameters[0].ParameterType,
                 parameters[1].ParameterType,
                 parameters[2].ParameterType,
                 parameters[3].ParameterType,
                 parameters[4].ParameterType
             ),
-            6 => typeof(HookInvoker6<,,,,,>).MakeGenericType(
+            6 => typeof(HookInvoker6<,,,,,,>).MakeGenericType(
+                invoke.ReturnType,
                 parameters[0].ParameterType,
                 parameters[1].ParameterType,
                 parameters[2].ParameterType,
@@ -49,7 +50,8 @@ public static class SafeHook
                 parameters[4].ParameterType,
                 parameters[5].ParameterType
             ),
-            7 => typeof(HookInvoker7<,,,,,,>).MakeGenericType(
+            7 => typeof(HookInvoker7<,,,,,,,>).MakeGenericType(
+                invoke.ReturnType,
                 parameters[0].ParameterType,
                 parameters[1].ParameterType,
                 parameters[2].ParameterType,
@@ -72,7 +74,15 @@ public static class SafeHook
         }
 
         var wrapper = Activator.CreateInstance(wrapperType, [hook]);
-        return (T)Delegate.CreateDelegate(delegateType, wrapper, wrapperType.GetMethod("Invoke"));
+
+        if (invoke.ReturnType == typeof(void))
+        {
+            return (T)Delegate.CreateDelegate(delegateType, wrapper, wrapperType.GetMethod("Invoke"));
+        }
+        else
+        {
+            return (T)Delegate.CreateDelegate(delegateType, wrapper, wrapperType.GetMethod("InvokeReturn"));
+        }
     }
 
     private static bool ShouldCallOrigOnError(Delegate handler)
@@ -86,7 +96,8 @@ public static class SafeHook
         return ((SafeHookAttribute)attributes[0]).CallOrigOnError;
     }
 
-    private sealed class HookInvoker2<TOrig, TSelf>(Delegate handler)
+    private sealed class HookInvoker2<TReturn, TOrig, TSelf>(Delegate handler)
+        where TOrig : Delegate
     {
         private readonly bool callOrigOnError = ShouldCallOrigOnError(handler);
 
@@ -101,13 +112,31 @@ public static class SafeHook
                 logger.Exception(ex, "[{0}]", handler.Method.Name);
                 if (callOrigOnError)
                 {
-                    ((Delegate)(object)orig).DynamicInvoke([self]);
+                    orig.DynamicInvoke([self]);
                 }
+            }
+        }
+
+        public TReturn InvokeReturn(TOrig orig, TSelf self)
+        {
+            try
+            {
+                return (TReturn)handler.DynamicInvoke([orig, self]);
+            }
+            catch (Exception ex)
+            {
+                logger.Exception(ex, "[{0}]", handler.Method.Name);
+                if (callOrigOnError)
+                {
+                    return (TReturn)orig.DynamicInvoke([self]);
+                }
+                return default;
             }
         }
     }
 
-    private sealed class HookInvoker3<TOrig, TSelf, TArg1>(Delegate handler)
+    private sealed class HookInvoker3<TReturn, TOrig, TSelf, TArg1>(Delegate handler)
+        where TOrig : Delegate
     {
         private readonly bool callOrigOnError = ShouldCallOrigOnError(handler);
 
@@ -122,13 +151,31 @@ public static class SafeHook
                 logger.Exception(ex, "[{0}]", handler.Method.Name);
                 if (callOrigOnError)
                 {
-                    ((Delegate)(object)orig).DynamicInvoke([self, arg1]);
+                    orig.DynamicInvoke([self, arg1]);
                 }
+            }
+        }
+
+        public TReturn InvokeReturn(TOrig orig, TSelf self, TArg1 arg1)
+        {
+            try
+            {
+                return (TReturn)handler.DynamicInvoke([orig, self, arg1]);
+            }
+            catch (Exception ex)
+            {
+                logger.Exception(ex, "[{0}]", handler.Method.Name);
+                if (callOrigOnError)
+                {
+                    return (TReturn)orig.DynamicInvoke([self, arg1]);
+                }
+                return default;
             }
         }
     }
 
-    private sealed class HookInvoker4<TOrig, TSelf, TArg1, TArg2>(Delegate handler)
+    private sealed class HookInvoker4<TReturn, TOrig, TSelf, TArg1, TArg2>(Delegate handler)
+        where TOrig : Delegate
     {
         private readonly bool callOrigOnError = ShouldCallOrigOnError(handler);
 
@@ -143,13 +190,31 @@ public static class SafeHook
                 logger.Exception(ex, "[{0}]", handler.Method.Name);
                 if (callOrigOnError)
                 {
-                    ((Delegate)(object)orig).DynamicInvoke([self, arg1, arg2]);
+                    orig.DynamicInvoke([self, arg1, arg2]);
                 }
+            }
+        }
+
+        public TReturn InvokeReturn(TOrig orig, TSelf self, TArg1 arg1, TArg2 arg2)
+        {
+            try
+            {
+                return (TReturn)handler.DynamicInvoke([orig, self, arg1, arg2]);
+            }
+            catch (Exception ex)
+            {
+                logger.Exception(ex, "[{0}]", handler.Method.Name);
+                if (callOrigOnError)
+                {
+                    return (TReturn)orig.DynamicInvoke([self, arg1, arg2]);
+                }
+                return default;
             }
         }
     }
 
-    private sealed class HookInvoker5<TOrig, TSelf, TArg1, TArg2, TArg3>(Delegate handler)
+    private sealed class HookInvoker5<TReturn, TOrig, TSelf, TArg1, TArg2, TArg3>(Delegate handler)
+        where TOrig : Delegate
     {
         private readonly bool callOrigOnError = ShouldCallOrigOnError(handler);
 
@@ -164,13 +229,31 @@ public static class SafeHook
                 logger.Exception(ex, "[{0}]", handler.Method.Name);
                 if (callOrigOnError)
                 {
-                    ((Delegate)(object)orig).DynamicInvoke([self, arg1, arg2, arg3]);
+                    orig.DynamicInvoke([self, arg1, arg2, arg3]);
                 }
+            }
+        }
+
+        public TReturn InvokeReturn(TOrig orig, TSelf self, TArg1 arg1, TArg2 arg2, TArg3 arg3)
+        {
+            try
+            {
+                return (TReturn)handler.DynamicInvoke([orig, self, arg1, arg2, arg3]);
+            }
+            catch (Exception ex)
+            {
+                logger.Exception(ex, "[{0}]", handler.Method.Name);
+                if (callOrigOnError)
+                {
+                    return (TReturn)orig.DynamicInvoke([self, arg1, arg2, arg3]);
+                }
+                return default;
             }
         }
     }
 
-    private sealed class HookInvoker6<TOrig, TSelf, TArg1, TArg2, TArg3, TArg4>(Delegate handler)
+    private sealed class HookInvoker6<TReturn, TOrig, TSelf, TArg1, TArg2, TArg3, TArg4>(Delegate handler)
+        where TOrig : Delegate
     {
         private readonly bool callOrigOnError = ShouldCallOrigOnError(handler);
 
@@ -185,13 +268,31 @@ public static class SafeHook
                 logger.Exception(ex, "[{0}]", handler.Method.Name);
                 if (callOrigOnError)
                 {
-                    ((Delegate)(object)orig).DynamicInvoke([self, arg1, arg2, arg3, arg4]);
+                    orig.DynamicInvoke([self, arg1, arg2, arg3, arg4]);
                 }
+            }
+        }
+
+        public TReturn InvokeReturn(TOrig orig, TSelf self, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4)
+        {
+            try
+            {
+                return (TReturn)handler.DynamicInvoke([orig, self, arg1, arg2, arg3, arg4]);
+            }
+            catch (Exception ex)
+            {
+                logger.Exception(ex, "[{0}]", handler.Method.Name);
+                if (callOrigOnError)
+                {
+                    return (TReturn)orig.DynamicInvoke([self, arg1, arg2, arg3, arg4]);
+                }
+                return default;
             }
         }
     }
 
-    private sealed class HookInvoker7<TOrig, TSelf, TArg1, TArg2, TArg3, TArg4, TArg5>(Delegate handler)
+    private sealed class HookInvoker7<TReturn, TOrig, TSelf, TArg1, TArg2, TArg3, TArg4, TArg5>(Delegate handler)
+        where TOrig : Delegate
     {
         private readonly bool callOrigOnError = ShouldCallOrigOnError(handler);
 
@@ -206,8 +307,25 @@ public static class SafeHook
                 logger.Exception(ex, "[{0}]", handler.Method.Name);
                 if (callOrigOnError)
                 {
-                    ((Delegate)(object)orig).DynamicInvoke([self, arg1, arg2, arg3, arg4, arg5]);
+                    orig.DynamicInvoke([self, arg1, arg2, arg3, arg4, arg5]);
                 }
+            }
+        }
+
+        public TReturn InvokeReturn(TOrig orig, TSelf self, TArg1 arg1, TArg2 arg2, TArg3 arg3, TArg4 arg4, TArg5 arg5)
+        {
+            try
+            {
+                return (TReturn)handler.DynamicInvoke([orig, self, arg1, arg2, arg3, arg4, arg5]);
+            }
+            catch (Exception ex)
+            {
+                logger.Exception(ex, "[{0}]", handler.Method.Name);
+                if (callOrigOnError)
+                {
+                    return (TReturn)orig.DynamicInvoke([self, arg1, arg2, arg3, arg4, arg5]);
+                }
+                return default;
             }
         }
     }

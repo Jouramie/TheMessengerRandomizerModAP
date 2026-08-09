@@ -85,7 +85,7 @@ public class APRandomizerMain : CourierModule
             SaveGameSelectionScreen_OnNewGame
         );
         On.SaveGameSelectionScreen.ConfirmSaveDelete +=
-            SafeHook.Wrap<On.SaveGameSelectionScreen.hook_ConfirmSaveDelete>(SaveGameSelectionScreen_ConfirmSaveDelete);
+            HookMonitor.Log<On.SaveGameSelectionScreen.hook_ConfirmSaveDelete>();
         On.SaveGameSelectionScreen.OnDeleteChoiceDone +=
             SafeHook.Wrap<On.SaveGameSelectionScreen.hook_OnDeleteChoiceDone>(SaveGameSelectionScreen_OnDelete);
         On.SaveGameSelectionScreen.Update += SafeHook.Wrap<On.SaveGameSelectionScreen.hook_Update>(
@@ -183,14 +183,15 @@ public class APRandomizerMain : CourierModule
         );
         On.Cutscene.Play += SafeHook.Wrap<On.Cutscene.hook_Play>(Cutscene_Play);
         On.PlayerController.Awake += SafeHook.Wrap<On.PlayerController.hook_Awake>(OnPlayerController_Awake);
-        //temp add
+
 #if DEBUG
         On.PhantomIntroCutscene.OnEnterRoom += SafeHook.Wrap<On.PhantomIntroCutscene.hook_OnEnterRoom>(
             PhantomIntro_OnEnterRoom
-        ); //this lets us skip the phantom fight
-        On.UIManager.ShowView += SafeHook.Wrap<On.UIManager.hook_ShowView>(UIManager_ShowView);
-        On.MusicBox.SetNotesState += SafeHook.Wrap<On.MusicBox.hook_SetNotesState>(MusicBox_SetNotesState);
+        );
 #endif
+
+        On.UIManager.ShowView += HookMonitor.Debug<On.UIManager.hook_ShowView>();
+        On.MusicBox.SetNotesState += HookMonitor.Debug<On.MusicBox.hook_SetNotesState>();
 
         ItemsAndLocationsHandler.SkylandsGeneratorManager = skylandsGeneratorManager;
 
@@ -583,15 +584,6 @@ public class APRandomizerMain : CourierModule
         }
     }
 
-    private void SaveGameSelectionScreen_ConfirmSaveDelete(
-        On.SaveGameSelectionScreen.orig_ConfirmSaveDelete orig,
-        SaveGameSelectionScreen self,
-        SaveSlotUI slot
-    )
-    {
-        orig(self, slot);
-    }
-
     private void SaveGameSelectionScreen_OnDelete(
         On.SaveGameSelectionScreen.orig_OnDeleteChoiceDone orig,
         SaveGameSelectionScreen self,
@@ -704,22 +696,6 @@ public class APRandomizerMain : CourierModule
         }
     }
 
-    View UIManager_ShowView(
-        On.UIManager.orig_ShowView orig,
-        UIManager self,
-        Type viewType,
-        EScreenLayers layer,
-        IViewParams screenParams,
-        bool transitionIn,
-        AnimatorUpdateMode animUpdateMode
-    )
-    {
-        logger.Log(
-            $"ShowView {viewType} layer {layer} params [{screenParams}] transitionIn {transitionIn} updateMode {animUpdateMode}"
-        );
-        return orig(self, viewType, layer, screenParams, transitionIn, animUpdateMode);
-    }
-
     void DialogCutscene_Play(On.DialogCutscene.orig_Play orig, DialogCutscene self)
     {
         //ruxxtin cutscene is being a bitch so just gonna hard code around it here.
@@ -733,12 +709,6 @@ public class APRandomizerMain : CourierModule
                 }
             }
         }
-        orig(self);
-    }
-
-    void MusicBox_SetNotesState(On.MusicBox.orig_SetNotesState orig, MusicBox self)
-    {
-        // this determines which notes should be shown present in the music box
         orig(self);
     }
 

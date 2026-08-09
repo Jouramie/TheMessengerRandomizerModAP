@@ -121,6 +121,7 @@
         <Compile Include="Overrides\CatacombsOverrides.cs" />
         <Compile Include="RO\RandoItemRO.cs" />
         <Compile Include="RO\LocationRO.cs" />
+        <Compile Include="Utils\HookMonitor.cs" />
         <Compile Include="Utils\Logger.cs" />
         <Compile Include="Utils\Menus\ArchipelagoMenu.cs" />
         <Compile Include="Utils\Menus\HintButtonInfo.cs" />

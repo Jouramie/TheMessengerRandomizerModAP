@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using UnityEngine;
 
 namespace MessengerRando.Utils;
 
@@ -21,62 +20,98 @@ public class Logger(string Tag)
         return new Logger(typeof(T).Name);
     }
 
+    public enum LogLevel
+    {
+        Error,
+        Assert,
+        Warning,
+        Info,
+        Debug,
+        Exception,
+    }
+
+    public void Debug(string message)
+    {
+#if DEBUG
+        LogFormat(LogLevel.Debug, null, message);
+#endif
+    }
+
+    public void Debug(object message)
+    {
+#if DEBUG
+        LogFormat(LogLevel.Debug, null, "{0}", message);
+#endif
+    }
+
+    public void Debug(string format, params object[] args)
+    {
+#if DEBUG
+        LogFormat(LogLevel.Debug, null, format, args);
+#endif
+    }
+
     public void Log(string message)
     {
-        LogFormat(LogType.Log, null, message);
+        LogFormat(LogLevel.Info, null, message);
     }
 
     public void Log(object message)
     {
-        LogFormat(LogType.Log, null, "{0}", message);
+        LogFormat(LogLevel.Info, null, "{0}", message);
     }
 
     public void Log(string format, params object[] args)
     {
-        LogFormat(LogType.Log, null, format, args);
+        LogFormat(LogLevel.Info, null, format, args);
     }
 
     public void Warning(string message)
     {
-        LogFormat(LogType.Warning, null, message);
+        LogFormat(LogLevel.Warning, null, message);
     }
 
     public void Warning(string format, params object[] args)
     {
-        LogFormat(LogType.Warning, null, format, args);
+        LogFormat(LogLevel.Warning, null, format, args);
     }
 
     public void Error(string message)
     {
-        LogFormat(LogType.Error, null, message);
+        LogFormat(LogLevel.Error, null, message);
     }
 
     public void Error(string format, params object[] args)
     {
-        LogFormat(LogType.Error, null, format, args);
+        LogFormat(LogLevel.Error, null, format, args);
     }
 
     public void Exception(Exception exception)
     {
-        LogFormat(LogType.Exception, null, "{0}", exception);
+        LogFormat(LogLevel.Exception, null, "{0}", exception);
     }
 
     public void Exception(Exception exception, string message)
     {
-        LogFormat(LogType.Exception, null, "{0}\n{1}", message, exception);
+        LogFormat(LogLevel.Exception, null, "{0}\n{1}", message, exception);
     }
 
     public void Exception(Exception exception, string format, params object[] args)
     {
-        LogFormat(LogType.Exception, null, "{0}\n{1}", string.Format(format, args), exception);
+        LogFormat(LogLevel.Exception, null, "{0}\n{1}", string.Format(format, args), exception);
     }
 
-    public void Log(LogType logType, string message)
+    public void Log(LogLevel logType, string message)
     {
         LogFormat(logType, null, message);
     }
 
-    public void LogFormat(LogType logType, UnityEngine.Object context, string format, params object[] args)
+    public void Log(LogLevel logType, string format, params object[] args)
+    {
+        LogFormat(logType, null, format, args);
+    }
+
+    public void LogFormat(LogLevel logType, UnityEngine.Object context, string format, params object[] args)
     {
         var threadName = Thread.CurrentThread.Name ?? Thread.CurrentThread.ManagedThreadId.ToString();
         if (context == null)
