@@ -83,7 +83,7 @@ public static class RandoRoomManager
         var bossRoomKey = oldRoomKey.Replace(" ", string.Empty);
         if (IsBossRoom(bossRoomKey, out var bossName))
         {
-            RandoBossManager.ShouldFightBoss(bossName);
+            ServiceLocator.Get<RandoBossManager>().ShouldFightBoss(bossName);
         }
         else if (RoomRando)
         {

@@ -21,14 +21,12 @@ namespace MessengerRando.Utils;
 public class RandomizerStateManager
 {
     private static readonly Logger logger = Logger.GetLogger<RandomizerStateManager>();
-    public static RandomizerStateManager Instance { private set; get; }
     public int CurrentFileSlot { set; get; }
 
     public RandoPowerSealManager PowerSealManager;
 
     // ReSharper disable once UnassignedField.Global
     // gets assigned externally
-    public RandoBossManager BossManager;
     public static List<long> SeenHints = [];
 
     public bool SkipMusicBox;
@@ -43,8 +41,6 @@ public class RandomizerStateManager
     public static Random SeedRandom;
     public static bool OnMainMenu = true;
 
-    public static SkylandsGeneratorManager skylandsGeneratorManager;
-
     public RandomizerStateManager()
     {
 #if DEBUG
@@ -53,7 +49,6 @@ public class RandomizerStateManager
         try
         {
             //Create initial values for the state machine
-            ItemsAndLocationsHandler.RandoStateManager = Instance = this;
             APSave = new Dictionary<int, ArchipelagoData>
             {
                 { 1, new ArchipelagoData() },
@@ -69,7 +64,7 @@ public class RandomizerStateManager
         }
     }
 
-    public static void InitializeSeed()
+    public void InitializeSeed()
     {
         var slotData = ArchipelagoClient.ServerData.SlotData;
         SeenHints = [];
@@ -91,10 +86,7 @@ public class RandomizerStateManager
             var raceMode = ArchipelagoClient.Session.DataStorage[Scope.ReadOnly, "race_mode"];
             RandoShopManager.RaceMode = raceMode is not null && (bool)raceMode;
             ArchipelagoClient.Session.DataStorage[Scope.Slot, "Events"].Initialize(new List<string>());
-            if (
-                (Instance.ScoutedLocations == null || Instance.ScoutedLocations.Count < 1)
-                && ArchipelagoClient.Authenticated
-            )
+            if ((ScoutedLocations == null || ScoutedLocations.Count < 1) && ArchipelagoClient.Authenticated)
             {
                 ArchipelagoClient.Session.Locations.ScoutLocationsAsync(
                     SetupScoutedLocations,
@@ -108,8 +100,8 @@ public class RandomizerStateManager
             slotData.TryGetValue("deathlink", out var deathLink) ? deathLink : slotData["death_link"]
         );
 
-        Instance.PowerSealManager = new RandoPowerSealManager(Convert.ToInt32(slotData["required_seals"]));
-        Instance.SkipMusicBox = !Convert.ToBoolean(slotData["music_box"]);
+        PowerSealManager = new RandoPowerSealManager(Convert.ToInt32(slotData["required_seals"]));
+        SkipMusicBox = !Convert.ToBoolean(slotData["music_box"]);
         RandoShopManager.ShopPrices = ((JObject)slotData["shop"]).ToObject<Dictionary<EShopUpgradeID, int>>();
         RandoShopManager.FigurePrices = ((JObject)slotData["figures"]).ToObject<Dictionary<EFigurine, int>>();
 
@@ -173,7 +165,7 @@ public class RandomizerStateManager
         )
         {
             logger.Log("Found at least one location for skylands generator shutdown, meaning generators are shuffled");
-            skylandsGeneratorManager.AreGeneratorsShuffled = true;
+            ServiceLocator.Get<SkylandsGeneratorManager>().AreGeneratorsShuffled = true;
         }
         else
         {
@@ -181,9 +173,9 @@ public class RandomizerStateManager
         }
     }
 
-    private static void SetupScoutedLocations(Dictionary<long, ScoutedItemInfo> scoutedLocationInfo)
+    private void SetupScoutedLocations(Dictionary<long, ScoutedItemInfo> scoutedLocationInfo)
     {
-        Instance.ScoutedLocations = scoutedLocationInfo;
+        ScoutedLocations = scoutedLocationInfo;
         logger.Log("Scouting done");
     }
 
@@ -380,7 +372,7 @@ public class RandomizerStateManager
         }
     }
 
-    public static void StartOfflineSeed()
+    public void StartOfflineSeed()
     {
         if (ItemsAndLocationsHandler.ItemsLookup == null)
             ItemsAndLocationsHandler.Initialize();

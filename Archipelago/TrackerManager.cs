@@ -2,11 +2,12 @@
 using System.Linq;
 using Archipelago.MultiClient.Net.Enums;
 using MessengerRando.GameOverrideManagers;
+using MessengerRando.Lifecycle;
 using MessengerRando.Utils;
 
 namespace MessengerRando.Archipelago;
 
-public class TrackerManager
+public class TrackerManager : IOnBackToTitleHandler
 {
     private static readonly Logger logger = Logger.GetLogger<TrackerManager>();
 
@@ -17,6 +18,15 @@ public class TrackerManager
     private readonly HashSet<string> unsentVisitedEntrances = [];
     private bool needsUnlockedPortalsReconciliation = true;
     private ELevel lastKnownCurrentRegion = ELevel.NONE;
+
+    public void OnBackToTitle()
+    {
+        visitedEntrances.Clear();
+        Synced = false;
+        unsentVisitedEntrances.Clear();
+        needsUnlockedPortalsReconciliation = true;
+        lastKnownCurrentRegion = ELevel.NONE;
+    }
 
     public void ReSync()
     {

@@ -1,5 +1,6 @@
 ﻿using MessengerRando.Archipelago;
 using MessengerRando.Extensions;
+using MessengerRando.Lifecycle;
 using MessengerRando.RO;
 using MessengerRando.Utils;
 using MonoMod.Cil;
@@ -8,9 +9,9 @@ using Object = UnityEngine.Object;
 
 namespace MessengerRando.Overrides;
 
-public static class CatacombsOverrides
+public class CatacombsOverrides : IOnModLoadHandler
 {
-    public static void ApplyHooks()
+    public void OnModLoad()
     {
         On.CatacombLevelInitializer.OnBeforeInitDone +=
             SafeHook.Wrap<On.CatacombLevelInitializer.hook_OnBeforeInitDone>(CatacombLevelInitializer_OnBeforeInitDone);
@@ -37,6 +38,7 @@ public static class CatacombsOverrides
                     .GetComponent<CutsceneInteractionZone>()
                     .interactionPrompt
             );
+
             chatPrompt.transform.SetParent(phobekin);
             chatPrompt.transform.localPosition = new Vector3(-0.5f, 2, 0);
 
@@ -96,7 +98,7 @@ public static class CatacombsOverrides
 
     private static EItems GetRandoItemByItem(EItems item)
     {
-        return !RandomizerStateManager.Instance.IsLocationRandomized(item, out var ruxxAmuletLocation)
+        return !ServiceLocator.Get<RandomizerStateManager>().IsLocationRandomized(item, out var ruxxAmuletLocation)
             ? item
             : EItems.POTION;
     }

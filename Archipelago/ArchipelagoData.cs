@@ -54,7 +54,7 @@ public class ArchipelagoData
     private bool loadData(int slot)
     {
         if (
-            !RandomizerStateManager.Instance.APSave.TryGetValue(slot, out var tempServerData)
+            !ServiceLocator.Get<RandomizerStateManager>().APSave.TryGetValue(slot, out var tempServerData)
             || tempServerData.SeedName == null
             || tempServerData.SeedName.Equals("Unknown")
         )
@@ -122,7 +122,7 @@ public class ArchipelagoData
             if (Uri == "offline")
             {
                 logger.Log("continuing offline seed");
-                RandomizerStateManager.InitializeSeed();
+                ServiceLocator.Get<RandomizerStateManager>().InitializeSeed();
                 return ArchipelagoClient.HasConnected = ArchipelagoClient.Offline = true;
             }
 

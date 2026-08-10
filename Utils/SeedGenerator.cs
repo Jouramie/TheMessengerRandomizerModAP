@@ -95,7 +95,7 @@ public static class SeedGenerator
         logger.Log($"Exit code: {archipelago.ExitCode}");
         if (archipelago.ExitCode == 0)
         {
-            RandomizerStateManager.StartOfflineSeed();
+            ServiceLocator.Get<RandomizerStateManager>().StartOfflineSeed();
             return true;
         }
 

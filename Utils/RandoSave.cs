@@ -20,8 +20,8 @@ public class RandoSave : CourierModSave
     {
         if (Manager<LevelManager>.Instance.GetCurrentLevelEnum().Equals(ELevel.NONE))
             return;
-        RandomizerStateManager.Instance.APSave[RandomizerStateManager.Instance.CurrentFileSlot] =
-            ArchipelagoClient.ServerData;
+        var randoStateManager = ServiceLocator.Get<RandomizerStateManager>();
+        randoStateManager.APSave[randoStateManager.CurrentFileSlot] = ArchipelagoClient.ServerData;
 
         if (ArchipelagoClient.Authenticated)
             ArchipelagoClient.SyncLocations();
@@ -36,10 +36,11 @@ public class RandoSave : CourierModSave
 
     private static string GetSaveData()
     {
+        var randoStateManager = ServiceLocator.Get<RandomizerStateManager>();
         var output =
-            $"{RandomizerStateManager.Instance.APSave[1]}|"
-            + $"{RandomizerStateManager.Instance.APSave[2]}|"
-            + $"{RandomizerStateManager.Instance.APSave[3]}|"
+            $"{randoStateManager.APSave[1]}|"
+            + $"{randoStateManager.APSave[2]}|"
+            + $"{randoStateManager.APSave[3]}|"
             + $"{SeedGenerator.ArchipelagoPath}";
         return output;
     }
@@ -60,7 +61,7 @@ public class RandoSave : CourierModSave
             for (var i = 1; i < 4; i++)
             {
                 var loadedAPData = JsonConvert.DeserializeObject<ArchipelagoData>(loadedData[i - 1]);
-                RandomizerStateManager.Instance.APSave[i] = loadedAPData;
+                ServiceLocator.Get<RandomizerStateManager>().APSave[i] = loadedAPData;
             }
 
             if (loadedData.Length > 3 && !loadedData[3].IsNullOrEmpty())

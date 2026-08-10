@@ -52,7 +52,6 @@ public static class RandoPortalManager
     public static bool EnteredTower;
     public static List<string> StartingPortals;
     public static List<Portal> PortalMapping;
-    public static TrackerManager TrackerManager;
 
     static readonly List<List<List<LevelConstants.RandoLevel>>> AreaCheckpoints = new List<
         List<List<LevelConstants.RandoLevel>>
@@ -468,7 +467,7 @@ public static class RandoPortalManager
                         return;
                 }
 
-                TrackerManager.AddVisitedEntrance("HQ - " + portal.Replace("- ", ""));
+                ServiceLocator.Get<TrackerManager>().AddVisitedEntrance("HQ - " + portal.Replace("- ", ""));
                 RandoLevelManager.TeleportInArea(newLevel.LevelName, newLevel.PlayerPos, newLevel.Dimension);
             }
             catch (Exception e)
@@ -499,7 +498,7 @@ public static class RandoPortalManager
             // When portals are shuffled, the teleportation override will set the current region.
             if (!PortalShuffleEnabled)
             {
-                TrackerManager.SetCurrentRegion(self.nextLevel);
+                ServiceLocator.Get<TrackerManager>().SetCurrentRegion(self.nextLevel);
                 return;
             }
         }

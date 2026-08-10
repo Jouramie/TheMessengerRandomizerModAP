@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using MessengerRando.Archipelago;
 using MessengerRando.Extensions;
+using MessengerRando.Lifecycle;
 using MessengerRando.RO;
 using MessengerRando.Utils;
 using static MessengerRando.Utils.SafeHook;
 
 namespace MessengerRando.GameOverrideManagers;
 
-public class SkylandsGeneratorManager
+public class SkylandsGeneratorManager : IOnModLoadHandler, IOnBackToTitleHandler
 {
     private static readonly Logger logger = Logger.GetLogger<SkylandsGeneratorManager>();
 
@@ -31,7 +32,7 @@ public class SkylandsGeneratorManager
 
     public bool AreGeneratorsShuffled = false;
 
-    public void ApplyHooks()
+    public void OnModLoad()
     {
         On.ElementalSkylandGenerator.Start += Wrap<On.ElementalSkylandGenerator.hook_Start>(
             ElementalSkylandGenerator_Start
@@ -51,6 +52,11 @@ public class SkylandsGeneratorManager
         On.ElementalSkylandGenerator.OnDisable += Wrap<On.ElementalSkylandGenerator.hook_OnDisable>(
             ElementalSkylandGenerator_OnDisable
         );
+    }
+
+    public void OnBackToTitle()
+    {
+        AreGeneratorsShuffled = false;
     }
 
     public void ReceiveGeneratorShutdown(string generatorShutdownItem)

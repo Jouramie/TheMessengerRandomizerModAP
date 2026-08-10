@@ -99,9 +99,10 @@ public static class DialogChanger
                     Loc[replaceableKey][0].forcedPortraitOrientation = 0;
                     Loc[replaceableKey][0].position = EDialogPosition.CENTER;
                     Loc[replaceableKey][0].skippable = false;
+                    var randoStateManager = ServiceLocator.Get<RandomizerStateManager>();
                     if (
-                        (RandomizerStateManager.Instance.ScoutedLocations != null || ArchipelagoClient.Offline)
-                        && RandomizerStateManager.Instance.IsLocationRandomized(
+                        (randoStateManager.ScoutedLocations != null || ArchipelagoClient.Offline)
+                        && randoStateManager.IsLocationRandomized(
                             ItemDialogID.First(x => x.Value.Equals(replaceableKey)).Key,
                             out var locationID
                         )
@@ -113,7 +114,7 @@ public static class DialogChanger
                         }
                         else if (ArchipelagoClient.Authenticated)
                         {
-                            var netItem = RandomizerStateManager.Instance.ScoutedLocations[locationID];
+                            var netItem = randoStateManager.ScoutedLocations[locationID];
                             if (netItem.Player.Slot.Equals(ArchipelagoClient.Session.ConnectionInfo.Slot))
                             {
                                 Loc[replaceableKey][0].text = netItem.ToReadableString();

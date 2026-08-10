@@ -17,9 +17,6 @@ public static class ItemsAndLocationsHandler
     private static Dictionary<EItems, long> EItemsLocationsLookup;
     public static Dictionary<long, LocationRO> IDtoLocationsLookup;
 
-    public static RandomizerStateManager RandoStateManager;
-    public static SkylandsGeneratorManager SkylandsGeneratorManager;
-
     public const int APQuantity = 69;
     public const long BaseOffset = 0xADD_000;
 
@@ -340,7 +337,8 @@ public static class ItemsAndLocationsHandler
     /// <param name="quantity"></param>
     public static void Unlock(long itemToUnlock, int quantity = APQuantity)
     {
-        if (!ItemsLookup.TryGetValue(itemToUnlock, out var randoItem) || RandoStateManager.CurrentFileSlot == 0)
+        var randoStateManager = ServiceLocator.Get<RandomizerStateManager>();
+        if (!ItemsLookup.TryGetValue(itemToUnlock, out var randoItem) || randoStateManager.CurrentFileSlot == 0)
         {
             logger.Log("Couldn't find {0} or not currently in game", itemToUnlock);
             return;
@@ -383,7 +381,7 @@ public static class ItemsAndLocationsHandler
                 Manager<InventoryManager>.Instance.CollectTimeShard(quantity);
                 break;
             case EItems.POWER_SEAL:
-                RandoStateManager.PowerSealManager.AddPowerSeal();
+                randoStateManager.PowerSealManager.AddPowerSeal();
                 break;
             case EItems.NONE:
                 try
@@ -395,7 +393,7 @@ public static class ItemsAndLocationsHandler
                 {
                     if (randoItem.Name.EndsWith("Generator Shutdown"))
                     {
-                        SkylandsGeneratorManager.ReceiveGeneratorShutdown(randoItem.Name);
+                        ServiceLocator.Get<SkylandsGeneratorManager>().ReceiveGeneratorShutdown(randoItem.Name);
                         break;
                     }
                     switch (randoItem.Name)
@@ -505,7 +503,7 @@ public static class ItemsAndLocationsHandler
                     ArchipelagoClient.ServerData.CheckedLocations.ToArray()
                 )
             );
-            if (!RandoStateManager.ScoutedLocations.TryGetValue(locationID, out var item))
+            if (!ServiceLocator.Get<RandomizerStateManager>().ScoutedLocations.TryGetValue(locationID, out var item))
                 return;
             if (!HasDialog(locationID))
             {

@@ -20,7 +20,6 @@ public static class RandoLevelManager
 
     // ReSharper disable once UnassignedField.Global
     public static Dictionary<string, LevelConstants.RandoLevel> RandoLevelMapping;
-    public static TrackerManager TrackerManager;
 
     [SafeHook(callOrigOnError: true)]
     public static void LoadLevel(On.LevelManager.orig_LoadLevel orig, LevelManager self, LevelLoadingInfo levelInfo)
@@ -151,7 +150,7 @@ public static class RandoLevelManager
             {
                 sourceExit = sourceExit + " exit";
             }
-            TrackerManager.AddVisitedEntrance(sourceExit);
+            ServiceLocator.Get<TrackerManager>().AddVisitedEntrance(sourceExit);
             return RandoLevelMapping[entrance];
         }
         catch (Exception e)
@@ -211,7 +210,9 @@ public static class RandoLevelManager
             AddCurrentRegionToStorage(self);
         }
 
-        if (currentLevel.Equals(ELevel.Level_11_B_MusicBox) && RandomizerStateManager.Instance.SkipMusicBox)
+        if (
+            currentLevel.Equals(ELevel.Level_11_B_MusicBox) && ServiceLocator.Get<RandomizerStateManager>().SkipMusicBox
+        )
         {
             SkipMusicBox();
             return;
@@ -259,14 +260,14 @@ public static class RandoLevelManager
             return;
         // put the region we just loaded into in AP data storage for tracking
         if (self.lastLevelLoaded.Equals(ELevel.Level_13_TowerOfTimeHQ + "_Build"))
-            TrackerManager.SetCurrentRegion(ELevel.Level_13_TowerOfTimeHQ);
+            ServiceLocator.Get<TrackerManager>().SetCurrentRegion(ELevel.Level_13_TowerOfTimeHQ);
         else
-            TrackerManager.SetCurrentRegion(self.GetCurrentLevelEnum());
+            ServiceLocator.Get<TrackerManager>().SetCurrentRegion(self.GetCurrentLevelEnum());
     }
 
     public static void SkipMusicBox()
     {
-        var playerPosition = RandomizerStateManager.Instance.SkipMusicBox
+        var playerPosition = ServiceLocator.Get<RandomizerStateManager>().SkipMusicBox
             ? new Vector2(125, 40)
             : new Vector2(-428, -55);
 

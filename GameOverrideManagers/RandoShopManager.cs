@@ -204,7 +204,7 @@ public static class RandoShopManager
                 : SeedGenerator.GetOfflineShopText(locationID);
         }
 
-        var itemOnLocation = RandomizerStateManager.Instance.ScoutedLocations[locationID];
+        var itemOnLocation = ServiceLocator.Get<RandomizerStateManager>().ScoutedLocations[locationID];
         if (locType.Equals(TextType.Name) && ArchipelagoClient.Authenticated)
         {
             if (!ArchipelagoClient.ServerData.CheckedLocations.Contains(locationID))

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using MessengerRando.Archipelago;
 using MessengerRando.RO;
-using MessengerRando.Utils;
 using UnityEngine;
 using Logger = MessengerRando.Utils.Logger;
 using Object = UnityEngine.Object;
@@ -12,12 +11,12 @@ using Object = UnityEngine.Object;
 
 namespace MessengerRando.GameOverrideManagers;
 
-public abstract class RandoBossManager
+public class RandoBossManager
 {
     private static readonly Logger logger = Logger.GetLogger<RandoBossManager>();
     public static List<string> DefeatedBosses = [];
 
-    private readonly Dictionary<string, string> origToNewBoss;
+    private Dictionary<string, string> origToNewBoss = null;
     private static bool bossOverride;
 
     private struct BossLocation
@@ -140,12 +139,10 @@ public abstract class RandoBossManager
         }
     }
 
-    public static bool HasBossDefeated(string bossName)
+    public bool HasBossDefeated(string bossName)
     {
         if (bossOverride)
-            bossName = RandomizerStateManager
-                .Instance.BossManager.origToNewBoss.First(name => name.Value.Equals(bossName))
-                .Key;
+            bossName = origToNewBoss.First(name => name.Value.Equals(bossName)).Key;
 #if DEBUG
         logger.Log("Checking if {0} is defeated.", bossName);
 #endif
@@ -160,13 +157,13 @@ public abstract class RandoBossManager
         }
     }
 
-    public static void SetBossAsDefeated(string bossName)
+    public void SetBossAsDefeated(string bossName)
     {
         if (DefeatedBosses.Contains(bossName))
             return;
         if (bossOverride)
         {
-            bossName = RandomizerStateManager.Instance.BossManager.origToNewBoss[bossName];
+            bossName = origToNewBoss[bossName];
             bossOverride = false;
         }
         if (ArchipelagoClient.HasConnected)
@@ -183,7 +180,7 @@ public abstract class RandoBossManager
             }
         }
         DefeatedBosses.Add(bossName);
-        if (RandomizerStateManager.Instance.BossManager != null)
+        if (origToNewBoss != null)
         {
             var newPosition = BossLocations[bossName];
 
@@ -195,7 +192,7 @@ public abstract class RandoBossManager
         }
     }
 
-    public static bool ShouldFightBoss(string bossName)
+    public bool ShouldFightBoss(string bossName)
     {
         if (bossOverride)
             return false;
@@ -204,7 +201,7 @@ public abstract class RandoBossManager
         if (HasBossDefeated(bossName) || !currentLevel.Equals(BossLocations[bossName].BossRegion))
             return false;
 
-        var teleporting = RandomizerStateManager.Instance.BossManager != null;
+        var teleporting = origToNewBoss != null;
         logger.Log("Should teleport: {0}", teleporting);
         if (teleporting)
         {
@@ -246,13 +243,13 @@ public abstract class RandoBossManager
             {
                 logger.Log("Error while ending cutscenes: {0}", e);
             }
-            bossName = RandomizerStateManager.Instance.BossManager.GetActualBoss(bossName);
+            bossName = GetActualBoss(bossName);
         }
         AdjustPlayerInBossRoom(bossName);
         return teleporting;
     }
 
-    public static void TryCollectLocation(long locationID)
+    public void TryCollectLocation(long locationID)
     {
         if (IDToBossMap.TryGetValue(locationID, out var boss))
         {
@@ -260,11 +257,10 @@ public abstract class RandoBossManager
         }
     }
 
-    protected RandoBossManager(Dictionary<string, string> bossMapping)
+    protected void SetBossMapping(Dictionary<string, string> bossMapping)
     {
-        Manager<ProgressionManager>.Instance.bossesDefeated = Manager<ProgressionManager>
-            .Instance
-            .allTimeBossesDefeated = new List<string>();
+        Manager<ProgressionManager>.Instance.bossesDefeated.Clear();
+        Manager<ProgressionManager>.Instance.allTimeBossesDefeated.Clear();
         origToNewBoss = bossMapping;
     }
 

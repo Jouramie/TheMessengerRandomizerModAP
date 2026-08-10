@@ -104,9 +104,16 @@
         <Compile Include="Archipelago\ItemsAndLocationsHandler.cs" />
         <Compile Include="Archipelago\TrackerManager.cs" />
         <Compile Include="APDebug.cs" />
-        <Compile Include="Exceptions\RandomizerException.cs" />
+        <Compile Include="Overrides\AutumnHillsOverrides.cs" />
+        <Compile Include="RandomizerException.cs" />
+        <Compile Include="Extensions\DimensionManagerExtensions.cs" />
+        <Compile Include="Extensions\ELevelExtensions.cs" />
+        <Compile Include="Extensions\PoolManagerExtensions.cs" />
         <Compile Include="Extensions\ProgressionManagerExtensions.cs" />
         <Compile Include="GameOverrideManagers\LostWoodsManager.cs" />
+        <Compile Include="Lifecycle\IOnBackToTitleHandler.cs" />
+        <Compile Include="Lifecycle\IOnModLoadHandler.cs" />
+        <Compile Include="Utils\PrefabHunter.cs" />
         <Compile Include="GameOverrideManagers\RandoBossManager.cs" />
         <Compile Include="GameOverrideManagers\SkylandsGeneratorManager.cs" />
         <Compile Include="GameOverrideManagers\RandoMusicManager.cs" />
@@ -121,6 +128,7 @@
         <Compile Include="Overrides\CatacombsOverrides.cs" />
         <Compile Include="RO\RandoItemRO.cs" />
         <Compile Include="RO\LocationRO.cs" />
+        <Compile Include="ServiceLocator.cs" />
         <Compile Include="Utils\HookMonitor.cs" />
         <Compile Include="Utils\Logger.cs" />
         <Compile Include="Utils\Menus\ArchipelagoMenu.cs" />

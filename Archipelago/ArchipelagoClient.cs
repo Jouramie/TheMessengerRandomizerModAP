@@ -186,7 +186,7 @@ public static class ArchipelagoClient
 
             try
             {
-                RandomizerStateManager.InitializeSeed();
+                ServiceLocator.Get<RandomizerStateManager>().InitializeSeed();
             }
             catch (Exception e)
             {
@@ -306,7 +306,7 @@ public static class ArchipelagoClient
 
     public static void SyncLocations()
     {
-        if (RandomizerStateManager.Instance.CurrentFileSlot == 0)
+        if (ServiceLocator.Get<RandomizerStateManager>().CurrentFileSlot == 0)
             return;
         var checkedLocations = Session.Locations.AllLocationsChecked;
         if (ServerData.CheckedLocations.Count == checkedLocations.Count)
@@ -349,7 +349,7 @@ public static class ArchipelagoClient
                 }
                 else
                 {
-                    RandoBossManager.TryCollectLocation(location);
+                    ServiceLocator.Get<RandoBossManager>().TryCollectLocation(location);
                 }
 
                 ServerData.CheckedLocations.Add(location);

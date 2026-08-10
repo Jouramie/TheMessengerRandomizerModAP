@@ -6,6 +6,7 @@ using Archipelago.MultiClient.Net.Enums;
 using MessengerRando.Archipelago;
 using MessengerRando.Extensions;
 using MessengerRando.GameOverrideManagers;
+using MessengerRando.Lifecycle;
 using MessengerRando.Overrides;
 using MessengerRando.Utils;
 using MessengerRando.Utils.Constants;
@@ -33,10 +34,6 @@ public class APRandomizerMain : CourierModule
     private float updateTimer;
     public static float UpdateTime = 3.0f;
 
-    private RandomizerStateManager randoStateManager;
-    private SkylandsGeneratorManager skylandsGeneratorManager;
-    private TrackerManager trackerManager;
-
     private TextMeshProUGUI apTextDisplay8;
     private TextMeshProUGUI apTextDisplay16;
     private TextMeshProUGUI apMessagesDisplay8;
@@ -57,15 +54,19 @@ public class APRandomizerMain : CourierModule
         Thread.CurrentThread.Name = "GameThread";
         logger.Log("Randomizer loading and ready to try things!");
 
-        //Initialize the randomizer state manager
-        skylandsGeneratorManager = new SkylandsGeneratorManager();
-        RandomizerStateManager.skylandsGeneratorManager = skylandsGeneratorManager;
+        // Client
+        var trackerManager = ServiceLocator.Register(new TrackerManager());
 
-        randoStateManager = new RandomizerStateManager();
+        // RandoManagers
+        var skylandsGeneratorManager = ServiceLocator.Register(new SkylandsGeneratorManager());
+        var randoStateManager = ServiceLocator.Register(new RandomizerStateManager());
+        var randoBossManager = ServiceLocator.Register(new RandoBossManager());
 
-        trackerManager = new TrackerManager();
-        RandoPortalManager.TrackerManager = trackerManager;
-        RandoLevelManager.TrackerManager = trackerManager;
+        // Overrides
+        var catacombsOverrides = ServiceLocator.Register(new CatacombsOverrides());
+
+        foreach (var item in ServiceLocator.GetAll<IOnModLoadHandler>())
+            item.OnModLoad();
 
         //Plug in my code :3
         On.InventoryManager.AddItem += SafeHook.Wrap<On.InventoryManager.hook_AddItem>(InventoryManager_AddItem);
@@ -95,8 +96,6 @@ public class APRandomizerMain : CourierModule
         On.BackToTitleScreen.GoBackToTitleScreen += SafeHook.Wrap<On.BackToTitleScreen.hook_GoBackToTitleScreen>(
             PauseScreen_OnQuitToTitle
         );
-
-        CatacombsOverrides.ApplyHooks();
 
         On.DialogCutscene.Play += SafeHook.Wrap<On.DialogCutscene.hook_Play>(DialogCutscene_Play);
         On.DialogManager.LoadDialogs_ELanguage += SafeHook.Wrap<On.DialogManager.hook_LoadDialogs_ELanguage>(
@@ -133,13 +132,13 @@ public class APRandomizerMain : CourierModule
         On.AudioManager.PlayMusic += SafeHook.Wrap<On.AudioManager.hook_PlayMusic>(RandoMusicManager.OnPlayMusic);
         // boss management
         On.ProgressionManager.HasDefeatedBoss += SafeHook.Wrap<On.ProgressionManager.hook_HasDefeatedBoss>(
-            (orig, self, bossName) => RandoBossManager.HasBossDefeated(bossName)
+            (orig, self, bossName) => ServiceLocator.Get<RandoBossManager>().HasBossDefeated(bossName)
         );
         On.ProgressionManager.HasEverDefeatedBoss += SafeHook.Wrap<On.ProgressionManager.hook_HasEverDefeatedBoss>(
-            (orig, self, bossName) => RandoBossManager.HasBossDefeated(bossName)
+            (orig, self, bossName) => ServiceLocator.Get<RandoBossManager>().HasBossDefeated(bossName)
         );
         On.ProgressionManager.SetBossAsDefeated += SafeHook.Wrap<On.ProgressionManager.hook_SetBossAsDefeated>(
-            (orig, self, bossName) => RandoBossManager.SetBossAsDefeated(bossName)
+            (orig, self, bossName) => ServiceLocator.Get<RandoBossManager>().SetBossAsDefeated(bossName)
         );
         // level teleporting etc management
         On.Level.ChangeRoom += SafeHook.Wrap<On.Level.hook_ChangeRoom>(RandoRoomManager.Level_ChangeRoom);
@@ -156,18 +155,16 @@ public class APRandomizerMain : CourierModule
         On.TowerOfTimePortal.LoadLevel += SafeHook.Wrap<On.TowerOfTimePortal.hook_LoadLevel>(
             RandoPortalManager.TowerOfTimePortal_LoadLevel
         );
-        // generator deactivation management
-        skylandsGeneratorManager.ApplyHooks();
         //These functions let us override and manage power seals ourselves with 'fake' items
         On.ProgressionManager.TotalPowerSealCollected +=
             SafeHook.Wrap<On.ProgressionManager.hook_TotalPowerSealCollected>(
                 ProgressionManager_TotalPowerSealCollected
             );
         On.ShopChestOpenCutscene.OnChestOpened += SafeHook.Wrap<On.ShopChestOpenCutscene.hook_OnChestOpened>(
-            (orig, self) => RandomizerStateManager.Instance.PowerSealManager?.OnShopChestOpen(orig, self)
+            (orig, self) => randoStateManager.PowerSealManager?.OnShopChestOpen(orig, self)
         );
         On.ShopChestChangeShurikenCutscene.Play += SafeHook.Wrap<On.ShopChestChangeShurikenCutscene.hook_Play>(
-            (orig, self) => RandomizerStateManager.Instance.PowerSealManager?.OnShopChestOpen(orig, self)
+            (orig, self) => randoStateManager.PowerSealManager?.OnShopChestOpen(orig, self)
         );
         //update loops for Archipelago
         Courier.Events.PlayerController.OnUpdate += SafeHook.Wrap(PlayerController_OnUpdate);
@@ -192,8 +189,6 @@ public class APRandomizerMain : CourierModule
 
         On.UIManager.ShowView += HookMonitor.Debug<On.UIManager.hook_ShowView>();
         On.MusicBox.SetNotesState += HookMonitor.Debug<On.MusicBox.hook_SetNotesState>();
-
-        ItemsAndLocationsHandler.SkylandsGeneratorManager = skylandsGeneratorManager;
 
         logger.Log("Randomizer finished loading!");
     }
@@ -231,7 +226,7 @@ public class APRandomizerMain : CourierModule
 
     private void OnOptionScreenEnable(On.OptionScreen.orig_OnEnable orig, OptionScreen self)
     {
-        if (RandomizerStateManager.Instance.APSave == null)
+        if (ServiceLocator.Get<RandomizerStateManager>().APSave == null)
             RandoSave.TryLoad(Save.APSaveData);
         orig(self);
     }
@@ -301,6 +296,7 @@ public class APRandomizerMain : CourierModule
                 orig(self, itemId, 1);
                 return;
             }
+            var randoStateManager = ServiceLocator.Get<RandomizerStateManager>();
             if (randoStateManager.IsLocationRandomized(itemId, out var randoItemCheck))
             {
                 if (
@@ -339,6 +335,7 @@ public class APRandomizerMain : CourierModule
     {
         bool hasItem = false;
         //Check to make sure this is an item that was randomized and make sure we are not ignoring this specific trigger check
+        var randoStateManager = ServiceLocator.Get<RandomizerStateManager>();
         if (
             ArchipelagoClient.HasConnected
             && randoStateManager.IsLocationRandomized(self.item, out var check)
@@ -406,7 +403,7 @@ public class APRandomizerMain : CourierModule
     bool AwardNoteCutscene_ShouldPlay(On.AwardNoteCutscene.orig_ShouldPlay orig, AwardNoteCutscene self)
     {
         //Need to handle note cutscene triggers so they will play as long as I dont have the actual item it grants
-        if (!randoStateManager.IsLocationRandomized(self.noteToAward, out var noteCheck))
+        if (!ServiceLocator.Get<RandomizerStateManager>().IsLocationRandomized(self.noteToAward, out var noteCheck))
             return orig(self);
         var shouldPlay = !ArchipelagoClient.ServerData.CheckedLocations.Contains(noteCheck);
         if (shouldPlay)
@@ -418,10 +415,9 @@ public class APRandomizerMain : CourierModule
     {
         if (
             RandomizerConstants.GetCutsceneMappings().ContainsKey(self.cutsceneId)
-            && randoStateManager.IsLocationRandomized(
-                RandomizerConstants.GetCutsceneMappings()[self.cutsceneId],
-                out var cutsceneCheck
-            )
+            && ServiceLocator
+                .Get<RandomizerStateManager>()
+                .IsLocationRandomized(RandomizerConstants.GetCutsceneMappings()[self.cutsceneId], out var cutsceneCheck)
         )
         {
             return RandomizerStateManager.HasCompletedCheck(cutsceneCheck);
@@ -436,6 +432,7 @@ public class APRandomizerMain : CourierModule
     )
     {
         //slotIndex is 0-based, going to increment it locally to keep things simple.
+        var randoStateManager = ServiceLocator.Get<RandomizerStateManager>();
         randoStateManager.CurrentFileSlot = slotIndex + 1;
 
         //This is probably a bad way to do this
@@ -594,7 +591,7 @@ public class APRandomizerMain : CourierModule
         {
             RandoSave.TryLoad(Save.APSaveData);
             var slotIndex = self.GetPrivateField<SaveSlotUI>("focusedSlot").slotIndex + 1;
-            randoStateManager.APSave[slotIndex] = new ArchipelagoData();
+            ServiceLocator.Get<RandomizerStateManager>().APSave[slotIndex] = new ArchipelagoData();
             Save?.ForceUpdate();
         }
         orig(self, delete);
@@ -614,8 +611,12 @@ public class APRandomizerMain : CourierModule
             RandoLevelManager.RandoLevelMapping = null;
             Manager<ProgressionManager>.Instance.powerSealTotal = 0;
             HintMenu.ReBuildHintMenu();
+
+            foreach (var handler in ServiceLocator.GetAll<IOnBackToTitleHandler>())
+                handler.OnBackToTitle();
         }
-        randoStateManager = new RandomizerStateManager();
+
+        ServiceLocator.Register(new RandomizerStateManager());
         ArchipelagoClient.ServerData = new ArchipelagoData();
         RandomizerStateManager.OnMainMenu = true;
         orig();
@@ -636,7 +637,7 @@ public class APRandomizerMain : CourierModule
         ProgressionManager self
     )
     {
-        return randoStateManager.PowerSealManager?.AmountPowerSealsCollected() ?? orig(self);
+        return ServiceLocator.Get<RandomizerStateManager>().PowerSealManager?.AmountPowerSealsCollected() ?? orig(self);
     }
 
     void Cutscene_Play(On.Cutscene.orig_Play orig, Cutscene self)
@@ -675,8 +676,9 @@ public class APRandomizerMain : CourierModule
 
     private void OnAnyPortalOpeningCutsceneDone(Cutscene cutscene)
     {
+        Manager<LevelManager>.Instance.GetCurrentLevelEnum();
         cutscene.onDone -= OnAnyPortalOpeningCutsceneDone;
-        trackerManager.ReconciliateUnlockedPortals();
+        ServiceLocator.Get<TrackerManager>().ReconciliateUnlockedPortals();
     }
 
     void PhantomIntro_OnEnterRoom(
@@ -685,7 +687,7 @@ public class APRandomizerMain : CourierModule
         bool teleportedInRoom
     )
     {
-        if (randoStateManager.SkipPhantom)
+        if (ServiceLocator.Get<RandomizerStateManager>().SkipPhantom)
         {
             Manager<AudioManager>.Instance.StopMusic();
             Object.FindObjectOfType<PhantomOutroCutscene>().Play();
@@ -701,7 +703,7 @@ public class APRandomizerMain : CourierModule
         //ruxxtin cutscene is being a bitch so just gonna hard code around it here.
         if (ArchipelagoClient.HasConnected && self.name.Equals("ReadNote"))
         {
-            if (randoStateManager.IsLocationRandomized(EItems.RUXXTIN_AMULET, out var locID))
+            if (ServiceLocator.Get<RandomizerStateManager>().IsLocationRandomized(EItems.RUXXTIN_AMULET, out var locID))
             {
                 if (!RandomizerStateManager.HasCompletedCheck(locID))
                 {
@@ -728,7 +730,7 @@ public class APRandomizerMain : CourierModule
 
         //Load the HQ
         Manager<TowerOfTimeHQManager>.Instance.TeleportInToTHQ(true, ELevelEntranceID.ENTRANCE_A, null);
-        RandoLevelManager.TrackerManager.SetCurrentRegion(ELevel.Level_13_TowerOfTimeHQ);
+        ServiceLocator.Get<TrackerManager>().SetCurrentRegion(ELevel.Level_13_TowerOfTimeHQ);
         RandoLevelManager.CleanupAfterTeleport();
     }
 
@@ -886,7 +888,7 @@ public class APRandomizerMain : CourierModule
 
     private void PlayerController_OnUpdate(PlayerController controller)
     {
-        if (!ArchipelagoClient.HasConnected || randoStateManager.CurrentFileSlot == 0)
+        if (!ArchipelagoClient.HasConnected || ServiceLocator.Get<RandomizerStateManager>().CurrentFileSlot == 0)
         {
             return;
         }
@@ -944,6 +946,7 @@ public class APRandomizerMain : CourierModule
 
         if (!ItemsAndLocationsHandler.Synced)
             ItemsAndLocationsHandler.ReSync();
+        var trackerManager = ServiceLocator.Get<TrackerManager>();
         if (!trackerManager.Synced)
             trackerManager.ReSync();
     }
