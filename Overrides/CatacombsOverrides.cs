@@ -5,7 +5,6 @@ using MessengerRando.RO;
 using MessengerRando.Utils;
 using MonoMod.Cil;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace MessengerRando.Overrides;
 
@@ -32,14 +31,8 @@ public class CatacombsOverrides : IOnModLoadHandler
         {
             Manager<ProgressionManager>.Instance.cutscenesPlayed.Remove("NecrophobicWorkerCutscene");
             var phobekin = self.necrophobicWorkerCutscene.phobekin;
-            var chatPrompt = Object.Instantiate(
-                GameObject
-                    .Find("/ToForlornSecondQuest/ToForlornCutscene")
-                    .GetComponent<CutsceneInteractionZone>()
-                    .interactionPrompt
-            );
+            var chatPrompt = ServiceLocator.Get<PrefabHunter>().CreateChatPrompt(parent: phobekin);
 
-            chatPrompt.transform.SetParent(phobekin);
             chatPrompt.transform.localPosition = new Vector3(-0.5f, 2, 0);
 
             var lookController = phobekin.gameObject.AddComponent<LookDirectionController>();

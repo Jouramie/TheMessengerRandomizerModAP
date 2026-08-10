@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using MessengerRando.Archipelago;
+using MessengerRando.Extensions;
+using MessengerRando.Lifecycle;
 using MessengerRando.RO;
+using MessengerRando.Utils;
 using UnityEngine;
 using Logger = MessengerRando.Utils.Logger;
 using Object = UnityEngine.Object;
@@ -11,7 +14,7 @@ using Object = UnityEngine.Object;
 
 namespace MessengerRando.GameOverrideManagers;
 
-public class RandoBossManager
+public class RandoBossManager : IOnModLoadHandler
 {
     private static readonly Logger logger = Logger.GetLogger<RandoBossManager>();
     public static List<string> DefeatedBosses = [];
@@ -88,10 +91,10 @@ public class RandoBossManager
 
     private static readonly Dictionary<string, BossLocation> BossLocations = new Dictionary<string, BossLocation>
     {
-        { "LeafGolem", new BossLocation(ELevel.Level_02_AutumnHills, new Vector2(908, -27), EBits.BITS_8) },
-        { "Necromancer", new BossLocation(ELevel.Level_04_Catacombs, new Vector2(752, -75), EBits.BITS_8) },
-        { "EmeraldGolem", new BossLocation(ELevel.Level_05_A_HowlingGrotto, new Vector2(560, -123), EBits.BITS_8) },
-        { "QueenOfQuills", new BossLocation(ELevel.Level_07_QuillshroomMarsh, new Vector2(1100, -43), EBits.BITS_8) },
+        { "LeafGolem", new BossLocation(ELevel.Level_02_AutumnHills, new Vector2(909, -27), EBits.BITS_8) },
+        { "Necromancer", new BossLocation(ELevel.Level_04_Catacombs, new Vector2(749, -75), EBits.BITS_8) },
+        { "EmeraldGolem", new BossLocation(ELevel.Level_05_A_HowlingGrotto, new Vector2(557, -123), EBits.BITS_8) },
+        { "QueenOfQuills", new BossLocation(ELevel.Level_07_QuillshroomMarsh, new Vector2(1101, -43), EBits.BITS_8) },
         // { "Colos_Susses", new BossLocation(ELevel.Level_08_SearingCrags, new Vector2(364, 311), EBits.BITS_8) },
         // { "Manfred", new BossLocation(ELevel.Level_11_A_CloudRuins, new Vector2(1165, -26), EBits.BITS_16)},
         // { "Tower Golem", new BossLocation(ELevel.Level_10_A_TowerOfTime, new Vector2(108, 237), EBits.BITS_16) },
@@ -114,6 +117,24 @@ public class RandoBossManager
         "-308-276420",
     };
 
+    public void OnModLoad()
+    {
+        On.NecromancerIntroCutscene.Start += SafeHook.Wrap<On.NecromancerIntroCutscene.hook_Start>(
+            NecromancerIntroCutscene_Start
+        );
+    }
+
+    private void NecromancerIntroCutscene_Start(
+        On.NecromancerIntroCutscene.orig_Start orig,
+        NecromancerIntroCutscene self
+    )
+    {
+        orig(self);
+        var collider = self.GetComponent<BoxCollider2D>();
+        collider.offset = new Vector2(-3.5f, 0);
+        collider.size = new Vector2(30.5f, 16);
+    }
+
     private static string GetVanillaBoss(string roomKey)
     {
         return RoomToVanillaBoss[roomKey];
@@ -126,7 +147,10 @@ public class RandoBossManager
         if (Manager<LevelManager>.Instance.GetCurrentLevelEnum().Equals(newLocation.BossRegion))
         {
             Manager<PlayerManager>.Instance.Player.transform.position = newLocation.PlayerPosition;
-            Manager<DimensionManager>.Instance.SetDimension(newLocation.PlayerDimension);
+            Manager<DimensionManager>.Instance.ChangeDimensionWithPortalAnimation(
+                newLocation.PlayerDimension,
+                delay: .3f
+            );
         }
         else
         {
@@ -254,6 +278,7 @@ public class RandoBossManager
         if (IDToBossMap.TryGetValue(locationID, out var boss))
         {
             SetBossAsDefeated(boss);
+            // TODO should also mark cutscene as watched (it breaks emerald golem)
         }
     }
 

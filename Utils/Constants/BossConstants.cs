@@ -65,10 +65,10 @@ public static class BossConstants
 
     public static readonly Dictionary<string, BossLocation> BossLocations = new Dictionary<string, BossLocation>
     {
-        { "LeafGolem", new BossLocation(ELevel.Level_02_AutumnHills, new Vector2(908, -27), EBits.BITS_8) },
-        { "Necromancer", new BossLocation(ELevel.Level_04_Catacombs, new Vector2(752, -75), EBits.BITS_8) },
-        { "EmeraldGolem", new BossLocation(ELevel.Level_05_A_HowlingGrotto, new Vector2(560, -123), EBits.BITS_8) },
-        { "QueenOfQuills", new BossLocation(ELevel.Level_07_QuillshroomMarsh, new Vector2(1100, -43), EBits.BITS_8) },
+        { "LeafGolem", new BossLocation(ELevel.Level_02_AutumnHills, new Vector2(909, -27), EBits.BITS_8) },
+        { "Necromancer", new BossLocation(ELevel.Level_04_Catacombs, new Vector2(749, -75), EBits.BITS_8) },
+        { "EmeraldGolem", new BossLocation(ELevel.Level_05_A_HowlingGrotto, new Vector2(557, -123), EBits.BITS_8) },
+        { "QueenOfQuills", new BossLocation(ELevel.Level_07_QuillshroomMarsh, new Vector2(1101, -43), EBits.BITS_8) },
         // { "Colos_Susses", new BossLocation(ELevel.Level_08_SearingCrags, new Vector2(364, 311), EBits.BITS_8) },
         { "Manfred", new BossLocation(ELevel.Level_11_A_CloudRuins, new Vector2(1165, -26), EBits.BITS_16) },
         // { "Tower Golem", new BossLocation(ELevel.Level_10_A_TowerOfTime, new Vector2(108, 237), EBits.BITS_16) },

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace MessengerRando.Exceptions;
+namespace MessengerRando;
 
 /// <summary>
 /// Empty rando exception class used to keep track of errors

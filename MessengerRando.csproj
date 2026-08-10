@@ -104,7 +104,6 @@
         <Compile Include="Archipelago\ItemsAndLocationsHandler.cs" />
         <Compile Include="Archipelago\TrackerManager.cs" />
         <Compile Include="APDebug.cs" />
-        <Compile Include="Overrides\AutumnHillsOverrides.cs" />
         <Compile Include="RandomizerException.cs" />
         <Compile Include="Extensions\DimensionManagerExtensions.cs" />
         <Compile Include="Extensions\ELevelExtensions.cs" />

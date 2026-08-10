@@ -65,6 +65,9 @@ public class APRandomizerMain : CourierModule
         // Overrides
         var catacombsOverrides = ServiceLocator.Register(new CatacombsOverrides());
 
+        // Tooling
+        var prefabHunter = ServiceLocator.Register(new PrefabHunter());
+
         foreach (var item in ServiceLocator.GetAll<IOnModLoadHandler>())
             item.OnModLoad();
 
