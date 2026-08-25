@@ -21,6 +21,11 @@ public static class RandoLevelManager
     // ReSharper disable once UnassignedField.Global
     public static Dictionary<string, LevelConstants.RandoLevel> RandoLevelMapping;
 
+    public static bool IsTransitionShuffled
+    {
+        get => RandoLevelMapping != null && RandoLevelMapping.Count > 0;
+    }
+
     [SafeHook(callOrigOnError: true)]
     public static void LoadLevel(On.LevelManager.orig_LoadLevel orig, LevelManager self, LevelLoadingInfo levelInfo)
     {

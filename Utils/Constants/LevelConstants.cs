@@ -87,10 +87,7 @@ public static class LevelConstants
     {
         { "Ninja Village - Right", new RandoLevel(ELevel.Level_01_NinjaVillage, new Vector3(-153.32f, -57f)) },
         { "Autumn Hills - Left", new RandoLevel(ELevel.Level_02_AutumnHills, new Vector3(-304.7717f, -72.99999f)) },
-        {
-            "Autumn Hills - Right",
-            new RandoLevel(ELevel.Level_02_AutumnHills, new Vector3(968.5283f, -27f), EBits.BITS_8)
-        },
+        { "Autumn Hills - Right", new RandoLevel(ELevel.Level_02_AutumnHills, new Vector3(968.5283f, -27f)) },
         {
             "Autumn Hills - Bottom",
             new RandoLevel(ELevel.Level_02_AutumnHills, new Vector3(679.6884f, -139f), EBits.BITS_16)

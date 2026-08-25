@@ -63,6 +63,7 @@ public class APRandomizerMain : CourierModule
         var randoBossManager = ServiceLocator.Register(new RandoBossManager());
 
         // Overrides
+        var autumnHillsOverrides = ServiceLocator.Register(new AutumnHillsOverrides());
         var catacombsOverrides = ServiceLocator.Register(new CatacombsOverrides());
 
         // Tooling

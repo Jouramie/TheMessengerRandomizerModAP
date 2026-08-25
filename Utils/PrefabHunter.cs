@@ -34,4 +34,18 @@ public class PrefabHunter : IOnModLoadHandler
         else
             return Object.Instantiate(GameObject.Find(path));
     }
+
+    public GameObject CreateDimensionPortalSpawner(Transform parent = null)
+    {
+        string path;
+        if (Manager<LevelManager>.Instance.CurrentSceneName == ELevel.Level_02_AutumnHills.SceneName)
+            path = "/DimensionZones/Portals/DimensionPortalSpawner (12)";
+        else
+            throw new RandomizerException("Could not find portal spawner to copy.");
+
+        if (parent != null)
+            return Object.Instantiate(GameObject.Find(path), parent);
+        else
+            return Object.Instantiate(GameObject.Find(path));
+    }
 }
