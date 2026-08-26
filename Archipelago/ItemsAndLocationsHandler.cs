@@ -381,7 +381,7 @@ public static class ItemsAndLocationsHandler
                 Manager<InventoryManager>.Instance.CollectTimeShard(quantity);
                 break;
             case EItems.POWER_SEAL:
-                randoStateManager.PowerSealManager.AddPowerSeal();
+                ServiceLocator.Get<RandoGoalManager>().AddPowerSeal();
                 break;
             case EItems.NONE:
                 try

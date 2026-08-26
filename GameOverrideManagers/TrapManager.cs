@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using MessengerRando.Data;
 using MessengerRando.Utils;
-using MessengerRando.Utils.Constants;
 using Mod.Courier;
 using UnityEngine;
 using Logger = MessengerRando.Utils.Logger;
@@ -98,7 +98,7 @@ public static class TrapManager
             var teleportLoc = TeleportTrapLocations
                 .Where(randoLevel => randoLevel.LevelName.Equals(level.GetCurrentLevelEnum()))
                 .ToList()[0];
-            RandoLevelManager.TeleportInArea(teleportLoc);
+            ServiceLocator.Get<Teleporter>().TeleportTo(teleportLoc);
         }
         else
         {
@@ -121,7 +121,7 @@ public static class TrapManager
         var teleportLoc = TeleportTrapLocations
             .Where(randoLevel => randoLevel.LevelName.Equals(level.GetCurrentLevelEnum()))
             .ToList()[0];
-        RandoLevelManager.TeleportInArea(teleportLoc);
+        ServiceLocator.Get<Teleporter>().TeleportTo(teleportLoc);
     }
 
     public static void ResetPlayerState()
@@ -195,14 +195,14 @@ public static class TrapManager
         },
     };
 
-    private static readonly List<LevelConstants.RandoLevel> TeleportTrapLocations =
+    private static readonly List<LevelData.DestinationLevel> TeleportTrapLocations =
     [
-        new LevelConstants.RandoLevel(ELevel.Level_09_A_GlacialPeak, new Vector3(127, -55)),
+        new LevelData.DestinationLevel(ELevel.Level_09_A_GlacialPeak, new Vector3(127, -55)),
         // new LevelConstants.RandoLevel(ELevel.Level_08_SearingCrags, new Vector3(456, 136)),
-        new LevelConstants.RandoLevel(ELevel.Level_07_QuillshroomMarsh, new Vector3(797, -38)),
-        new LevelConstants.RandoLevel(ELevel.Level_05_B_SunkenShrine, new Vector3(162, -109)),
-        new LevelConstants.RandoLevel(ELevel.Level_05_A_HowlingGrotto, new Vector3(253, -75)),
-        new LevelConstants.RandoLevel(ELevel.Level_02_AutumnHills, new Vector3(458, -50)),
+        new LevelData.DestinationLevel(ELevel.Level_07_QuillshroomMarsh, new Vector3(797, -38)),
+        new LevelData.DestinationLevel(ELevel.Level_05_B_SunkenShrine, new Vector3(162, -109)),
+        new LevelData.DestinationLevel(ELevel.Level_05_A_HowlingGrotto, new Vector3(253, -75)),
+        new LevelData.DestinationLevel(ELevel.Level_02_AutumnHills, new Vector3(458, -50)),
     ];
 
     private static readonly List<ELevel> AvailableTrapLevels = TeleportTrapLocations

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using MessengerRando.Archipelago;
+using MessengerRando.Utils;
 using MessengerRando.Utils.Constants;
 using WebSocketSharp;
 using Logger = MessengerRando.Utils.Logger;
@@ -96,7 +97,7 @@ public static class RandoRoomManager
             if (newRoom.Region.Equals(currentLevel))
                 Manager<Level>.Instance.ChangeRoom(leftEdge, rightEdge, bottomEdge, topEdge, teleportedInRoom);
             else
-                RandoLevelManager.TeleportInArea(newRoom.Region, transition.Position, transition.Dimension);
+                ServiceLocator.Get<Teleporter>().TeleportTo(newRoom.Region, transition.Position, transition.Dimension);
         }
     }
 

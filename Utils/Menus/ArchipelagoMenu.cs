@@ -28,6 +28,7 @@ public class ArchipelagoMenu
 
     public static SubMenuButtonInfo SendChatMessageButton;
     public static SubMenuButtonInfo WindmillShurikenToggleButton;
+    public static SubMenuButtonInfo TestingButton;
     public static SubMenuButtonInfo TeleportToHqButton;
     public static SubMenuButtonInfo TeleportToNinjaVillage;
     public static SubMenuButtonInfo TeleportToSearingShop;
@@ -674,26 +675,54 @@ public class ArchipelagoMenu
             );
 
         //Add teleport to HQ button
-        TeleportToHqButton = RegisterSubRandoButton(() => "Teleport to HQ", APRandomizerMain.OnSelectTeleportToHq);
+        TeleportToHqButton = RegisterSubRandoButton(
+            () => "Teleport to HQ",
+            () =>
+            {
+                CloseMenu();
+                ServiceLocator.Get<Teleporter>().TeleportToTHQ();
+            }
+        );
         TeleportToHqButton.IsEnabled = () =>
             Manager<LevelManager>.Instance.GetCurrentLevelEnum() != ELevel.NONE
             && RandomizerStateManager.IsSafeTeleportState();
 
+#if DEBUG
+        TestingButton = RegisterSubRandoButton(
+            () => "Set testing data",
+            () =>
+            {
+                Manager<ProgressionManager>.Instance.levelsDiscovered.Remove(ELevel.Level_05_B_SunkenShrine);
+                Manager<ProgressionManager>.Instance.cutscenesPlayed.Remove("SunkenShrinePortalOpeningCutscene");
+                CloseMenu();
+            }
+        );
+        TestingButton.IsEnabled = () => true;
+#endif
+
         //Add teleport to Ninja Village button
         TeleportToNinjaVillage = RegisterSubRandoButton(
             () => "Teleport to Ninja Village",
-            APRandomizerMain.OnSelectTeleportToNinjaVillage
+            () =>
+            {
+                CloseMenu();
+                ServiceLocator.Get<Teleporter>().TeleportTo(ELevel.Level_01_NinjaVillage, new Vector2(-153.3f, -56.5f));
+            }
         );
         TeleportToNinjaVillage.IsEnabled = () =>
             Manager<LevelManager>.Instance.GetCurrentLevelEnum() != ELevel.NONE
             && RandomizerStateManager.IsSafeTeleportState()
             && ArchipelagoClient.ServerData?.AvailableTeleports != null
             && ArchipelagoClient.ServerData.AvailableTeleports[0]
-            && RandoLevelManager.RandoLevelMapping == null;
+            && !RandoLevelManager.IsTransitionShuffled;
 
         TeleportToSearingShop = RegisterSubRandoButton(
             () => "Teleport to Searing Crags",
-            APRandomizerMain.OnSelectTeleportToSearing
+            () =>
+            {
+                CloseMenu();
+                ServiceLocator.Get<Teleporter>().TeleportTo(ELevel.Level_08_SearingCrags, new Vector3(380.5f, 311));
+            }
         );
         TeleportToSearingShop.IsEnabled = () =>
             Manager<LevelManager>.Instance.GetCurrentLevelEnum() != ELevel.NONE
@@ -701,7 +730,7 @@ public class ArchipelagoMenu
             && RandomizerStateManager.IsSafeTeleportState()
             && ArchipelagoClient.ServerData?.AvailableTeleports != null
             && ArchipelagoClient.ServerData.AvailableTeleports[1]
-            && RandoLevelManager.RandoLevelMapping == null;
+            && !RandoLevelManager.IsTransitionShuffled;
 
         //Add Archipelago status button
         ArchipelagoStatusButton = RegisterSubRandoButton(
@@ -786,5 +815,12 @@ public class ArchipelagoMenu
             APRandomizerMain.OnSelectArchipelagoCollect
         );
         ArchipelagoCollectButton.IsEnabled = ArchipelagoClient.CanCollect;
+    }
+
+    private static void CloseMenu()
+    {
+        Manager<PauseManager>.Instance.Resume();
+        archipelagoScreen.Close(false);
+        Manager<UIManager>.Instance.CloseAllScreensOfType<OptionScreen>(false);
     }
 }

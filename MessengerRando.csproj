@@ -104,6 +104,7 @@
         <Compile Include="Archipelago\ItemsAndLocationsHandler.cs" />
         <Compile Include="Archipelago\TrackerManager.cs" />
         <Compile Include="APDebug.cs" />
+        <Compile Include="Data\PortalData.cs" />
         <Compile Include="Extensions\LostWoodsExtensions.cs" />
         <Compile Include="Lifecycle\ISaveLifecycleHandler.cs" />
         <Compile Include="Overrides\AutumnHillsOverrides.cs" />
@@ -120,7 +121,7 @@
         <Compile Include="GameOverrideManagers\SkylandsGeneratorManager.cs" />
         <Compile Include="GameOverrideManagers\RandoMusicManager.cs" />
         <Compile Include="GameOverrideManagers\RandoPortalManager.cs" />
-        <Compile Include="GameOverrideManagers\RandoPowerSealManager.cs" />
+        <Compile Include="GameOverrideManagers\RandoGoalManager.cs" />
         <Compile Include="GameOverrideManagers\RandoLevelManager.cs" />
         <Compile Include="GameOverrideManagers\RandoRoomManager.cs" />
         <Compile Include="GameOverrideManagers\RandoShopManager.cs" />
@@ -143,7 +144,7 @@
         <Compile Include="Utils\SafeHookAttribute.cs" />
         <Compile Include="Utils\SeedGenerator.cs" />
         <Compile Include="Utils\Constants\BossConstants.cs" />
-        <Compile Include="Utils\Constants\LevelConstants.cs" />
+        <Compile Include="Data\LevelData.cs" />
         <Compile Include="Utils\Constants\RoomConstants.cs" />
         <Compile Include="Utils\RandomizerOptions.cs" />
         <Compile Include="Utils\RandoSave.cs" />
@@ -154,6 +155,7 @@
         <Compile Include="Utils\ItemRandomizerUtil.cs" />
         <Compile Include="APRandomizerMain.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Utils\Teleporter.cs" />
         <Compile Include="Utils\UserConfig.cs" />
         <Content Include="courier.toml">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

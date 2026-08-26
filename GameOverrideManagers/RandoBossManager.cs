@@ -155,11 +155,9 @@ public class RandoBossManager : IOnModLoadHandler
         else
         {
             bossOverride = true;
-            RandoLevelManager.TeleportInArea(
-                newLocation.BossRegion,
-                newLocation.PlayerPosition,
-                newLocation.PlayerDimension
-            );
+            ServiceLocator
+                .Get<Teleporter>()
+                .TeleportTo(newLocation.BossRegion, newLocation.PlayerPosition, newLocation.PlayerDimension);
         }
     }
 
@@ -208,11 +206,9 @@ public class RandoBossManager : IOnModLoadHandler
         {
             var newPosition = BossLocations[bossName];
 
-            RandoLevelManager.TeleportInArea(
-                newPosition.BossRegion,
-                newPosition.PlayerPosition,
-                newPosition.PlayerDimension
-            );
+            ServiceLocator
+                .Get<Teleporter>()
+                .TeleportTo(newPosition.BossRegion, newPosition.PlayerPosition, newPosition.PlayerDimension);
         }
     }
 

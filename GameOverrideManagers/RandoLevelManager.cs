@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using MessengerRando.Archipelago;
+using MessengerRando.Data;
+using MessengerRando.Extensions;
 using MessengerRando.Utils;
-using MessengerRando.Utils.Constants;
-using MessengerRando.Utils.Menus;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using Logger = MessengerRando.Utils.Logger;
 
 namespace MessengerRando.GameOverrideManagers;
@@ -13,324 +11,267 @@ namespace MessengerRando.GameOverrideManagers;
 public static class RandoLevelManager
 {
     private static readonly Logger logger = Logger.GetLogger(typeof(RandoLevelManager));
-    private static bool teleporting;
-    public static bool KillManfred;
-    private static ELevel lastLevel;
-    private static ELevel currentLevel;
 
-    // ReSharper disable once UnassignedField.Global
-    public static Dictionary<string, LevelConstants.RandoLevel> RandoLevelMapping;
+    private static readonly Dictionary<LevelData.LevelExit, LevelData.DestinationLevel> DestinationReplacements = [];
 
-    public static bool IsTransitionShuffled
+    // Ongoing transition state
+    private static LevelData.DestinationLevel? _ongoingTransitionShuffle = null;
+    private static bool _startOnManfred = false;
+
+    public static bool IsTransitionShuffled { get; private set; } = false;
+    public static bool IsPortalShuffled { get; private set; } = false;
+
+    public static void ApplyHooks()
     {
-        get => RandoLevelMapping != null && RandoLevelMapping.Count > 0;
+        // For current region tracker
+        On.TotHQ.OnInitDone += SafeHook.Wrap<On.TotHQ.hook_OnInitDone>(TotHQ_OnInitDone);
+        On.Shop.Init += SafeHook.Wrap<On.Shop.hook_Init>(Shop_Init);
+        On.Shop.LeaveToCurrentLevel += SafeHook.Wrap<On.Shop.hook_LeaveToCurrentLevel>(Shop_LeaveToCurrentLevel);
+
+        // Portals
+        On.TowerOfTimePortal.LoadLevel += SafeHook.Wrap<On.TowerOfTimePortal.hook_LoadLevel>(
+            TowerOfTimePortal_LoadLevel
+        );
+
+        On.LevelManager.ReinitCurrentLevel += SafeHook.Wrap<On.LevelManager.hook_ReinitCurrentLevel>(
+            LevelManager_ReinitCurrentLevel
+        );
+        On.LevelManager.LoadLevel += SafeHook.Wrap<On.LevelManager.hook_LoadLevel>(LevelManager_LoadLevel);
+
+        On.ElementalSkylandsLevelInitializer.OnBeforeInitDone +=
+            SafeHook.Wrap<On.ElementalSkylandsLevelInitializer.hook_OnBeforeInitDone>(
+                ElementalSkylandsLevelInitializer_OnBeforeInitDone
+            );
+
+        On.LevelInitializer.InitDone += HookMonitor.Debug<On.LevelInitializer.hook_InitDone>();
+        On.ExitPortalCutscene.Play += HookMonitor.Debug<On.ExitPortalCutscene.hook_Play>();
+    }
+
+    public static void Reset()
+    {
+        DestinationReplacements.Clear();
+        _ongoingTransitionShuffle = null;
+        _startOnManfred = false;
+
+        IsTransitionShuffled = false;
+        IsPortalShuffled = false;
+    }
+
+    public static void SetTransitionMapping(Dictionary<LevelData.LevelExit, LevelData.DestinationLevel> mapping)
+    {
+        DestinationReplacements.AddRange(mapping);
+        IsTransitionShuffled = true;
+    }
+
+    public static void SetPortalMapping(Dictionary<LevelData.LevelExit, LevelData.DestinationLevel> mapping)
+    {
+        DestinationReplacements.AddRange(mapping);
+        IsPortalShuffled = true;
+        DestinationReplacements[LevelData.EntranceNameToDestinationLevel["Glacial Peak - Portal"].AsLevelExit()] =
+            LevelData.EntranceNameToDestinationLevel["Sunken Shrine - Portal"];
+    }
+
+    public static void SetSkipMusicBox()
+    {
+        DestinationReplacements.Add(
+            LevelData.EntranceNameToDestinationLevel["Music Box - Left"].AsLevelExit(),
+            LevelData.MusicBoxSkip
+        );
+    }
+
+    private static void TotHQ_OnInitDone(On.TotHQ.orig_OnInitDone orig, TotHQ self)
+    {
+        orig(self);
+        ServiceLocator.Get<TrackerManager>().SetCurrentRegion(ELevel.Level_13_TowerOfTimeHQ);
+    }
+
+    private static void Shop_Init(On.Shop.orig_Init orig, Shop self, ShopParameters shopParameters, bool fakeShop)
+    {
+        orig(self, shopParameters, fakeShop);
+        ServiceLocator.Get<TrackerManager>().SetCurrentRegion(ELevel.Level_13_TowerOfTimeHQ);
+    }
+
+    private static void Shop_LeaveToCurrentLevel(On.Shop.orig_LeaveToCurrentLevel orig, Shop self)
+    {
+        orig(self);
+        ServiceLocator.Get<TrackerManager>().SetCurrentRegion(Manager<LevelManager>.Instance.GetCurrentLevelEnum());
     }
 
     [SafeHook(callOrigOnError: true)]
-    public static void LoadLevel(On.LevelManager.orig_LoadLevel orig, LevelManager self, LevelLoadingInfo levelInfo)
+    private static void LevelManager_ReinitCurrentLevel(
+        On.LevelManager.orig_ReinitCurrentLevel orig,
+        LevelManager self,
+        bool showTransition,
+        ELevelEntranceID levelEntrance,
+        Type reinitCutscene,
+        EBits dimension,
+        bool playMusic
+    )
     {
-        logger.Log("Current Level: {0}", Manager<LevelManager>.Instance.GetCurrentLevelEnum());
-        logger.Log("Loading Level: {0}", levelInfo.levelName);
-        logger.Log("Entrance ID: {0}, Dimension: {1}", levelInfo.levelEntranceId, levelInfo.dimension);
-
-        if (!teleporting)
+        if (_ongoingTransitionShuffle is not null)
         {
-            lastLevel = Manager<LevelManager>.Instance.GetCurrentLevelEnum();
-            var levelName = levelInfo.levelName.Contains("_Build")
-                ? levelInfo.levelName.Replace("_Build", "")
-                : levelInfo.levelName;
-            currentLevel = Manager<LevelManager>.Instance.GetLevelEnumFromLevelName(levelName);
+            var destination = _ongoingTransitionShuffle.Value;
+            logger.Log("Reinitializing level after taking portal; Overriding dimension to {0}", destination.Dimension);
+            dimension = destination.Dimension == EBits.NONE ? dimension : destination.Dimension;
+            levelEntrance = destination.LevelEntrance;
+            _ongoingTransitionShuffle = null;
         }
+
+        ServiceLocator.Get<TrackerManager>().SetCurrentRegion(self.GetCurrentLevelEnum());
+
+        orig(self, showTransition, levelEntrance, reinitCutscene, dimension, playMusic);
+    }
+
+    [SafeHook(callOrigOnError: true)]
+    public static void LevelManager_LoadLevel(
+        On.LevelManager.orig_LoadLevel orig,
+        LevelManager self,
+        LevelLoadingInfo levelInfo
+    )
+    {
+        if (_ongoingTransitionShuffle is not null)
+        {
+            var destination = _ongoingTransitionShuffle.Value;
+            logger.Log("Loading level with transition shuffle; Overriding dimension to {0}", destination.Dimension);
+            levelInfo.dimension = destination.Dimension == EBits.NONE ? levelInfo.dimension : destination.Dimension;
+            levelInfo.levelEntranceId = destination.LevelEntrance;
+            _ongoingTransitionShuffle = null;
+
+            ServiceLocator.Get<TrackerManager>().SetCurrentRegion(ELevel.FromSceneName(levelInfo.levelName));
+            orig(self, levelInfo);
+            return;
+        }
+
+        logger.Log("Current Level: {0}", Manager<LevelManager>.Instance.GetCurrentLevelEnum());
+        logger.Log(
+            "Loading Level: {0}, Entrance: {1}, Dimension: {2}",
+            levelInfo.levelName,
+            levelInfo.levelEntranceId,
+            levelInfo.dimension
+        );
+        logger.Log(
+            "Transition type: {0}, EntranceCutscene: {1}",
+            levelInfo.transitionType?.Name,
+            levelInfo.levelInitializerParams?.entranceCutsceneType
+        );
+
+        TryOverrideWithTransitionRando(levelInfo);
+        ServiceLocator.Get<TrackerManager>().SetCurrentRegion(ELevel.FromSceneName(levelInfo.levelName));
 
         orig(self, levelInfo);
     }
 
-    public static bool WithinRange(float pos1, float pos2)
+    private static bool TryOverrideWithTransitionRando(LevelLoadingInfo levelLoadingInfo)
     {
-        logger.Log("Comparing positions: {0}, {1}", pos1, pos2);
-        var comparison = pos2 - pos1;
-        if (comparison < 0)
-            comparison *= -1;
-        return comparison <= 50;
-    }
+        var targetLevel = ELevel.FromSceneName(levelLoadingInfo.levelName);
+        var targetEntrance = levelLoadingInfo.levelEntranceId;
+        var originalDestination = new LevelData.LevelExit(targetLevel, targetEntrance);
 
-    public static LevelConstants.RandoLevel FindEntrance()
-    {
-        try
+        if (LevelData.LevelExitToExitName.TryGetValue(originalDestination, out var exitName))
         {
-            logger.Log("Looking for entrance we just entered");
-            var playerPos = Manager<PlayerManager>.Instance.Player.transform.position;
-            logger.Log("Last Level: {0}", lastLevel);
-            logger.Log("Current Level: {0}", currentLevel);
-
-            if (RandoLevelMapping == null)
-                return new LevelConstants.RandoLevel(ELevel.NONE, new Vector3());
-
-            string entrance;
-            // this can happen if the player goes to tower from future then back to future
-            if (currentLevel.Equals(ELevel.Level_13_TowerOfTimeHQ) && lastLevel.Equals(ELevel.Level_14_CorruptedFuture))
-            {
-                entrance = "Corrupted Future";
-            }
-            else if (currentLevel.Equals(ELevel.Level_14_CorruptedFuture))
-            {
-                entrance = "Corrupted Future";
-            }
-            else if (RandoPortalManager.EnteredTower)
-            {
-                entrance = "Tower of Time - Left";
-                RandoPortalManager.EnteredTower = false;
-            }
-            else if (
-                !LevelConstants.TransitionToEntranceName.TryGetValue(
-                    new LevelConstants.Transition(lastLevel, currentLevel),
-                    out entrance
-                )
-            )
-                return new LevelConstants.RandoLevel(ELevel.NONE, new Vector3());
-
-            if (LevelConstants.SpecialEntranceNames.Contains(entrance))
-            {
-                Vector3 comparePos;
-                switch (entrance)
-                {
-                    case "Howling Grotto - Right":
-                        comparePos = LevelConstants.EntranceNameToRandoLevel["Howling Grotto - Right"].PlayerPos;
-                        entrance = WithinRange(playerPos.x, comparePos.x)
-                            ? "Howling Grotto - Right"
-                            : "Howling Grotto - Top";
-
-                        break;
-                    case "Quillshroom Marsh - Left":
-                        comparePos = LevelConstants.EntranceNameToRandoLevel["Quillshroom Marsh - Top Left"].PlayerPos;
-                        entrance = WithinRange(playerPos.x, comparePos.x)
-                            ? "Quillshroom Marsh - Top Left"
-                            : "Quillshroom Marsh - Bottom Left";
-
-                        break;
-                    case "Quillshroom Marsh - Right":
-                        comparePos = LevelConstants.EntranceNameToRandoLevel["Quillshroom Marsh - Top Right"].PlayerPos;
-                        entrance = WithinRange(playerPos.x, comparePos.x)
-                            ? "Quillshroom Marsh - Top Right"
-                            : "Quillshroom Marsh - Bottom Right";
-
-                        break;
-                    case "Searing Crags - Left":
-                        comparePos = LevelConstants.EntranceNameToRandoLevel["Searing Crags - Left"].PlayerPos;
-                        entrance = WithinRange(playerPos.x, comparePos.x)
-                            ? "Searing Crags - Left"
-                            : "Searing Crags - Bottom";
-
-                        break;
-                }
-            }
-            logger.Log("Entrance: {0}", entrance);
-            string sourceExit;
-            if (LevelConstants.SpecialConnectionSourceExits.TryGetValue(entrance, out var specialSource))
-            {
-                sourceExit = specialSource + " exit";
-            }
-            else if (entrance.Equals("Corrupted Future"))
-            {
-                sourceExit = "HQ - Artificer's Portal";
-            }
-            else if (entrance.Equals("Tower of Time - Left"))
-            {
-                sourceExit = "HQ - Artificer's Challenge";
-            }
-            else if (entrance.Equals("Glacial Peak - Left"))
-            {
-                sourceExit = "Elemental Skylands - Right exit";
-            }
-            else if (
-                !LevelConstants.TransitionToEntranceName.TryGetValue(
-                    new LevelConstants.Transition(currentLevel, lastLevel),
-                    out sourceExit
-                )
-            )
-            {
-                sourceExit = entrance;
-            }
-            else
-            {
-                sourceExit = sourceExit + " exit";
-            }
-            ServiceLocator.Get<TrackerManager>().AddVisitedEntrance(sourceExit);
-            return RandoLevelMapping[entrance];
+            ServiceLocator.Get<TrackerManager>().AddVisitedEntrance(exitName + " exit");
         }
-        catch (Exception e)
+        else
         {
-            logger.Log("Error while finding entrance: {0}", e);
-        }
-        return new LevelConstants.RandoLevel(ELevel.NONE, new Vector3());
-    }
-
-    public static void EndLevelLoading(On.LevelManager.orig_EndLevelLoading orig, LevelManager self)
-    {
-        orig(self);
-        // i haven't figured out any way to teleport the player between boss rooms yet still
-        // this check is specifically for emerald golem since that boss exists on a transition screen
-        // if (RandoBossManager.OrigToNewBoss != null &&
-        //     RandoRoomManager.IsBossRoom(Manager<Level>.Instance.CurrentRoom.roomKey, out var bossName))
-        // {
-        //     if (RandoBossManager.OrigToNewBoss.TryGetValue(bossName, out bossName))
-        //     {
-        //         try
-        //         {
-        //             RandoBossManager.AdjustPlayerInBossRoom(bossName);
-        //         }
-        //         catch (Exception e)
-        //         {
-        //             logger.Log("Error while adjusting player in boss room: {0}", e);
-        //             throw;
-        //         }
-        //         return;
-        //     }
-        // }
-
-        // if (self.GetCurrentLevelEnum().Equals(ELevel.Level_05_A_HowlingGrotto))
-        // {
-        //     var progManager = Manager<ProgressionManager>.Instance;
-        // progManager.levelsDiscovered.Remove(ELevel.Level_05_B_SunkenShrine);
-        // progManager.allTimeDiscoveredLevels.Remove(ELevel.Level_05_B_SunkenShrine);
-        // }
-
-        if (teleporting)
-        {
-            teleporting = false;
-            AddCurrentRegionToStorage(self);
-            CleanupAfterTeleport();
-            return;
+            exitName = originalDestination.ToString();
         }
 
-        var shouldTeleport =
-            (
-                RandoPortalManager.PortalMapping != null
-                && RandoPortalManager.PortalMapping.Count > 0
-                && RandoPortalManager.LeftHQPortal
-            ) || RandoLevelMapping is { Count: > 0 };
-
-        if (!shouldTeleport)
+        if (!DestinationReplacements.TryGetValue(originalDestination, out var destination))
         {
-            AddCurrentRegionToStorage(self);
+            logger.Log("No transition rando mapping found for exit {0}. Not applying transition rando.", exitName);
+            return false;
         }
 
-        if (
-            currentLevel.Equals(ELevel.Level_11_B_MusicBox) && ServiceLocator.Get<RandomizerStateManager>().SkipMusicBox
-        )
+        if (originalDestination.Equals(LevelData.EntranceNameToDestinationLevel["Searing Crags - Left"]))
         {
-            SkipMusicBox();
-            return;
+            destination = LevelData.EntranceNameToDestinationLevel["Howling Grotto - Bottom"];
         }
 
-        logger.Log("Loaded into level...");
-        logger.Log("Last Level Loaded: {0}", self.lastLevelLoaded);
-        logger.Log("Current Level: {0}", self.GetCurrentLevelEnum());
-        if (self.lastLevelLoaded.Equals(ELevel.Level_13_TowerOfTimeHQ + "_Build"))
+        logger.Log(
+            "Applying transition rando override. Exit: {0} will go to {1} {2}",
+            exitName,
+            destination.LevelName,
+            destination.LevelEntrance
+        );
+
+        levelLoadingInfo.levelName = destination.LevelName.SceneName;
+
+        levelLoadingInfo.levelEntranceId = destination.LevelEntrance;
+        if (levelLoadingInfo.levelEntranceId is ELevelEntranceID.NONE)
+            Manager<ProgressionManager>.Instance.checkpointSaveInfo.loadedLevelPlayerPosition = destination.PlayerPos;
+
+        if (destination.Dimension is not EBits.NONE)
+            levelLoadingInfo.dimension = destination.Dimension;
+
+        // Not removing if cutscene is null because the portal animation is kinda cool. Will see if that causes issues.
+        if (destination.EntranceCutscene is not null)
         {
-            // we just teleported into HQ
-            return;
+            levelLoadingInfo.levelInitializerParams ??= new LevelInitializerParams();
+            levelLoadingInfo.levelInitializerParams.entranceCutsceneType = destination.EntranceCutscene;
         }
 
-        if (RandoPortalManager.LeftHQPortal)
-        {
-            RandoPortalManager.Teleport();
-            return;
-        }
-
-        if (currentLevel.Equals(ELevel.Level_14_CorruptedFuture) || currentLevel.Equals(ELevel.Level_10_A_TowerOfTime))
-        {
-            //have to be handled by the portal manager
-            return;
-        }
-        // level transition shuffling
-        var newLevel = FindEntrance();
-        if (newLevel.Equals(LevelConstants.EntranceNameToRandoLevel["Howling Grotto - Bottom"]))
+        if (destination.Equals(LevelData.EntranceNameToDestinationLevel["Elemental Skylands - Air Shmup"]))
+            _startOnManfred = true;
+        if (destination.Equals(LevelData.EntranceNameToDestinationLevel["Howling Grotto - Bottom"]))
+            // FIXME This won't handle the case where player could die/exit the game and have their game saved there.
             ServiceLocator.Get<LostWoodsManager>().SolveLostWoodsUntilExit();
 
-        if (RandoLevelMapping != null && !newLevel.LevelName.Equals(ELevel.NONE))
-            TeleportInArea(newLevel.LevelName, newLevel.PlayerPos, newLevel.Dimension);
+        return true;
     }
 
-    private static void AddCurrentRegionToStorage(LevelManager self)
+    [SafeHook(callOrigOnError: true)]
+    private static void TowerOfTimePortal_LoadLevel(On.TowerOfTimePortal.orig_LoadLevel orig, TowerOfTimePortal self)
     {
-        if (!ArchipelagoClient.Authenticated)
+        var levelExit = new LevelData.LevelExit(self.nextLevel, self.levelEntrance);
+        if (!DestinationReplacements.TryGetValue(levelExit, out var destination))
+        {
+            logger.Log("Found no replacement destination portal going to {0}", levelExit);
+            orig(self);
             return;
-        // put the region we just loaded into in AP data storage for tracking
-        if (self.lastLevelLoaded.Equals(ELevel.Level_13_TowerOfTimeHQ + "_Build"))
-            ServiceLocator.Get<TrackerManager>().SetCurrentRegion(ELevel.Level_13_TowerOfTimeHQ);
-        else
-            ServiceLocator.Get<TrackerManager>().SetCurrentRegion(self.GetCurrentLevelEnum());
-    }
+        }
 
-    public static void SkipMusicBox()
-    {
-        var playerPosition = ServiceLocator.Get<RandomizerStateManager>().SkipMusicBox
-            ? new Vector2(125, 40)
-            : new Vector2(-428, -55);
+        if (destination.LevelName is ELevel.Level_09_B_ElementalSkylands)
+        {
+            // Reinit does not work very well with Elemental Skylands. There are two specific bugs
+            // 1- Reinit cutscene is set to null, so the portal cutscene does not trigger.
+            // 2- When Reinit to Air Shmup, player is not put on Manfred.
+            //    Or sometimes the Camera moves to Manfred but not the player.
+            // By not handling it here, it forces the portal to reload the scene and reset everything, and it works.
 
-        TeleportInArea(ELevel.Level_11_B_MusicBox, playerPosition, EBits.BITS_16);
-    }
+            logger.Log("Found shuffled destination for portal {0}, but it's going to Elemental Skylands.", levelExit);
+            orig(self);
+            return;
+        }
 
-    public static void TeleportInArea(ELevel area, Vector2 position, EBits dimension = EBits.NONE)
-    {
-#if DEBUG
-        logger.Log("Attempting to teleport to {0}, ({1}, {2}), {3}", area, position.x, position.y, dimension);
-#endif
-        CleanupBeforeTeleport();
-        Manager<ProgressionManager>.Instance.checkpointSaveInfo.loadedLevelPlayerPosition = position;
-        if (dimension.Equals(EBits.NONE))
-            dimension = Manager<DimensionManager>.Instance.currentDimension;
-        LevelLoadingInfo levelLoadingInfo = new LevelLoadingInfo(
-            area + "_Build",
-            true,
-            true,
-            LoadSceneMode.Single,
-            ELevelEntranceID.NONE,
-            dimension
+        ServiceLocator.Get<TrackerManager>().AddVisitedEntrance(LevelData.LevelExitToExitName[levelExit]);
+        logger.Log(
+            "Player entered {0}, overriding destination to {1} {2}",
+            self.name,
+            destination.LevelName,
+            destination.LevelEntrance is ELevelEntranceID.NONE ? destination.PlayerPos : destination.LevelEntrance
         );
-        teleporting = true;
-        Manager<LevelManager>.Instance.LoadLevel(levelLoadingInfo);
+
+        self.nextLevel = destination.LevelName;
+        if (destination.LevelEntrance is ELevelEntranceID.NONE)
+            Manager<ProgressionManager>.Instance.checkpointSaveInfo.loadedLevelPlayerPosition = destination.PlayerPos;
+
+        _ongoingTransitionShuffle = destination;
+
+        orig(self);
+
+        self.nextLevel = levelExit.NextLevel;
+        return;
     }
 
-    public static void TeleportInArea(LevelConstants.RandoLevel teleportLocation)
-    {
-        TeleportInArea(teleportLocation.LevelName, teleportLocation.PlayerPos, teleportLocation.Dimension);
-    }
-
-    public static void ElementalSkylandsInit(
+    [SafeHook(callOrigOnError: true)]
+    private static void ElementalSkylandsLevelInitializer_OnBeforeInitDone(
         On.ElementalSkylandsLevelInitializer.orig_OnBeforeInitDone orig,
         ElementalSkylandsLevelInitializer self
     )
     {
-        if (RandoPortalManager.PortalMapping != null && RandoLevelMapping != null)
-            self.startOnManfred = !KillManfred && teleporting;
-        else if (RandoPortalManager.PortalMapping != null)
-            self.startOnManfred = !KillManfred;
-        else if (RandoLevelMapping != null)
-            self.startOnManfred = teleporting;
+        self.startOnManfred = _startOnManfred;
+        logger.Log("Starting on Manfred {0}", self.startOnManfred);
         orig(self);
-        KillManfred = false;
-    }
-
-    public static void CleanupBeforeOptionsTeleport()
-    {
-        CleanupBeforeTeleport();
-        Manager<PauseManager>.Instance.Resume();
-        ArchipelagoMenu.archipelagoScreen.Close(false);
-        Manager<UIManager>.Instance.CloseAllScreensOfType<OptionScreen>(false);
-    }
-
-    private static void CleanupBeforeTeleport()
-    {
-        Manager<AudioManager>.Instance.StopMusic();
-    }
-
-    public static void CleanupAfterTeleport()
-    {
-        Manager<UIManager>.Instance.CloseAllScreensOfType<CinematicBordersScreen>(false);
-        Manager<UIManager>.Instance.CloseAllScreensOfType<TransitionScreen>(false);
-        Manager<UIManager>.Instance.CloseAllScreensOfType<SavingScreen>(false);
-        Manager<UIManager>.Instance.CloseAllScreensOfType<LoadingAnimation>(false);
+        _startOnManfred = false;
     }
 }

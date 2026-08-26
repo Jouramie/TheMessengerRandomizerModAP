@@ -5,8 +5,8 @@ using System.Linq;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Models;
 using MessengerRando.Archipelago;
+using MessengerRando.Data;
 using MessengerRando.GameOverrideManagers;
-using MessengerRando.Utils.Constants;
 using MessengerRando.Utils.Menus;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -22,8 +22,6 @@ public class RandomizerStateManager
 {
     private static readonly Logger logger = Logger.GetLogger<RandomizerStateManager>();
     public int CurrentFileSlot { set; get; }
-
-    public RandoPowerSealManager PowerSealManager;
 
     // ReSharper disable once UnassignedField.Global
     // gets assigned externally
@@ -100,8 +98,11 @@ public class RandomizerStateManager
             slotData.TryGetValue("deathlink", out var deathLink) ? deathLink : slotData["death_link"]
         );
 
-        PowerSealManager = new RandoPowerSealManager(Convert.ToInt32(slotData["required_seals"]));
-        SkipMusicBox = !Convert.ToBoolean(slotData["music_box"]);
+        ServiceLocator.Get<RandoGoalManager>().SetPowerSealGoal(Convert.ToInt32(slotData["required_seals"]));
+        var isSkipMusicBox = !Convert.ToBoolean(slotData["music_box"]);
+        if (isSkipMusicBox)
+            RandoLevelManager.SetSkipMusicBox();
+
         RandoShopManager.ShopPrices = ((JObject)slotData["shop"]).ToObject<Dictionary<EShopUpgradeID, int>>();
         RandoShopManager.FigurePrices = ((JObject)slotData["figures"]).ToObject<Dictionary<EFigurine, int>>();
 
@@ -128,32 +129,44 @@ public class RandomizerStateManager
         if (slotData.TryGetValue("portal_exits", out var portalExitsJson))
         {
             var portalExits = ((JArray)portalExitsJson).ToObject<List<int>>();
-            RandoPortalManager.PortalMapping = [];
-            foreach (var portalExit in portalExits)
+            if (portalExits.Count > 0)
             {
-                RandoPortalManager.PortalMapping.Add(new RandoPortalManager.Portal(portalExit));
+                var portalMapping = new Dictionary<LevelData.LevelExit, LevelData.DestinationLevel>
+                {
+                    [PortalData.AutumnHillsPortal] = PortalData.DecodePortalDestination(portalExits[0]),
+                    [PortalData.RiviereTurquoisePortal] = PortalData.DecodePortalDestination(portalExits[1]),
+                    [PortalData.HowlingGrottoPortal] = PortalData.DecodePortalDestination(portalExits[2]),
+                    [PortalData.SunkenShrinePortal] = PortalData.DecodePortalDestination(portalExits[3]),
+                    [PortalData.SearingCragsPortal] = PortalData.DecodePortalDestination(portalExits[4]),
+                    [PortalData.GlacialPeakPortal] = PortalData.DecodePortalDestination(portalExits[5]),
+                };
+                RandoLevelManager.SetPortalMapping(portalMapping);
             }
         }
 
         if (slotData.TryGetValue("transitions", out var transitions))
         {
             var transitionPairs = ((JArray)transitions).ToObject<List<List<int>>>();
-            if (transitionPairs.Count == 0)
+            if (transitionPairs.Count > 0)
             {
-                RandoLevelManager.RandoLevelMapping = null;
-            }
-            else
-            {
-                RandoLevelManager.RandoLevelMapping = [];
+                var transitionMapping = new Dictionary<LevelData.LevelExit, LevelData.DestinationLevel>();
+
                 foreach (var pairing in transitionPairs)
                 {
-                    var orig = LevelConstants.TransitionNames[pairing[0]];
-                    var replacement = LevelConstants.EntranceNameToRandoLevel[
-                        LevelConstants.TransitionNames[pairing[1]]
-                    ];
-                    RandoLevelManager.RandoLevelMapping[orig] = replacement;
-                    logger.Log("Replacing transition to {0} by {1}", orig, LevelConstants.TransitionNames[pairing[1]]);
+                    var vanillaDestinationName = LevelData.TransitionNames[pairing[0]];
+                    var vanillaDestination = LevelData.EntranceNameToDestinationLevel[vanillaDestinationName];
+                    var vanilla = vanillaDestination.AsLevelExit();
+
+                    var exitName = LevelData.LevelExitToExitName[vanilla];
+
+                    var newDestinationName = LevelData.TransitionNames[pairing[1]];
+                    var newDestination = LevelData.EntranceNameToDestinationLevel[newDestinationName];
+
+                    transitionMapping[vanilla] = newDestination;
+
+                    logger.Log("Connecting {0} => {1}", exitName, newDestinationName);
                 }
+                RandoLevelManager.SetTransitionMapping(transitionMapping);
             }
         }
 
@@ -181,6 +194,8 @@ public class RandomizerStateManager
 
     public static bool IsSafeTeleportState()
     {
+        // TODO Move that to Teleporter
+
         //Unsafe teleport states are shops/hq/boss fights
         try
         {

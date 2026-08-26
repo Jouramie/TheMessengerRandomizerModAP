@@ -9,7 +9,6 @@ using MessengerRando.GameOverrideManagers;
 using MessengerRando.Lifecycle;
 using MessengerRando.Overrides;
 using MessengerRando.Utils;
-using MessengerRando.Utils.Constants;
 using MessengerRando.Utils.Menus;
 using Mod.Courier;
 using Mod.Courier.Module;
@@ -61,6 +60,7 @@ public class APRandomizerMain : CourierModule
         var skylandsGeneratorManager = ServiceLocator.Register(new SkylandsGeneratorManager());
         var randoStateManager = ServiceLocator.Register(new RandomizerStateManager());
         var randoBossManager = ServiceLocator.Register(new RandoBossManager());
+        var randoGoalManager = ServiceLocator.Register(new RandoGoalManager());
         var lostWoodsManager = ServiceLocator.Register(new LostWoodsManager());
 
         // Overrides
@@ -69,6 +69,7 @@ public class APRandomizerMain : CourierModule
 
         // Tooling
         var prefabHunter = ServiceLocator.Register(new PrefabHunter());
+        var teleporter = ServiceLocator.Register(new Teleporter());
 
         foreach (var item in ServiceLocator.GetAll<IOnModLoadHandler>())
             item.OnModLoad();
@@ -146,30 +147,10 @@ public class APRandomizerMain : CourierModule
         );
         // level teleporting etc management
         On.Level.ChangeRoom += SafeHook.Wrap<On.Level.hook_ChangeRoom>(RandoRoomManager.Level_ChangeRoom);
-        On.LevelManager.LoadLevel += SafeHook.Wrap<On.LevelManager.hook_LoadLevel>(RandoLevelManager.LoadLevel);
-        On.LevelManager.EndLevelLoading += SafeHook.Wrap<On.LevelManager.hook_EndLevelLoading>(
-            RandoLevelManager.EndLevelLoading
-        );
-        On.ElementalSkylandsLevelInitializer.OnBeforeInitDone +=
-            SafeHook.Wrap<On.ElementalSkylandsLevelInitializer.hook_OnBeforeInitDone>(
-                RandoLevelManager.ElementalSkylandsInit
-            );
-        // On.PortalOpeningCutscene.OnOpenPortalEvent += RandoPortalManager.OpenPortalEvent;
-        On.TotHQ.LeaveToLevel += SafeHook.Wrap<On.TotHQ.hook_LeaveToLevel>(RandoPortalManager.LeaveHQ);
-        On.TowerOfTimePortal.LoadLevel += SafeHook.Wrap<On.TowerOfTimePortal.hook_LoadLevel>(
-            RandoPortalManager.TowerOfTimePortal_LoadLevel
-        );
-        //These functions let us override and manage power seals ourselves with 'fake' items
-        On.ProgressionManager.TotalPowerSealCollected +=
-            SafeHook.Wrap<On.ProgressionManager.hook_TotalPowerSealCollected>(
-                ProgressionManager_TotalPowerSealCollected
-            );
-        On.ShopChestOpenCutscene.OnChestOpened += SafeHook.Wrap<On.ShopChestOpenCutscene.hook_OnChestOpened>(
-            (orig, self) => randoStateManager.PowerSealManager?.OnShopChestOpen(orig, self)
-        );
-        On.ShopChestChangeShurikenCutscene.Play += SafeHook.Wrap<On.ShopChestChangeShurikenCutscene.hook_Play>(
-            (orig, self) => randoStateManager.PowerSealManager?.OnShopChestOpen(orig, self)
-        );
+
+        RandoLevelManager.ApplyHooks();
+        RandoPortalManager.ApplyHooks();
+
         //update loops for Archipelago
         Courier.Events.PlayerController.OnUpdate += SafeHook.Wrap(PlayerController_OnUpdate);
         On.InGameHud.OnGUI += SafeHook.Wrap<On.InGameHud.hook_OnGUI>(InGameHud_OnGUI);
@@ -183,7 +164,6 @@ public class APRandomizerMain : CourierModule
             DialogSequence_GetDialogList
         );
         On.Cutscene.Play += SafeHook.Wrap<On.Cutscene.hook_Play>(Cutscene_Play);
-        On.PlayerController.Awake += SafeHook.Wrap<On.PlayerController.hook_Awake>(OnPlayerController_Awake);
 
 #if DEBUG
         On.PhantomIntroCutscene.OnEnterRoom += SafeHook.Wrap<On.PhantomIntroCutscene.hook_OnEnterRoom>(
@@ -214,18 +194,6 @@ public class APRandomizerMain : CourierModule
     private void OnNameSaveUpdate(On.NameSavePopup.orig_Update orig, NameSavePopup self)
     {
         self.OnLetterErased();
-    }
-
-    private void OnPlayerController_Awake(On.PlayerController.orig_Awake orig, PlayerController self)
-    {
-        // try {
-        //     GameObject darkness = Courier.LoadFromAssetBundles<GameObject>("Assets/PrefabInstance/modded/DarkCave_LightStencil.prefab");
-        //     Object.Instantiate(darkness, self.transform);
-        // } catch(Exception e) {
-        //     e.LogDetailed();
-        // }
-
-        orig(self);
     }
 
     private void OnOptionScreenEnable(On.OptionScreen.orig_OnEnable orig, OptionScreen self)
@@ -617,8 +585,7 @@ public class APRandomizerMain : CourierModule
             ArchipelagoClient.OfflineReceivedItems = 0;
             RandoBossManager.DefeatedBosses = [];
             RandoPortalManager.StartingPortals = null;
-            RandoPortalManager.PortalMapping = null;
-            RandoLevelManager.RandoLevelMapping = null;
+            RandoLevelManager.Reset();
             Manager<ProgressionManager>.Instance.powerSealTotal = 0;
             HintMenu.ReBuildHintMenu();
 
@@ -640,14 +607,6 @@ public class APRandomizerMain : CourierModule
         var currentRoom = Manager<Level>.Instance.CurrentRoom.roomKey;
         RandoTimeShardManager.BreakShard(new RandoTimeShardManager.MegaShard(currentLevel, currentRoom));
         orig(self);
-    }
-
-    int ProgressionManager_TotalPowerSealCollected(
-        On.ProgressionManager.orig_TotalPowerSealCollected orig,
-        ProgressionManager self
-    )
-    {
-        return ServiceLocator.Get<RandomizerStateManager>().PowerSealManager?.AmountPowerSealsCollected() ?? orig(self);
     }
 
     void Cutscene_Play(On.Cutscene.orig_Play orig, Cutscene self)
@@ -731,36 +690,6 @@ public class APRandomizerMain : CourierModule
             .useWindmillShuriken;
         InGameHud view = Manager<UIManager>.Instance.GetView<InGameHud>();
         view?.UpdateShurikenVisibility();
-    }
-
-    public static void OnSelectTeleportToHq()
-    {
-        logger.Log("Teleporting to HQ!");
-        RandoLevelManager.CleanupBeforeOptionsTeleport();
-
-        //Load the HQ
-        Manager<TowerOfTimeHQManager>.Instance.TeleportInToTHQ(true, ELevelEntranceID.ENTRANCE_A, null);
-        ServiceLocator.Get<TrackerManager>().SetCurrentRegion(ELevel.Level_13_TowerOfTimeHQ);
-        RandoLevelManager.CleanupAfterTeleport();
-    }
-
-    public static void OnSelectTeleportToNinjaVillage()
-    {
-        logger.Log("Teleporting to Ninja Village.");
-        RandoLevelManager.CleanupBeforeOptionsTeleport();
-        //Load to Ninja Village
-        RandoLevelManager.TeleportInArea(
-            new LevelConstants.RandoLevel(ELevel.Level_01_NinjaVillage, new Vector3(-153.3f, -56.5f))
-        );
-    }
-
-    public static void OnSelectTeleportToSearing()
-    {
-        logger.Log("Teleporting to Searing Crags.");
-        RandoLevelManager.CleanupBeforeOptionsTeleport();
-        RandoLevelManager.TeleportInArea(
-            new LevelConstants.RandoLevel(ELevel.Level_08_SearingCrags, new Vector3(380.5f, 311))
-        );
     }
 
     public static bool OnSelectArchipelagoHost(string answer)
@@ -1012,19 +941,6 @@ public class APRandomizerMain : CourierModule
         if (!ArchipelagoClient.HasConnected)
             return;
         Save?.Update();
-        try
-        {
-            if (RandoPortalManager.LeftHQPortal && RandoPortalManager.ForceTeleport)
-            {
-                RandoPortalManager.Teleport();
-                RandoPortalManager.ForceTeleport = false;
-                return;
-            }
-        }
-        catch (Exception e)
-        {
-            logger.Exception(e);
-        }
 
         // The game calls the save method after the ending cutscene before rolling credits
         if (

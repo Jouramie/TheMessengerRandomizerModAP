@@ -1,4 +1,4 @@
-﻿using MessengerRando.Archipelago;
+using MessengerRando.Archipelago;
 using MessengerRando.Extensions;
 using MessengerRando.Lifecycle;
 using MessengerRando.Utils;

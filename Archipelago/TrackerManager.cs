@@ -107,8 +107,9 @@ public class TrackerManager : IOnBackToTitleHandler
 
     public void SetCurrentRegion(ELevel level)
     {
-        if (ArchipelagoClient.Offline)
+        if (ArchipelagoClient.Offline || lastKnownCurrentRegion == level)
             return;
+
         if (!ArchipelagoClient.Authenticated)
         {
             Synced = false;
@@ -117,5 +118,6 @@ public class TrackerManager : IOnBackToTitleHandler
         }
 
         ArchipelagoClient.Session.DataStorage[Scope.Slot, "CurrentRegion"] = level.ToString();
+        lastKnownCurrentRegion = level;
     }
 }
