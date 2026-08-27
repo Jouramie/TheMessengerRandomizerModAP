@@ -104,6 +104,8 @@
         <Compile Include="Archipelago\ItemsAndLocationsHandler.cs" />
         <Compile Include="Archipelago\TrackerManager.cs" />
         <Compile Include="APDebug.cs" />
+        <Compile Include="Extensions\LostWoodsExtensions.cs" />
+        <Compile Include="Lifecycle\ISaveLifecycleHandler.cs" />
         <Compile Include="Overrides\AutumnHillsOverrides.cs" />
         <Compile Include="RandomizerException.cs" />
         <Compile Include="Extensions\DimensionManagerExtensions.cs" />

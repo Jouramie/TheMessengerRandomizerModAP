@@ -61,6 +61,7 @@ public class APRandomizerMain : CourierModule
         var skylandsGeneratorManager = ServiceLocator.Register(new SkylandsGeneratorManager());
         var randoStateManager = ServiceLocator.Register(new RandomizerStateManager());
         var randoBossManager = ServiceLocator.Register(new RandoBossManager());
+        var lostWoodsManager = ServiceLocator.Register(new LostWoodsManager());
 
         // Overrides
         var autumnHillsOverrides = ServiceLocator.Register(new AutumnHillsOverrides());
@@ -106,7 +107,6 @@ public class APRandomizerMain : CourierModule
             DialogChanger.LoadDialogs_Elanguage
         );
         On.OptionScreen.OnEnable += SafeHook.Wrap<On.OptionScreen.hook_OnEnable>(OnOptionScreenEnable);
-        On.LostWoods.SetAsSolved += SafeHook.Wrap<On.LostWoods.hook_SetAsSolved>(LostWoodsManager.OnSetAsSolved);
         // shop management
         On.UpgradeButtonData.GetPrice += SafeHook.Wrap<On.UpgradeButtonData.hook_GetPrice>(RandoShopManager.GetPrice);
         On.LocalizationManager.GetText += SafeHook.Wrap<On.LocalizationManager.hook_GetText>(RandoShopManager.GetText);
@@ -467,6 +467,9 @@ public class APRandomizerMain : CourierModule
                         $"{item}: {randoStateManager.APSave[randoStateManager.CurrentFileSlot].ReceivedItems[item]}"
                     );
                 }
+
+                foreach (var handler in ServiceLocator.GetAll<ISaveLifecycleHandler>())
+                    handler.OnLoad(randoStateManager.APSave[randoStateManager.CurrentFileSlot]);
             }
             else if (
                 ArchipelagoClient.Authenticated
@@ -483,6 +486,9 @@ public class APRandomizerMain : CourierModule
                 {
                     logger.Exception(e);
                 }
+
+                foreach (var handler in ServiceLocator.GetAll<ISaveLifecycleHandler>())
+                    handler.OnLoad(randoStateManager.APSave[randoStateManager.CurrentFileSlot]);
             }
             else if (ArchipelagoClient.Offline)
             {
@@ -1018,16 +1024,6 @@ public class APRandomizerMain : CourierModule
         catch (Exception e)
         {
             logger.Exception(e);
-        }
-
-        if (LostWoodsManager.NeedsUnsolved)
-        {
-            LostWoodsManager.UnsolveLostWoods();
-        }
-        else if (LostWoodsManager.NeedsSolved)
-        {
-            // just keep trying to solve it until it eventually works lmao
-            LostWoodsManager.SolveLostWoods();
         }
 
         // The game calls the save method after the ending cutscene before rolling credits

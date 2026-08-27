@@ -245,16 +245,9 @@ public static class RandoLevelManager
         }
         // level transition shuffling
         var newLevel = FindEntrance();
-        switch (newLevel.LevelName)
-        {
-            // case ELevel.Level_05_A_HowlingGrotto:
-            //     LostWoodsManager.SolveLostWoods();
-            //     break;
-            case ELevel.Level_05_B_SunkenShrine:
-                LostWoodsManager.ShouldBeSolved = true;
-                LostWoodsManager.SolveLostWoods();
-                break;
-        }
+        if (newLevel.Equals(LevelConstants.EntranceNameToRandoLevel["Howling Grotto - Bottom"]))
+            ServiceLocator.Get<LostWoodsManager>().SolveLostWoodsUntilExit();
+
         if (RandoLevelMapping != null && !newLevel.LevelName.Equals(ELevel.NONE))
             TeleportInArea(newLevel.LevelName, newLevel.PlayerPos, newLevel.Dimension);
     }

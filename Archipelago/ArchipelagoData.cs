@@ -24,6 +24,7 @@ public class ArchipelagoData
     public Dictionary<long, int> ReceivedItems;
     public Dictionary<long, Dictionary<string, List<long>>> LocationData;
     public List<bool> AvailableTeleports;
+    public bool LostWoodsSolved;
 
     public void StartNewSeed()
     {
@@ -34,6 +35,7 @@ public class ArchipelagoData
         CheckedLocations = [];
         ReceivedItems = new Dictionary<long, int>();
         AvailableTeleports = [false, false];
+        LostWoodsSolved = false;
     }
 
     public override string ToString()
@@ -75,6 +77,7 @@ public class ArchipelagoData
                     RandoBossManager.DefeatedBosses = DefeatedBosses = tempServerData.DefeatedBosses ?? [];
                     ReceivedItems = tempServerData.ReceivedItems ?? [];
                     AvailableTeleports = tempServerData.AvailableTeleports ?? [false, false];
+                    LostWoodsSolved = tempServerData.LostWoodsSolved;
 
                     ThreadPool.QueueUserWorkItem(_ =>
                         ArchipelagoClient.Session.Locations.CompleteLocationChecksAsync(
@@ -116,6 +119,7 @@ public class ArchipelagoData
             SlotData = tempServerData.SlotData;
             LocationData = tempServerData.LocationData;
             AvailableTeleports = tempServerData.AvailableTeleports ?? [false, false];
+            LostWoodsSolved = tempServerData.LostWoodsSolved;
 
             //Attempt to connect to the server and save the new data
             logger.Log("Rando save found!");

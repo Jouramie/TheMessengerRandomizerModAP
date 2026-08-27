@@ -1,5 +1,6 @@
 ﻿using System;
 using MessengerRando.Archipelago;
+using MessengerRando.Lifecycle;
 using Mod.Courier.Save;
 using Newtonsoft.Json;
 using WebSocketSharp;
@@ -22,6 +23,8 @@ public class RandoSave : CourierModSave
             return;
         var randoStateManager = ServiceLocator.Get<RandomizerStateManager>();
         randoStateManager.APSave[randoStateManager.CurrentFileSlot] = ArchipelagoClient.ServerData;
+        foreach (var handler in ServiceLocator.GetAll<ISaveLifecycleHandler>())
+            handler.OnSave(randoStateManager.APSave[randoStateManager.CurrentFileSlot]);
 
         if (ArchipelagoClient.Authenticated)
             ArchipelagoClient.SyncLocations();
