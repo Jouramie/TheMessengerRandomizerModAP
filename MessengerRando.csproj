@@ -11,7 +11,7 @@
         <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <Deterministic>true</Deterministic>
-        <Version>0.16.0-beta</Version>
+        <Version>0.16.1-beta</Version>
         <LangVersion>latest</LangVersion>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
