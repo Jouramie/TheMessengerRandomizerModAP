@@ -338,60 +338,66 @@ public static class LevelData
 
     public static readonly Dictionary<LevelExit, string> LevelExitToExitName = new()
     {
-        { new LevelExit(ELevel.Level_02_AutumnHills, ELevelEntranceID.ENTRANCE_A), "Ninja Village - Right" },
-        { new LevelExit(ELevel.Level_01_NinjaVillage, ELevelEntranceID.ENTRANCE_B), "Autumn Hills - Left" },
-        { new LevelExit(ELevel.Level_04_Catacombs, ELevelEntranceID.ENTRANCE_D), "Autumn Hills - Bottom" },
-        { new LevelExit(ELevel.Level_03_ForlornTemple, ELevelEntranceID.ENTRANCE_A), "Autumn Hills - Right" },
-        { new LevelExit(ELevel.Level_06_A_BambooCreek, ELevelEntranceID.ENTRANCE_C), "Forlorn Temple - Right" },
-        { new LevelExit(ELevel.Level_02_AutumnHills, ELevelEntranceID.ENTRANCE_B), "Forlorn Temple - Left" },
-        { new LevelExit(ELevel.Level_04_Catacombs, ELevelEntranceID.ENTRANCE_A), "Forlorn Temple - Bottom" },
-        { new LevelExit(ELevel.Level_02_AutumnHills, ELevelEntranceID.ENTRANCE_D), "Catacombs - Bottom Left" },
-        { new LevelExit(ELevel.Level_06_A_BambooCreek, ELevelEntranceID.ENTRANCE_A), "Catacombs - Right" },
-        { new LevelExit(ELevel.Level_04_B_DarkCave, ELevelEntranceID.ENTRANCE_A), "Catacombs - Bottom" },
-        { new LevelExit(ELevel.Level_03_ForlornTemple, ELevelEntranceID.ENTRANCE_C), "Catacombs - Top Left" },
-        { new LevelExit(ELevel.Level_04_Catacombs, ELevelEntranceID.ENTRANCE_C), "Dark Cave - Right" },
-        { new LevelExit(ELevel.Level_04_C_RiviereTurquoise, ELevelEntranceID.ENTRANCE_A), "Dark Cave - Left" },
-        { new LevelExit(ELevel.Level_04_Catacombs, ELevelEntranceID.ENTRANCE_B), "Bamboo Creek - Bottom Left" },
-        { new LevelExit(ELevel.Level_03_ForlornTemple, ELevelEntranceID.ENTRANCE_B), "Bamboo Creek - Top Left" },
-        { new LevelExit(ELevel.Level_05_A_HowlingGrotto, ELevelEntranceID.ENTRANCE_A), "Bamboo Creek - Right" },
-        { new LevelExit(ELevel.Level_07_QuillshroomMarsh, ELevelEntranceID.ENTRANCE_A), "Howling Grotto - Right" },
-        { new LevelExit(ELevel.Level_06_A_BambooCreek, ELevelEntranceID.ENTRANCE_B), "Howling Grotto - Left" },
-        { new LevelExit(ELevel.Level_07_QuillshroomMarsh, ELevelEntranceID.ENTRANCE_C), "Howling Grotto - Top" },
-        { new LevelExit(ELevel.Level_05_B_SunkenShrine, ELevelEntranceID.ENTRANCE_A), "Howling Grotto - Bottom" },
-        { new LevelExit(ELevel.Level_05_A_HowlingGrotto, ELevelEntranceID.ENTRANCE_D), "Sunken Shrine - Left" },
-        { new LevelExit(ELevel.Level_05_A_HowlingGrotto, ELevelEntranceID.ENTRANCE_B), "Quillshroom Marsh - Top Left" },
+        { new LevelExit(ELevel.Level_02_AutumnHills, ELevelEntranceID.ENTRANCE_A), "Ninja Village - Right exit" },
+        { new LevelExit(ELevel.Level_01_NinjaVillage, ELevelEntranceID.ENTRANCE_B), "Autumn Hills - Left exit" },
+        { new LevelExit(ELevel.Level_04_Catacombs, ELevelEntranceID.ENTRANCE_D), "Autumn Hills - Bottom exit" },
+        { new LevelExit(ELevel.Level_03_ForlornTemple, ELevelEntranceID.ENTRANCE_A), "Autumn Hills - Right exit" },
+        { new LevelExit(ELevel.Level_06_A_BambooCreek, ELevelEntranceID.ENTRANCE_C), "Forlorn Temple - Right exit" },
+        { new LevelExit(ELevel.Level_02_AutumnHills, ELevelEntranceID.ENTRANCE_B), "Forlorn Temple - Left exit" },
+        { new LevelExit(ELevel.Level_04_Catacombs, ELevelEntranceID.ENTRANCE_A), "Forlorn Temple - Bottom exit" },
+        { new LevelExit(ELevel.Level_02_AutumnHills, ELevelEntranceID.ENTRANCE_D), "Catacombs - Bottom Left exit" },
+        { new LevelExit(ELevel.Level_06_A_BambooCreek, ELevelEntranceID.ENTRANCE_A), "Catacombs - Right exit" },
+        { new LevelExit(ELevel.Level_04_B_DarkCave, ELevelEntranceID.ENTRANCE_A), "Catacombs - Bottom exit" },
+        { new LevelExit(ELevel.Level_03_ForlornTemple, ELevelEntranceID.ENTRANCE_C), "Catacombs - Top Left exit" },
+        { new LevelExit(ELevel.Level_04_Catacombs, ELevelEntranceID.ENTRANCE_C), "Dark Cave - Right exit" },
+        { new LevelExit(ELevel.Level_04_C_RiviereTurquoise, ELevelEntranceID.ENTRANCE_A), "Dark Cave - Left exit" },
+        { new LevelExit(ELevel.Level_04_Catacombs, ELevelEntranceID.ENTRANCE_B), "Bamboo Creek - Bottom Left exit" },
+        { new LevelExit(ELevel.Level_03_ForlornTemple, ELevelEntranceID.ENTRANCE_B), "Bamboo Creek - Top Left exit" },
+        { new LevelExit(ELevel.Level_05_A_HowlingGrotto, ELevelEntranceID.ENTRANCE_A), "Bamboo Creek - Right exit" },
+        { new LevelExit(ELevel.Level_07_QuillshroomMarsh, ELevelEntranceID.ENTRANCE_A), "Howling Grotto - Right exit" },
+        { new LevelExit(ELevel.Level_06_A_BambooCreek, ELevelEntranceID.ENTRANCE_B), "Howling Grotto - Left exit" },
+        { new LevelExit(ELevel.Level_07_QuillshroomMarsh, ELevelEntranceID.ENTRANCE_C), "Howling Grotto - Top exit" },
+        { new LevelExit(ELevel.Level_05_B_SunkenShrine, ELevelEntranceID.ENTRANCE_A), "Howling Grotto - Bottom exit" },
+        { new LevelExit(ELevel.Level_05_A_HowlingGrotto, ELevelEntranceID.ENTRANCE_D), "Sunken Shrine - Left exit" },
+        {
+            new LevelExit(ELevel.Level_05_A_HowlingGrotto, ELevelEntranceID.ENTRANCE_B),
+            "Quillshroom Marsh - Top Left exit"
+        },
         {
             new LevelExit(ELevel.Level_05_A_HowlingGrotto, ELevelEntranceID.ENTRANCE_E),
-            "Quillshroom Marsh - Bottom Left"
+            "Quillshroom Marsh - Bottom Left exit"
         },
-        { new LevelExit(ELevel.Level_08_SearingCrags, ELevelEntranceID.ENTRANCE_A), "Quillshroom Marsh - Top Right" },
+        {
+            new LevelExit(ELevel.Level_08_SearingCrags, ELevelEntranceID.ENTRANCE_A),
+            "Quillshroom Marsh - Top Right exit"
+        },
         {
             new LevelExit(ELevel.Level_08_SearingCrags, ELevelEntranceID.ENTRANCE_D),
-            "Quillshroom Marsh - Bottom Right"
+            "Quillshroom Marsh - Bottom Right exit"
         },
-        { new LevelExit(ELevel.Level_09_A_GlacialPeak, ELevelEntranceID.ENTRANCE_A), "Searing Crags - Top" },
-        { new LevelExit(ELevel.Level_07_QuillshroomMarsh, ELevelEntranceID.ENTRANCE_B), "Searing Crags - Left" },
-        { new LevelExit(ELevel.Level_07_QuillshroomMarsh, ELevelEntranceID.ENTRANCE_D), "Searing Crags - Bottom" },
-        { new LevelExit(ELevel.Level_12_UnderWorld, ELevelEntranceID.ENTRANCE_B), "Searing Crags - Right" },
-        { new LevelExit(ELevel.Level_08_SearingCrags, ELevelEntranceID.ENTRANCE_B), "Glacial Peak - Bottom" },
+        { new LevelExit(ELevel.Level_09_A_GlacialPeak, ELevelEntranceID.ENTRANCE_A), "Searing Crags - Top exit" },
+        { new LevelExit(ELevel.Level_07_QuillshroomMarsh, ELevelEntranceID.ENTRANCE_B), "Searing Crags - Left exit" },
+        { new LevelExit(ELevel.Level_07_QuillshroomMarsh, ELevelEntranceID.ENTRANCE_D), "Searing Crags - Bottom exit" },
+        { new LevelExit(ELevel.Level_12_UnderWorld, ELevelEntranceID.ENTRANCE_B), "Searing Crags - Right exit" },
+        { new LevelExit(ELevel.Level_08_SearingCrags, ELevelEntranceID.ENTRANCE_B), "Glacial Peak - Bottom exit" },
         { // Not an actual exit, its the cutscene that triggers it.
             new LevelExit(ELevel.Level_08_SearingCrags, ELevelEntranceID.ENTRANCE_E),
-            "Glacial Peak - Bottom"
+            "Glacial Peak - Bottom exit"
         },
         { // Not an actual exit, its the cutscene that triggers it.
             new LevelExit(ELevel.Level_11_A_CloudRuins, ELevelEntranceID.ENTRANCE_B),
-            "Glacial Peak - Top"
+            "Glacial Peak - Top exit"
         },
         { // Not an actual exit, its the cutscene that triggers it.
             new LevelExit(ELevel.Level_09_B_ElementalSkylands, ELevelEntranceID.ENTRANCE_A),
-            "Glacial Peak - Left"
+            "Glacial Peak - Left exit"
         },
         { // Not an actual exit, its the cutscene that triggers it.
             new LevelExit(ELevel.Level_09_A_GlacialPeak, ELevelEntranceID.ENTRANCE_B),
-            "Elemental Skylands - Right"
+            "Elemental Skylands - Right exit"
         },
-        { new LevelExit(ELevel.Level_09_A_GlacialPeak, ELevelEntranceID.ENTRANCE_C), "Cloud Ruins - Left" },
-        { new LevelExit(ELevel.Level_08_SearingCrags, ELevelEntranceID.ENTRANCE_C), "Underworld - Left" },
+        { new LevelExit(ELevel.Level_09_A_GlacialPeak, ELevelEntranceID.ENTRANCE_C), "Cloud Ruins - Left exit" },
+        { new LevelExit(ELevel.Level_08_SearingCrags, ELevelEntranceID.ENTRANCE_C), "Underworld - Left exit" },
         { new LevelExit(ELevel.Level_02_AutumnHills, ELevelEntranceID.ENTRANCE_C), "HQ - Autumn Hills Portal" },
         {
             new LevelExit(ELevel.Level_04_C_RiviereTurquoise, ELevelEntranceID.ENTRANCE_B),
@@ -401,8 +407,8 @@ public static class LevelData
         { new LevelExit(ELevel.Level_05_B_SunkenShrine, ELevelEntranceID.ENTRANCE_B), "HQ - Sunken Shrine Portal" },
         { new LevelExit(ELevel.Level_05_A_HowlingGrotto, ELevelEntranceID.ENTRANCE_C), "HQ - Howling Grotto Portal" },
         { new LevelExit(ELevel.Level_08_SearingCrags, ELevelEntranceID.ENTRANCE_F), "HQ - Searing Crags Portal" },
-        { new LevelExit(ELevel.Level_10_A_TowerOfTime, ELevelEntranceID.ENTRANCE_A), "Artificer's Challenge" },
-        { new LevelExit(ELevel.Level_14_CorruptedFuture, ELevelEntranceID.ENTRANCE_C), "Artificer's Portal" },
+        { new LevelExit(ELevel.Level_10_A_TowerOfTime, ELevelEntranceID.ENTRANCE_A), "HQ - Artificer's Challenge" },
+        { new LevelExit(ELevel.Level_14_CorruptedFuture, ELevelEntranceID.ENTRANCE_C), "HQ - Artificer's Portal" },
     };
 
     public static readonly List<string> TransitionNames =

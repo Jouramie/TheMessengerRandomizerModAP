@@ -167,7 +167,7 @@ public static class RandoLevelManager
 
         if (LevelData.LevelExitToExitName.TryGetValue(originalDestination, out var exitName))
         {
-            ServiceLocator.Get<TrackerManager>().AddVisitedEntrance(exitName + " exit");
+            ServiceLocator.Get<TrackerManager>().AddVisitedEntrance(exitName);
         }
         else
         {
