@@ -140,6 +140,17 @@ public class RandomizerStateManager
                     [PortalData.SearingCragsPortal] = PortalData.DecodePortalDestination(portalExits[4]),
                     [PortalData.GlacialPeakPortal] = PortalData.DecodePortalDestination(portalExits[5]),
                 };
+                logger.Log(
+                    "Portal mapping:\n\t{0}",
+                    string.Join(
+                        "\n\t",
+                        [
+                            .. portalMapping.Select(pair =>
+                                $"{LevelData.LevelExitToExitName[pair.Key]} => {pair.Value.LevelName} {pair.Value.LevelEntrance}/{pair.Value.PlayerPos}"
+                            ),
+                        ]
+                    )
+                );
                 RandoLevelManager.SetPortalMapping(portalMapping);
             }
         }

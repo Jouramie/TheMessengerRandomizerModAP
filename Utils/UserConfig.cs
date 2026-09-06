@@ -44,25 +44,16 @@ public static class UserConfig
         Port = (int)configTable.get_Item("port").AsInteger.Value;
         SlotName = configTable.get_Item("slot_name").AsString.Value;
         Password = configTable.get_Item("password").AsString.Value;
-        try
-        {
-            StatusTextSize = (float)configTable.get_Item("status_text_size").AsFloat.Value;
-        }
-        catch (Exception e)
-        {
-            logger.Exception(e, "Failed to get status size as float, trying int");
-            StatusTextSize = configTable.get_Item("status_text_size").AsInteger.Value;
-        }
 
-        try
-        {
-            MessageTextSize = (float)configTable.get_Item("message_text_size").AsFloat.Value;
-        }
-        catch (Exception e)
-        {
-            logger.Exception(e, "Failed to get message size as float, trying int");
-            MessageTextSize = configTable.get_Item("message_text_size").AsInteger.Value;
-        }
+        var statusTextSize = configTable.get_Item("status_text_size");
+        StatusTextSize =
+            statusTextSize.AsFloat == null ? statusTextSize.AsInteger.Value : (float)statusTextSize.AsFloat.Value;
+        logger.Debug("Status text size: {0}", StatusTextSize);
+
+        var messageTextSize = configTable.get_Item("message_text_size");
+        MessageTextSize =
+            messageTextSize.AsFloat == null ? messageTextSize.AsInteger.Value : (float)messageTextSize.AsFloat.Value;
+        logger.Debug("Message text size: {0}", MessageTextSize);
 
         if (configTable.HasKey("advancement_color"))
             AdvancementColor = configTable.get_Item("advancement_color").AsString.Value;
@@ -77,6 +68,8 @@ public static class UserConfig
                 }
             );
         }
+        logger.Debug("Advancement color: {0}", AdvancementColor);
+
         if (configTable.HasKey("useful_color"))
             UsefulColor = configTable.get_Item("useful_color").AsString.Value;
         else
@@ -90,6 +83,8 @@ public static class UserConfig
                 }
             );
         }
+        logger.Debug("Useful color: {0}", UsefulColor);
+
         if (configTable.HasKey("trap_color"))
             TrapColor = configTable.get_Item("trap_color").AsString.Value;
         else
@@ -103,6 +98,8 @@ public static class UserConfig
                 }
             );
         }
+        logger.Debug("Trap color: {0}", TrapColor);
+
         if (configTable.HasKey("filler_color"))
             FillerColor = configTable.get_Item("filler_color").AsString.Value;
         else
@@ -116,6 +113,8 @@ public static class UserConfig
                 }
             );
         }
+        logger.Debug("Filler color: {0}", FillerColor);
+
         if (configTable.HasKey("priority_color"))
             PriorityColor = configTable.get_Item("priority_color").AsString.Value;
         else
@@ -125,6 +124,8 @@ public static class UserConfig
                 new TomlString { Value = PriorityColor, Comment = "Hex ID of the color used for Priority hints" }
             );
         }
+        logger.Debug("Priority color: {0}", PriorityColor);
+
         if (configTable.HasKey("avoid_color"))
             AvoidColor = configTable.get_Item("avoid_color").AsString.Value;
         else
@@ -134,6 +135,8 @@ public static class UserConfig
                 new TomlString { Value = AvoidColor, Comment = "Hex ID of the color used for Avoid hints" }
             );
         }
+        logger.Debug("Avoid color: {0}", AvoidColor);
+
         if (configTable.HasKey("no_priority_color"))
             NoPriorityColor = configTable.get_Item("no_priority_color").AsString.Value;
         else
@@ -143,6 +146,8 @@ public static class UserConfig
                 new TomlString { Value = NoPriorityColor, Comment = "Hex ID of the color used for No priority hints" }
             );
         }
+        logger.Debug("No priority color: {0}", NoPriorityColor);
+
         if (configTable.HasKey("unspecified_color"))
             UnspecifiedColor = configTable.get_Item("unspecified_color").AsString.Value;
         else
@@ -152,6 +157,8 @@ public static class UserConfig
                 new TomlString { Value = UnspecifiedColor, Comment = "Hex ID of the color used for Unspecified hints" }
             );
         }
+        logger.Debug("Unspecified color: {0}", UnspecifiedColor);
+
         if (configTable.HasKey("player_color"))
             PlayerColor = configTable.get_Item("player_color").AsString.Value;
         else
@@ -161,6 +168,8 @@ public static class UserConfig
                 new TomlString { Value = PlayerColor, Comment = "Hex ID of the color used for your own name" }
             );
         }
+        logger.Debug("Player color: {0}", PlayerColor);
+
         if (configTable.HasKey("other_player_color"))
             OtherPlayerColor = configTable.get_Item("other_player_color").AsString.Value;
         else
@@ -170,6 +179,8 @@ public static class UserConfig
                 new TomlString { Value = OtherPlayerColor, Comment = "Hex ID of the color used for other players" }
             );
         }
+        logger.Debug("Other player color: {0}", OtherPlayerColor);
+
         if (configTable.HasKey("location_color"))
             LocationColor = configTable.get_Item("location_color").AsString.Value;
         else
@@ -179,20 +190,39 @@ public static class UserConfig
                 new TomlString { Value = LocationColor, Comment = "Hex ID of the color used for locations" }
             );
         }
+        logger.Debug("Location color: {0}", LocationColor);
+
         if (configTable.HasKey("music_shuffle"))
             RandoMusicManager.ShuffleMusic = configTable.get_Item("music_shuffle").AsBoolean.Value;
+        logger.Debug("Music shuffle: {0}", RandoMusicManager.ShuffleMusic);
+
         if (configTable.HasKey("show_status_info"))
             ArchipelagoClient.DisplayStatus = configTable.get_Item("show_status_info").AsBoolean.Value;
+        logger.Debug("Show status info: {0}", ArchipelagoClient.DisplayStatus);
+
         if (configTable.HasKey("show_server_messages"))
             ArchipelagoClient.DisplayAPMessages = configTable.get_Item("show_server_messages").AsBoolean.Value;
+        logger.Debug("Show server messages: {0}", ArchipelagoClient.DisplayAPMessages);
+
         if (configTable.HasKey("filter_server_messages"))
             ArchipelagoClient.FilterAPMessages = configTable.get_Item("filter_server_messages").AsBoolean.Value;
+        logger.Debug("Filter server messages: {0}", ArchipelagoClient.FilterAPMessages);
+
         if (configTable.HasKey("hint_popups"))
             ArchipelagoClient.HintPopUps = configTable.get_Item("hint_popups").AsBoolean.Value;
+        logger.Debug("Hint popups: {0}", ArchipelagoClient.HintPopUps);
+
         if (configTable.HasKey("message_display_timer"))
-            APRandomizerMain.UpdateTime = (float)configTable.get_Item("message_display_timer").AsFloat.Value;
+        {
+            var item = configTable.get_Item("message_display_timer");
+            APRandomizerMain.UpdateTime = item.AsFloat == null ? item.AsInteger.Value : (float)item.AsFloat.Value;
+        }
+
+        logger.Debug("Message display timer: {0}", APRandomizerMain.UpdateTime);
+
         if (configTable.HasKey("shop_hints"))
             RandoShopManager.ShopHints = configTable.get_Item("shop_hints").AsBoolean.Value;
+        logger.Debug("Shop hints: {0}", RandoShopManager.ShopHints);
     }
 
     private static void GenerateConfig(string path)

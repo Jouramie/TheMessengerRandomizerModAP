@@ -67,8 +67,6 @@ public static class RandoLevelManager
     {
         DestinationReplacements.AddRange(mapping);
         IsPortalShuffled = true;
-        DestinationReplacements[LevelData.EntranceNameToDestinationLevel["Glacial Peak - Portal"].AsLevelExit()] =
-            LevelData.EntranceNameToDestinationLevel["Sunken Shrine - Portal"];
     }
 
     public static void SetSkipMusicBox()
@@ -180,11 +178,6 @@ public static class RandoLevelManager
         {
             logger.Log("No transition rando mapping found for exit {0}. Not applying transition rando.", exitName);
             return false;
-        }
-
-        if (originalDestination.Equals(LevelData.EntranceNameToDestinationLevel["Searing Crags - Left"]))
-        {
-            destination = LevelData.EntranceNameToDestinationLevel["Howling Grotto - Bottom"];
         }
 
         logger.Log(
