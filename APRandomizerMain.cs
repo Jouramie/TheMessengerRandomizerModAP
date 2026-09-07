@@ -173,6 +173,8 @@ public class APRandomizerMain : CourierModule
 
         On.UIManager.ShowView += HookMonitor.Debug<On.UIManager.hook_ShowView>();
         On.MusicBox.SetNotesState += HookMonitor.Debug<On.MusicBox.hook_SetNotesState>();
+        On.DimensionPortal.ExpandCoroutine += HookMonitor.Debug<On.DimensionPortal.hook_ExpandCoroutine>();
+        On.DimensionPortal.GoToBackgroundLayer += HookMonitor.Debug<On.DimensionPortal.hook_GoToBackgroundLayer>();
 
         logger.Log("Randomizer finished loading!");
     }
